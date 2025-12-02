@@ -1,0 +1,1216 @@
+[
+	{
+		"in": "dev_assets/items/base_ingot1.png",
+		"out": "dev_out/items/ingot_myrite_{i}.png",
+		"key": "yourmod:myrite",
+		"scheme": "METAL",
+		"variants": 5,
+		"seed": -7046029254386353131,
+		"hueBase": 330,
+		"hueJitterDeg": 10,
+		"satBase": 0.65,
+		"satVar": 0.15,
+		"valBase": 0.70,
+		"valVar": 0.10,
+		"enforceContrast": true,
+		"temperature": 0.05
+	},
+	{
+		"in": "dev_assets/items/base_gem.png",
+		"out": "dev_out/items/gem_storm_{i}.png",
+		"key": "yourmod:stormglass",
+		"scheme": "GEM",
+		"variants": 2,
+		"seed": 42,
+		"hueBase": 180,
+		"hueJitterDeg": 15,
+		"satBase": 0.95,
+		"satVar": 0.10,
+		"valBase": 0.80,
+		"valVar": 0.15,
+		"enforceContrast": true
+	},
+	{
+		"in": "dev_assets/items/base_gem.png",
+		"out": "dev_out/items/gem_storm_alt_{i}.png",
+		"key": "yourmod:stormglass_alt",
+		"scheme": "GEM",
+		"variants": 3,
+		"seed": 424242,
+		"hueBase": 205,
+		"hueJitterDeg": 12,
+		"satBase": 0.90,
+		"satVar": 0.12,
+		"valBase": 0.75,
+		"valVar": 0.18,
+		"enforceContrast": true
+	},
+	{
+		"in": "dev_assets/items/base_ingot2.png",
+		"out": "dev_out/items/ingot_nightsteel_{i}.png",
+		"key": "yourmod:nightsteel",
+		"scheme": "METAL",
+		"variants": 4,
+		"seed": 7766554433,
+		"hueBase": 220,
+		"hueJitterDeg": 8,
+		"satBase": 0.45,
+		"satVar": 0.10,
+		"valBase": 0.76,
+		"valVar": 0.08,
+		"enforceContrast": true,
+		"temperature": -0.1
+	},
+	{
+		"in": "dev_assets/items/base_ingot3.png",
+		"out": "dev_out/items/ingot_sunbrass_{i}.png",
+		"key": "yourmod:sunbrass",
+		"scheme": "METAL",
+		"variants": 3,
+		"seed": 133713371337,
+		"hueBase": 40,
+		"hueJitterDeg": 12,
+		"satBase": 0.80,
+		"satVar": 0.15,
+		"valBase": 0.90,
+		"valVar": 0.05,
+		"enforceContrast": true
+	},
+	{
+		"in": "dev_assets/items/base_ingot4.png",
+		"out": "dev_out/items/ingot_starseam_{i}.png",
+		"key": "yourmod:starseam",
+		"scheme": "METAL_SHIFT",
+		"variants": 5,
+		"seed": 9007199254740991,
+		"hueBase": 270,
+		"hueJitterDeg": 15,
+		"satBase": 0.75,
+		"satVar": 0.12,
+		"valBase": 0.86,
+		"valVar": 0.08,
+		"enforceContrast": true,
+		"roughness": 0.3
+	},
+
+	// ==== Stones (richer color + mottling) ====
+	{
+		"in": "dev_assets/blocks/base_stone.png",
+		"out": "dev_out/blocks/stone_bloodshale_{i}.png",
+		"key": "yourmod:bloodshale",
+		"scheme": "STONE",
+		"variants": 5,
+		"seed": 987654321,
+		"hueBase": 12,
+		"hueJitterDeg": 6,
+		"satBase": 0.22,
+		"satVar": 0.07,
+		"valBase": 0.55,
+		"valVar": 0.15,
+		"enforceContrast": false
+	},
+	{
+		"in": "dev_assets/blocks/base_stone.png",
+		"out": "dev_out/blocks/stone_ashen_basalt_{i}.png",
+		"key": "yourmod:ashen_basalt",
+		"scheme": "STONE",
+		"variants": 4,
+		"seed": 555777999,
+		"hueBase": 8,
+		"hueJitterDeg": 8,
+		"satBase": 0.20,
+		"satVar": 0.06,
+		"valBase": 0.50,
+		"valVar": 0.12,
+		"enforceContrast": false
+	},
+	{
+		"in": "dev_assets/blocks/base_stone.png",
+		"out": "dev_out/blocks/stone_mossy_slate_{i}.png",
+		"key": "yourmod:mossy_slate",
+		"scheme": "STONE",
+		"variants": 3,
+		"seed": 3141592653,
+		"hueBase": 110,
+		"hueJitterDeg": 10,
+		"satBase": 0.26,
+		"satVar": 0.10,
+		"valBase": 0.60,
+		"valVar": 0.18,
+		"enforceContrast": false
+	},
+	{
+		"in": "dev_assets/blocks/base_stone.png",
+		"out": "dev_out/blocks/stone_marrow_granite_{i}.png",
+		"key": "yourmod:marrow_granite",
+		"scheme": "STONE",
+		"variants": 4,
+		"seed": 2718281828,
+		"hueBase": 15,
+		"hueJitterDeg": 7,
+		"satBase": 0.24,
+		"satVar": 0.08,
+		"valBase": 0.58,
+		"valVar": 0.14,
+		"enforceContrast": false
+	},
+	{
+		"in": "dev_assets/blocks/base_stone.png",
+		"out": "dev_out/blocks/stone_weathered_{i}.png",
+		"key": "yourmod:weathered_stone",
+		"scheme": "STONE",
+		"variants": 5,
+		"seed": 987654322,
+		"hueBase": 25,
+		"hueJitterDeg": 8,
+		"satBase": 0.25,
+		"satVar": 0.10,
+		"valBase": 0.60,
+		"valVar": 0.20,
+		"enforceContrast": false
+	},
+	{
+		"in": "dev_assets/items/base_ingot.png",
+		"out": "dev_out/items/ingot_iridalloy_{i}.png",
+		"key": "yourmod:iridalloy",
+		"scheme": "METAL_SHIFT",
+		"variants": 4,
+		"seed": 1337,
+		"hueBase": 205,
+		"hueJitterDeg": 14,
+		"satBase": 0.78,
+		"satVar": 0.12,
+		"valBase": 0.86,
+		"valVar": 0.08,
+		"enforceContrast": true,
+		"roughness": 0.4,
+		"anisotropy": 0.3,
+		"temperature": 0.1
+	},
+	{
+		"bundle": "WOOD_TEXTURE_SET",
+		"keyBase": "yourmod:oak_wood",
+		"name": "oak",
+		"outDir": "dev_out",
+		"palette": {
+			"scheme": "WOOD",
+			"seed": 12345,
+			"hueBase": 30,
+			"hueJitterDeg": 8,
+			"satBase": 0.40,
+			"satVar": 0.10,
+			"valBase": 0.65,
+			"valVar": 0.12,
+			"temperature": 0.10,
+			"enforceContrast": false
+		},
+		"parts": {
+			"planks": { "in": "dev_assets/blocks/_templates/planks_base.png" },
+			"log_side": { "in": "dev_assets/blocks/_templates/log_side_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 30,
+					"hueJitterDeg": 1.5,
+					"satBase": 0.34,
+					"satVar": 0.03,
+					"valBase": 0.46,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"log_top":  { "in": "dev_assets/blocks/_templates/log_top_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 32,          // slightly warmer brown
+					"hueJitterDeg": 1.0,
+					"satBase": 0.38,
+					"satVar": 0.03,
+					"valBase": 0.55,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"stripped_log_side": { "in": "dev_assets/blocks/_templates/stripped_log_side_base.png" },
+			"stripped_log_top":  { "in": "dev_assets/blocks/_templates/stripped_log_top_base.png" },
+			"door_top":     { "in": "dev_assets/blocks/_templates/door_top.png" },
+			"door_bottom":     { "in": "dev_assets/blocks/_templates/door_bottom.png" },
+			"trapdoor": { "in": "dev_assets/blocks/_templates/trapdoor_base.png" },
+			"ladder": { "in": "dev_assets/blocks/_templates/ladder.png" }
+		}
+	},
+	{
+		"bundle": "WOOD_TEXTURE_SET",
+		"keyBase": "yourmod:gold_oak",
+		"name": "gold_oak",
+		"outDir": "dev_out",
+		"palette": {
+			"scheme": "WOOD",
+			"seed": 24681012,
+			"hueBase": 42,
+			"hueJitterDeg": 6,
+			"satBase": 0.42,
+			"satVar": 0.06,
+			"valBase": 0.55,
+			"valVar": 0.04,
+			"brightness": 0.01,
+			"harmony": "ANALOGOUS",
+			"enforceContrast": false
+		},
+		"parts": {
+			"planks": { "in": "dev_assets/blocks/_templates/planks_base.png" },
+			"log_side": { "in": "dev_assets/blocks/_templates/log_side_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 30,          // brown
+					"hueJitterDeg": 1.5,
+					"satBase": 0.34,
+					"satVar": 0.03,
+					"valBase": 0.46,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"log_top":  { "in": "dev_assets/blocks/_templates/log_top_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 32,          // slightly warmer brown
+					"hueJitterDeg": 1.0,
+					"satBase": 0.38,
+					"satVar": 0.03,
+					"valBase": 0.55,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"stripped_log_side": { "in": "dev_assets/blocks/_templates/stripped_log_side_base.png" },
+			"stripped_log_top":  { "in": "dev_assets/blocks/_templates/stripped_log_top_base.png" },
+			"door_top":     { "in": "dev_assets/blocks/_templates/door_top.png" },
+			"door_bottom":     { "in": "dev_assets/blocks/_templates/door_bottom.png" },
+			"trapdoor": { "in": "dev_assets/blocks/_templates/trapdoor_base.png" },
+			"ladder": { "in": "dev_assets/blocks/_templates/ladder.png" }
+		}
+	},
+	{
+		"bundle": "WOOD_TEXTURE_SET",
+		"keyBase": "yourmod:olive_oak",
+		"name": "olive_oak",
+		"outDir": "dev_out",
+		"palette": {
+			"scheme": "WOOD",
+			"seed": 1357911,
+			"hueBase": 110,
+			"hueJitterDeg": 7,
+			"satBase": 0.40,
+			"satVar": 0.10,
+			"valBase": 0.60,
+			"valVar": 0.06,
+			"brightness": 0.00,
+			"harmony": "TRIADIC",
+			"enforceContrast": false
+		},
+		"parts": {
+			"planks": { "in": "dev_assets/blocks/_templates/planks_base.png" },
+			"log_side": { "in": "dev_assets/blocks/_templates/log_side_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 30,          // brown
+					"hueJitterDeg": 1.5,
+					"satBase": 0.34,
+					"satVar": 0.03,
+					"valBase": 0.46,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"log_top":  { "in": "dev_assets/blocks/_templates/log_top_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 32,          // slightly warmer brown
+					"hueJitterDeg": 1.0,
+					"satBase": 0.38,
+					"satVar": 0.03,
+					"valBase": 0.55,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"stripped_log_side": { "in": "dev_assets/blocks/_templates/stripped_log_side_base.png" },
+			"stripped_log_top":  { "in": "dev_assets/blocks/_templates/stripped_log_top_base.png" },
+			"door_top":     { "in": "dev_assets/blocks/_templates/door_top.png" },
+			"door_bottom":     { "in": "dev_assets/blocks/_templates/door_bottom.png" },
+			"trapdoor": { "in": "dev_assets/blocks/_templates/trapdoor_base.png" },
+			"ladder": { "in": "dev_assets/blocks/_templates/ladder.png" }
+		}
+	},
+	{
+		"bundle": "WOOD_TEXTURE_SET",
+		"keyBase": "yourmod:cedar",
+		"name": "cedar",
+		"outDir": "dev_out",
+		"palette": {
+			"scheme": "WOOD",
+			"seed": 9876543,
+			"hueBase": 24,
+			"hueJitterDeg": 5,
+			"satBase": 0.50,
+			"satVar": 0.10,
+			"valBase": 0.62,
+			"valVar": 0.06,
+			"brightness": 0.03,
+			"harmony": "COMPLEMENTARY",
+			"enforceContrast": false
+		},
+		"parts": {
+			"planks": { "in": "dev_assets/blocks/_templates/planks_base.png" },
+			"log_side": { "in": "dev_assets/blocks/_templates/log_side_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 30,          // brown
+					"hueJitterDeg": 1.5,
+					"satBase": 0.34,
+					"satVar": 0.03,
+					"valBase": 0.46,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"log_top":  { "in": "dev_assets/blocks/_templates/log_top_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 32,          // slightly warmer brown
+					"hueJitterDeg": 1.0,
+					"satBase": 0.38,
+					"satVar": 0.03,
+					"valBase": 0.55,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"stripped_log_side": { "in": "dev_assets/blocks/_templates/stripped_log_side_base.png" },
+			"stripped_log_top":  { "in": "dev_assets/blocks/_templates/stripped_log_top_base.png" },
+			"door_top":     { "in": "dev_assets/blocks/_templates/door_top.png" },
+			"door_bottom":     { "in": "dev_assets/blocks/_templates/door_bottom.png" },
+			"trapdoor": { "in": "dev_assets/blocks/_templates/trapdoor_base.png" },
+			"ladder": { "in": "dev_assets/blocks/_templates/ladder.png" }
+		}
+	},
+	// Deep violet (mulberry)
+	{
+		"bundle": "WOOD_TEXTURE_SET",
+		"keyBase": "yourmod:mulberry_wood",
+		"name": "mulberry_wood",
+		"outDir": "dev_out",
+		"palette": {
+			"scheme": "WOOD",
+			"seed": 290001,
+			"hueBase": 290,
+			"hueJitterDeg": 6,
+			"satBase": 0.40,
+			"satVar": 0.10,
+			"valBase": 0.60,
+			"valVar": 0.06,
+			"brightness": 0.01,
+			"harmony": "ANALOGOUS",
+			"enforceContrast": false
+		},
+		"parts": {
+			"planks": { "in": "dev_assets/blocks/_templates/planks_base.png" },
+			"log_side": { "in": "dev_assets/blocks/_templates/log_side_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 30,          // brown
+					"hueJitterDeg": 1.5,
+					"satBase": 0.34,
+					"satVar": 0.03,
+					"valBase": 0.46,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"log_top":  { "in": "dev_assets/blocks/_templates/log_top_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 32,          // slightly warmer brown
+					"hueJitterDeg": 1.0,
+					"satBase": 0.38,
+					"satVar": 0.03,
+					"valBase": 0.55,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"stripped_log_side": { "in": "dev_assets/blocks/_templates/stripped_log_side_base.png" },
+			"stripped_log_top":  { "in": "dev_assets/blocks/_templates/stripped_log_top_base.png" },
+			"door_top":     { "in": "dev_assets/blocks/_templates/door_top.png" },
+			"door_bottom":     { "in": "dev_assets/blocks/_templates/door_bottom.png" },
+			"trapdoor": { "in": "dev_assets/blocks/_templates/trapdoor_base.png" },
+			"ladder": { "in": "dev_assets/blocks/_templates/ladder.png" }
+		}
+	},
+
+	// Cooler lavender (wisteria)
+	{
+		"bundle": "WOOD_TEXTURE_SET",
+		"keyBase": "yourmod:wisteria_wood",
+		"name": "wisteria_wood",
+		"outDir": "dev_out",
+		"palette": {
+			"scheme": "WOOD",
+			"seed": 270002,
+			"hueBase": 265,
+			"hueJitterDeg": 7,
+			"satBase": 0.38,
+			"satVar": 0.10,
+			"valBase": 0.60,
+			"valVar": 0.06,
+			"brightness": 0.00,
+			"harmony": "ANALOGOUS",
+			"enforceContrast": false
+		},
+		"parts": {
+			"planks": { "in": "dev_assets/blocks/_templates/planks_base.png" },
+			"log_side": { "in": "dev_assets/blocks/_templates/log_side_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 30,          // brown
+					"hueJitterDeg": 1.5,
+					"satBase": 0.34,
+					"satVar": 0.03,
+					"valBase": 0.46,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"log_top":  { "in": "dev_assets/blocks/_templates/log_top_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 32,          // slightly warmer brown
+					"hueJitterDeg": 1.0,
+					"satBase": 0.38,
+					"satVar": 0.03,
+					"valBase": 0.55,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"stripped_log_side": { "in": "dev_assets/blocks/_templates/stripped_log_side_base.png" },
+			"stripped_log_top":  { "in": "dev_assets/blocks/_templates/stripped_log_top_base.png" },
+			"door_top":     { "in": "dev_assets/blocks/_templates/door_top.png" },
+			"door_bottom":     { "in": "dev_assets/blocks/_templates/door_bottom.png" },
+			"trapdoor": { "in": "dev_assets/blocks/_templates/trapdoor_base.png" },
+			"ladder": { "in": "dev_assets/blocks/_templates/ladder.png" }
+		}
+	},
+	{
+		"bundle": "WOOD_TEXTURE_SET",
+		"keyBase": "yourmod:teal_wood",
+		"name": "teal_wood",
+		"outDir": "dev_out",
+		"palette": {
+			"scheme": "WOOD",
+			"seed": 42001,
+			"hueBase": 180,
+			"hueJitterDeg": 6,
+			"satBase": 0.38,
+			"satVar": 0.08,
+			"valBase": 0.58,
+			"valVar": 0.05,
+			"brightness": 0.10,
+			"harmony": "ANALOGOUS",
+			"enforceContrast": true
+		},
+		"parts": {
+			"planks": { "in": "dev_assets/blocks/_templates/planks_base.png" },
+			"log_side": { "in": "dev_assets/blocks/_templates/log_side_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 30,          // brown
+					"hueJitterDeg": 1.5,
+					"satBase": 0.34,
+					"satVar": 0.03,
+					"valBase": 0.46,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"log_top":  { "in": "dev_assets/blocks/_templates/log_top_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 32,          // slightly warmer brown
+					"hueJitterDeg": 1.0,
+					"satBase": 0.38,
+					"satVar": 0.03,
+					"valBase": 0.55,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"stripped_log_side": { "in": "dev_assets/blocks/_templates/stripped_log_side_base.png" },
+			"stripped_log_top":  { "in": "dev_assets/blocks/_templates/stripped_log_top_base.png" },
+			"door_top":     { "in": "dev_assets/blocks/_templates/door_top.png" },
+			"door_bottom":     { "in": "dev_assets/blocks/_templates/door_bottom.png" },
+			"trapdoor": { "in": "dev_assets/blocks/_templates/trapdoor_base.png" },
+			"ladder": { "in": "dev_assets/blocks/_templates/ladder.png" }
+		}
+	},
+	{
+		"bundle": "WOOD_TEXTURE_SET",
+		"keyBase": "yourmod:peach_wood",
+		"name": "peach_wood",
+		"outDir": "dev_out",
+		"palette": {
+			"scheme": "WOOD",
+			"seed": 42002,
+			"hueBase": 20,
+			"hueJitterDeg": 5,
+			"satBase": 0.44,
+			"satVar": 0.09,
+			"valBase": 0.64,
+			"valVar": 0.06,
+			"brightness": 0.02,
+			"harmony": "COMPLEMENTARY",
+			"enforceContrast": false
+		},
+		"parts": {
+			"planks": { "in": "dev_assets/blocks/_templates/planks_base.png" },
+			"log_side": { "in": "dev_assets/blocks/_templates/log_side_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 30,          // brown
+					"hueJitterDeg": 1.5,
+					"satBase": 0.34,
+					"satVar": 0.03,
+					"valBase": 0.46,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"log_top":  { "in": "dev_assets/blocks/_templates/log_top_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 32,          // slightly warmer brown
+					"hueJitterDeg": 1.0,
+					"satBase": 0.38,
+					"satVar": 0.03,
+					"valBase": 0.55,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"stripped_log_side": { "in": "dev_assets/blocks/_templates/stripped_log_side_base.png" },
+			"stripped_log_top":  { "in": "dev_assets/blocks/_templates/stripped_log_top_base.png" },
+			"door_top":     { "in": "dev_assets/blocks/_templates/door_top.png" },
+			"door_bottom":     { "in": "dev_assets/blocks/_templates/door_bottom.png" },
+			"trapdoor": { "in": "dev_assets/blocks/_templates/trapdoor_base.png" },
+			"ladder": { "in": "dev_assets/blocks/_templates/ladder.png" }
+		}
+	},
+	{
+		"bundle": "WOOD_TEXTURE_SET",
+		"keyBase": "yourmod:driftwood",
+		"name": "driftwood",
+		"outDir": "dev_out",
+		"palette": {
+			"scheme": "WOOD",
+			"seed": 42003,
+			"hueBase": 200,
+			"hueJitterDeg": 4,
+			"satBase": 0.20,
+			"satVar": 0.06,
+			"valBase": 0.60,
+			"valVar": 0.05,
+			"brightness": 0.02,
+			"harmony": "ANALOGOUS",
+			"enforceContrast": true
+		},
+		"parts": {
+			"planks": { "in": "dev_assets/blocks/_templates/planks_base.png" },
+			"log_side": { "in": "dev_assets/blocks/_templates/log_side_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 30,          // brown
+					"hueJitterDeg": 1.5,
+					"satBase": 0.34,
+					"satVar": 0.03,
+					"valBase": 0.46,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"log_top":  { "in": "dev_assets/blocks/_templates/log_top_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 32,          // slightly warmer brown
+					"hueJitterDeg": 1.0,
+					"satBase": 0.38,
+					"satVar": 0.03,
+					"valBase": 0.55,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"stripped_log_side": { "in": "dev_assets/blocks/_templates/stripped_log_side_base.png" },
+			"stripped_log_top":  { "in": "dev_assets/blocks/_templates/stripped_log_top_base.png" },
+			"door_top":     { "in": "dev_assets/blocks/_templates/door_top.png" },
+			"door_bottom":     { "in": "dev_assets/blocks/_templates/door_bottom.png" },
+			"trapdoor": { "in": "dev_assets/blocks/_templates/trapdoor_base.png" },
+			"ladder": { "in": "dev_assets/blocks/_templates/ladder.png" }
+		}
+	},
+	{
+		"bundle": "WOOD_TEXTURE_SET",
+		"keyBase": "yourmod:emberwood",
+		"name": "emberwood",
+		"outDir": "dev_out",
+		"palette": {
+			"scheme": "WOOD",
+			"seed": 42004,
+			"hueBase": 10,
+			"hueJitterDeg": 7,
+			"satBase": 0.48,
+			"satVar": 0.10,
+			"valBase": 0.52,
+			"valVar": 0.06,
+			"brightness": 0.01,
+			"harmony": "ANALOGOUS",
+			"enforceContrast": false
+		},
+		"parts": {
+			"planks": { "in": "dev_assets/blocks/_templates/planks_base.png" },
+			"log_side": { "in": "dev_assets/blocks/_templates/log_side_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 30,          // brown
+					"hueJitterDeg": 1.5,
+					"satBase": 0.34,
+					"satVar": 0.03,
+					"valBase": 0.46,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"log_top":  { "in": "dev_assets/blocks/_templates/log_top_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 32,          // slightly warmer brown
+					"hueJitterDeg": 1.0,
+					"satBase": 0.38,
+					"satVar": 0.03,
+					"valBase": 0.55,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"stripped_log_side": { "in": "dev_assets/blocks/_templates/stripped_log_side_base.png" },
+			"stripped_log_top":  { "in": "dev_assets/blocks/_templates/stripped_log_top_base.png" },
+			"door_top":     { "in": "dev_assets/blocks/_templates/door_top.png" },
+			"door_bottom":     { "in": "dev_assets/blocks/_templates/door_bottom.png" },
+			"trapdoor": { "in": "dev_assets/blocks/_templates/trapdoor_base.png" },
+			"ladder": { "in": "dev_assets/blocks/_templates/ladder.png" }
+		}
+	},
+	{
+		"bundle": "WOOD_TEXTURE_SET",
+		"name": "olive_ash",
+		"keyBase": "yourmod:olive_ash",
+		"outDir": "dev_out",
+		"palette": {
+			"scheme": "WOOD",
+			"seed": 133,
+			"hueBase": 110,
+			"hueJitterDeg": 6,
+			"satBase": 0.40,
+			"satVar": 0.08,
+			"valBase": 0.60,
+			"valVar": 0.06,
+			"brightness": 0.00,
+			"harmony": "TRIADIC",
+			"enforceContrast": false
+		},
+		"parts": {
+			"planks": { "in": "dev_assets/blocks/_templates/planks_base.png" },
+			"log_side": { "in": "dev_assets/blocks/_templates/log_side_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 30,          // brown
+					"hueJitterDeg": 1.5,
+					"satBase": 0.34,
+					"satVar": 0.03,
+					"valBase": 0.46,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"log_top":  { "in": "dev_assets/blocks/_templates/log_top_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 32,          // slightly warmer brown
+					"hueJitterDeg": 1.0,
+					"satBase": 0.38,
+					"satVar": 0.03,
+					"valBase": 0.55,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"stripped_log_side": { "in": "dev_assets/blocks/_templates/stripped_log_side_base.png",
+				"palette": { "satBase": 0.36, "valBase": 0.58 }
+			},
+			"stripped_log_top":  { "in": "dev_assets/blocks/_templates/stripped_log_top_base.png" },
+			"door_top":     { "in": "dev_assets/blocks/_templates/door_top.png" },
+			"door_bottom":     { "in": "dev_assets/blocks/_templates/door_bottom.png" },
+			"trapdoor": { "in": "dev_assets/blocks/_templates/trapdoor_base.png" },
+			"ladder": { "in": "dev_assets/blocks/_templates/ladder.png" }
+		}
+	},
+	{
+		"bundle": "WOOD_TEXTURE_SET",
+		"keyBase": "yourmod:frostwood",
+		"name": "frostwood",
+		"outDir": "dev_out",
+		"palette": {
+			"scheme": "WOOD",
+			"seed": 42005,
+			"hueBase": 200,
+			"hueJitterDeg": 6,
+			"satBase": 0.35,
+			"satVar": 0.08,
+			"valBase": 0.66,
+			"valVar": 0.06,
+			"brightness": 0.01,
+			"harmony": "TETRADIC",
+			"enforceContrast": false
+		},
+		"parts": {
+			"planks": { "in": "dev_assets/blocks/_templates/planks_base.png" },
+			"log_side": { "in": "dev_assets/blocks/_templates/log_side_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 30,          // brown
+					"hueJitterDeg": 1.5,
+					"satBase": 0.34,
+					"satVar": 0.03,
+					"valBase": 0.46,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"log_top":  { "in": "dev_assets/blocks/_templates/log_top_base.png",
+				"palette": {
+					"scheme": "WOOD",
+					"harmony": "NONE",
+					"temperature": 0,
+					"hueBase": 32,          // slightly warmer brown
+					"hueJitterDeg": 1.0,
+					"satBase": 0.38,
+					"satVar": 0.03,
+					"valBase": 0.55,
+					"valVar": 0.03,
+					"enforceContrast": false
+				}
+			},
+			"stripped_log_side": { "in": "dev_assets/blocks/_templates/stripped_log_side_base.png" },
+			"stripped_log_top":  { "in": "dev_assets/blocks/_templates/stripped_log_top_base.png" },
+			"door_top":     { "in": "dev_assets/blocks/_templates/door_top.png" },
+			"door_bottom":     { "in": "dev_assets/blocks/_templates/door_bottom.png" },
+			"trapdoor": { "in": "dev_assets/blocks/_templates/trapdoor_base.png" },
+			"ladder": { "in": "dev_assets/blocks/_templates/ladder.png" }
+		}
+	},
+
+	// DARKWOOD / WALNUT-ish
+	{
+		"in": "dev_assets/blocks/base_wood.png",
+		"out": "dev_out/blocks/wood_darkwood_{i}.png",
+		"key": "yourmod:darkwood",
+		"scheme": "WOOD",
+		"variants": 3,
+		"seed": 12111,
+		"hueBase": 18,
+		"hueJitterDeg": 5,
+		"satBase": 0.38,
+		"satVar": 0.08,
+		"valBase": 0.46,
+		"valVar": 0.10,
+		"temperature": -0.05,
+		"enforceContrast": true
+	},
+
+	// BIRCH / PALE (cooler highlights)
+	{
+		"in": "dev_assets/blocks/base_wood.png",
+		"out": "dev_out/blocks/wood_birch_{i}.png",
+		"key": "yourmod:birch",
+		"scheme": "WOOD",
+		"variants": 3,
+		"seed": 12221,
+		"hueBase": 28,
+		"hueJitterDeg": 6,
+		"satBase": 0.25,
+		"satVar": 0.08,
+		"valBase": 0.78,
+		"valVar": 0.10,
+		"temperature": -0.05,
+		"enforceContrast": false
+	},
+	// PINE / RESINOUS
+	{
+		"in": "dev_assets/blocks/base_wood.png",
+		"out": "dev_out/blocks/wood_pine_{i}.png",
+		"key": "yourmod:pine",
+		"scheme": "WOOD",
+		"variants": 3,
+		"seed": 12321,
+		"hueBase": 35,
+		"hueJitterDeg": 8,
+		"satBase": 0.50,
+		"satVar": 0.12,
+		"valBase": 0.66,
+		"valVar": 0.12,
+		"temperature": 0.12,
+		"enforceContrast": false
+	},
+	{
+		"in": "dev_assets/items/base_ingot.png",
+		"out": "dev_out/items/ingot_cold_{i}.png",
+		"key": "yourmod:cold",
+		"scheme": "METAL",
+		"variants": 2,
+		"seed": 54321,
+		"preset": "cold",
+		"enforceContrast": true
+	},
+	{
+		"in": "dev_assets/items/base_ingot2.png",
+		"out": "dev_out/items/ingot_copper_{i}.png",
+		"key": "yourmod:copper",
+		"scheme": "METAL",
+		"variants": 3,
+		"seed": 202412,
+		"hueBase": 24,               // orange-red
+		"hueJitterDeg": 4,
+		"satBase": 0.62,
+		"satVar": 0.08,
+		"valBase": 0.78,
+		"valVar": 0.10,
+		"enforceContrast": true,
+		"temperature": 0.00
+	},
+	{
+		"in": "dev_assets/items/base_ingot2.png",
+		"out": "dev_out/items/ingot_weathered_copper_{i}.png",
+		"key": "yourmod:weathered_copper",
+		"scheme": "METAL",
+		"variants": 3,
+		"seed": 202412,
+		"hueBase": 150,              // green shift begins
+		"hueJitterDeg": 6,
+		"satBase": 0.55,
+		"satVar": 0.10,
+		"valBase": 0.70,
+		"valVar": 0.10,
+		"enforceContrast": true,
+		"temperature": -0.04
+	},
+	{
+		"in": "dev_assets/items/base_ingot2.png",
+		"out": "dev_out/items/ingot_verdigris_copper_{i}.png",
+		"key": "yourmod:verdigris_copper",
+		"scheme": "METAL",
+		"variants": 3,
+		"seed": 202412,
+		"hueBase": 175,              // turquoise patina
+		"hueJitterDeg": 8,
+		"satBase": 0.60,
+		"satVar": 0.12,
+		"valBase": 0.74,
+		"valVar": 0.10,
+		"enforceContrast": true,
+		"temperature": -0.08
+	},
+	{
+		"in": "dev_assets/items/base_ingot3.png",
+		"out": "dev_out/items/ingot_bronze_{i}.png",
+		"key": "yourmod:bronze",
+		"scheme": "METAL",
+		"variants": 3,
+		"seed": 202421,
+		"hueBase": 32,               // brown-gold
+		"hueJitterDeg": 4,
+		"satBase": 0.48,
+		"satVar": 0.08,
+		"valBase": 0.76,
+		"valVar": 0.10,
+		"enforceContrast": true,
+		"temperature": -0.05
+	},
+	{
+		"in": "dev_assets/items/base_ingot3.png",
+		"out": "dev_out/items/ingot_aged_bronze_{i}.png",
+		"key": "yourmod:aged_bronze",
+		"scheme": "METAL",
+		"variants": 3,
+		"seed": 202421,
+		"hueBase": 34,               // muted brown
+		"hueJitterDeg": 5,
+		"satBase": 0.42,
+		"satVar": 0.10,
+		"valBase": 0.56,
+		"valVar": 0.12,
+		"enforceContrast": true,
+		"temperature": -0.10
+	},
+	{
+		"in": "dev_assets/items/base_ingot3.png",
+		"out": "dev_out/items/ingot_blackened_bronze_{i}.png",
+		"key": "yourmod:blackened_bronze",
+		"scheme": "METAL",
+		"variants": 3,
+		"seed": 202421,
+		"hueBase": 28,               // deeper brown-red base
+		"hueJitterDeg": 5,
+		"satBase": 0.16,
+		"satVar": 0.08,
+		"valBase": 0.16,
+		"valVar": 0.10,
+		"enforceContrast": true,
+		"temperature": -0.12,
+		"brightness": 0.10
+	},
+	{
+		"in": "dev_assets/items/base_ingot4.png",
+		"out": "dev_out/items/ingot_gold_{i}.png",
+		"key": "yourmod:gold",
+		"scheme": "METAL",
+		"variants": 3,
+		"seed": 202431,
+		"hueBase": 45,
+		"hueJitterDeg": 3,
+		"satBase": 0.58,
+		"satVar": 0.06,
+		"valBase": 0.84,
+		"valVar": 0.08,
+		"enforceContrast": true,
+		"temperature": 0.08
+	},
+	{
+		"in": "dev_assets/items/base_ingot4.png",
+		"out": "dev_out/items/ingot_pale_gold_{i}.png",
+		"key": "yourmod:pale_gold",
+		"scheme": "METAL",
+		"variants": 3,
+		"seed": 202431,
+		"hueBase": 52,               // slightly greener
+		"hueJitterDeg": 3,
+		"satBase": 0.48,
+		"satVar": 0.06,
+		"valBase": 0.86,
+		"valVar": 0.08,
+		"enforceContrast": true,
+		"temperature": 0.02
+	},
+	{
+		"in": "dev_assets/items/base_ingot4.png",
+		"out": "dev_out/items/ingot_antique_gold_{i}.png",
+		"key": "yourmod:antique_gold",
+		"scheme": "METAL",
+		"variants": 3,
+		"seed": 202431,
+		"hueBase": 42,               // warmer, duller
+		"hueJitterDeg": 4,
+		"satBase": 0.40,
+		"satVar": 0.08,
+		"valBase": 0.72,
+		"valVar": 0.10,
+		"enforceContrast": true,
+		"temperature": -0.04
+	},
+	{
+		"in": "dev_assets/items/base_ingot1.png",
+		"out": "dev_out/items/ingot_rose_gold_{i}.png",
+		"key": "yourmod:rose_gold",
+		"scheme": "METAL",
+		"variants": 3,
+		"seed": 202404,
+		"hueBase": 18,
+		"hueJitterDeg": 4,
+		"satBase": 0.54,
+		"satVar": 0.08,
+		"valBase": 0.82,
+		"valVar": 0.09,
+		"enforceContrast": true,
+		"temperature": 0.04
+	},
+	{
+		"in": "dev_assets/items/base_ingot1.png",
+		"out": "dev_out/items/ingot_silver_{i}.png",
+		"key": "yourmod:silver",
+		"scheme": "METAL",
+		"variants": 3,
+		"seed": 202440,
+		"hueBase": 220,              // neutral blue-gray
+		"hueJitterDeg": 2,
+		"satBase": 0.10,
+		"satVar": 0.04,
+		"valBase": 0.88,
+		"valVar": 0.06,
+		"enforceContrast": true,
+		"temperature": -0.02
+	},
+	{
+		"in": "dev_assets/items/base_ingot1.png",
+		"out": "dev_out/items/ingot_tarnished_silver_{i}.png",
+		"key": "yourmod:tarnished_silver",
+		"scheme": "METAL",
+		"variants": 3,
+		"seed": 202441,
+		"hueBase": 210,              // cooler, duller
+		"hueJitterDeg": 3,
+		"satBase": 0.14,
+		"satVar": 0.05,
+		"valBase": 0.72,
+		"valVar": 0.08,
+		"enforceContrast": true,
+		"temperature": -0.06
+	},
+	{
+		"in": "dev_assets/items/base_ingot1.png",
+		"out": "dev_out/items/ingot_blackened_silver_{i}.png",
+		"key": "yourmod:blackened_silver",
+		"scheme": "METAL",
+		"variants": 3,
+		"seed": 202442,
+		"hueBase": 205,              // deepened blue-gray
+		"hueJitterDeg": 3,
+		"satBase": 0.18,
+		"satVar": 0.06,
+		"valBase": 0.30,
+		"valVar": 0.08,
+		"enforceContrast": true,
+		"temperature": -0.12
+	},
+	{
+		"in": "dev_assets/items/base_ingot2.png",
+		"out": "dev_out/items/ingot_wrought_iron_{i}.png",
+		"key": "yourmod:wrought_iron",
+		"scheme": "METAL",
+		"variants": 3,
+		"seed": 202462,
+		"hueBase": 215,
+		"hueJitterDeg": 4,
+		"satBase": 0.10,
+		"satVar": 0.04,
+		"valBase": 0.38,
+		"valVar": 0.06,
+		"temperature": -0.18,
+		"enforceContrast": true,
+		"gamma": 1.35,
+		"rankCurve": 2.2,
+		"rampLo": 0.00,
+		"rampHi": 0.55
+	},
+	{
+		"in": "dev_assets/items/base_ingot2.png",
+		"out": "dev_out/items/ingot_tempered_steel_{i}.png",
+		"key": "yourmod:tempered_steel",
+		"scheme": "METAL",
+		"variants": 3,
+		"seed": 133,
+		"hueBase": 225,
+		"hueJitterDeg": 6,
+		"satBase": 0.16,
+		"satVar": 0.05,
+		"valBase": 0.44,
+		"valVar": 0.07,
+		"temperature": -0.10,
+		"enforceContrast": true,
+		"gamma": 1.25,
+
+		"rankCurve": 1.8,
+		"rampLo": 0.05,
+		"rampHi": 0.65
+	},
+	{
+		"in": "dev_assets/items/base_ingot2.png",
+		"out": "dev_out/items/ingot_blackened_steel_{i}.png",
+		"key": "yourmod:blackened_steel",
+		"scheme": "METAL",
+		"variants": 3,
+		"seed": 133,
+		"hueBase": 210,
+		"hueJitterDeg": 3,
+		"satBase": 0.08,
+		"satVar": 0.03,
+		"valBase": 0.34,
+		"valVar": 0.05,
+		"temperature": -0.22,
+		"enforceContrast": true,
+		"gamma": 1.45,
+
+		"rankCurve": 2.6,
+		"rampLo": 0.00,
+		"rampHi": 0.50
+	},
+	{
+		"in": "dev_assets/blocks/base_stone.png",
+		"out": "dev_out/blocks/stone_marble_{i}.png",
+		"key": "yourmod:marble",
+		"scheme": "STONE",
+		"variants": 5,
+		"seed": 987654321,
+		"hueBase": 0,
+		"hueJitterDeg": 5,
+		"satBase": 0.1,
+		"satVar": 0.05,
+		"valBase": 0.9,
+		"valVar": 0.1,
+		"enforceContrast": false,
+		"brightness": 0.2
+	}
+]

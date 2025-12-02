@@ -1,0 +1,28 @@
+{
+	"schemaVersion": 1,
+	"id": "raa-materials",
+	"version": "${version}",
+	"name": "RAA-Materials",
+	"description": "",
+	"authors": [],
+	"contact": {},
+	"license": "MIT",
+	"icon": "assets/raa-materials/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"client": [
+			"net.vampirestudios.raaMaterials.client.RAAMaterialsClient"
+		],
+		"main": [
+			"net.vampirestudios.raaMaterials.RAAMaterials"
+		]
+	},
+	"mixins": [
+		"raa-materials.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.17.0",
+		"fabric": "*",
+		"minecraft": ">=1.21.8"
+	}
+}
