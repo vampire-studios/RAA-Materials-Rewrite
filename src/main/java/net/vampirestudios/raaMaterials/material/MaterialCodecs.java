@@ -71,7 +71,7 @@ public final class MaterialCodecs {
 			MaterialDef::tier,
 			Form.STREAM_CODEC.apply(ByteBufCodecs.list()),
 			MaterialDef::forms,
-			SpawnSpec.CODEC,
+			SpawnSpec.STREAM_CODEC,
 			MaterialDef::spawn,
 			ByteBufCodecs.optional(ToolMaterialSpec.STREAM_CODEC),
 			MaterialDef::toolSpec,

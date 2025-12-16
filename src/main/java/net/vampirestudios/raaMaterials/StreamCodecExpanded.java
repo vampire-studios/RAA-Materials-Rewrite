@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Function;
 
 public interface StreamCodecExpanded {
-	static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> StreamCodec<B, C> composite(
+	static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> StreamCodec<B, C> composite(
 			StreamCodec<? super B, T1> streamCodec,
 			Function<C, T1> function,
 			StreamCodec<? super B, T2> streamCodec2,
@@ -36,7 +36,7 @@ public interface StreamCodecExpanded {
 	) {
 		return new StreamCodec<>() {
 			@Override
-			public @NotNull C decode(B object) {
+			public @NotNull C decode(@NotNull B object) {
 				T1 object2 = streamCodec.decode(object);
 				T2 object3 = streamCodec2.decode(object);
 				T3 object4 = streamCodec3.decode(object);
@@ -54,7 +54,7 @@ public interface StreamCodecExpanded {
 			}
 
 			@Override
-			public void encode(B object, C object2) {
+			public void encode(@NotNull B object, @NotNull C object2) {
 				streamCodec.encode(object, function.apply(object2));
 				streamCodec2.encode(object, function2.apply(object2));
 				streamCodec3.encode(object, function3.apply(object2));

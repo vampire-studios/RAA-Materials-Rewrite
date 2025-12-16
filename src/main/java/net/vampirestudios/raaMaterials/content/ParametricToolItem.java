@@ -33,7 +33,7 @@ public class ParametricToolItem extends Item {
 		ResourceLocation mat = stack.get(YComponents.MATERIAL);
 		Optional<MaterialDef> def = ClientMaterialCache.byRL(mat);
 		return Component.literal(def
-				.map(d -> name.replace("%s", d.displayName()))
+				.map(d -> name.replace("%s", d.nameInformation().displayName()))
 				.orElse(name.replace("%s ", ""))
 		);
 	}

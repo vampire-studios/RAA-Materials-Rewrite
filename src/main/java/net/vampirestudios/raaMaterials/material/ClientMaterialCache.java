@@ -18,7 +18,7 @@ public final class ClientMaterialCache {
 	}
 
 	public static Optional<MaterialDef> byRL(ResourceLocation rl) {
-		return set.all().stream().filter(m -> m.id().equals(rl)).findFirst();
+		return set.all().stream().filter(m -> m.nameInformation().id().equals(rl)).findFirst();
 	}
 
 	public static Optional<MaterialDef> byIndex(int idx) {
@@ -28,7 +28,7 @@ public final class ClientMaterialCache {
 	public static Optional<Integer> indexOf(ResourceLocation rl) {
 		var all = set.all();
 		for (int i = 0; i < all.size(); i++) {
-			if (all.get(i).id().equals(rl)) {
+			if (all.get(i).nameInformation().id().equals(rl)) {
 				return Optional.of(i);
 			}
 		}

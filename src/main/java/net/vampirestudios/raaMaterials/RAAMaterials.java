@@ -42,7 +42,7 @@ public class RAAMaterials implements ModInitializer {
 			if (a.byForm().isEmpty()) {
 				// Collect candidate materials (server-side IDs)
 				var mats = net.vampirestudios.raaMaterials.material.MaterialRegistry
-						.all(overworld).stream().map(MaterialDef::id).toList();
+						.all(overworld).stream().map(m -> m.nameInformation().id()).toList();
 
 				// Choose which forms participate in the lottery (put your unique forms here)
 				// NOTE: keep this list in data if you want it fully data-driven.

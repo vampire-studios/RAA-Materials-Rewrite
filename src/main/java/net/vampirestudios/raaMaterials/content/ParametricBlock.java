@@ -30,7 +30,7 @@ public class ParametricBlock extends Block {
 		int idx = state.getValue(MAT);
 
 		// Resolve the material id from the index
-		ClientMaterialCache.byIndex(idx).ifPresent(def -> stack.set(YComponents.MATERIAL, def.id()));
+		ClientMaterialCache.byIndex(idx).ifPresent(def -> stack.set(YComponents.MATERIAL, def.nameInformation().id()));
 
 		// Also stamp the exact blockstate so placement preserves MAT even without lookups
 		stack.set(net.minecraft.core.component.DataComponents.BLOCK_STATE,

@@ -4,6 +4,9 @@ package net.vampirestudios.raaMaterials.material;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
@@ -23,6 +26,27 @@ public record VeinSpec(
 		int branchCount,          // small offshoots per vein
 		float densityFalloff      // 0..1: thinner ends (0 none, 1 strong)
 ) implements SpawnSpec {
+	public static final StreamCodec<RegistryFriendlyByteBuf, VeinSpec> STREAM_CODEC = StreamCodec.composite(
+			ResourceLocation.STREAM_CODEC.apply(ByteBufCodecs.list()),
+			VeinSpec::biomeTags,
+			SpawnSpecStreamCodecs.TARGET.apply(ByteBufCodecs.list()),
+			VeinSpec::replaceables,
+			SpawnSpecStreamCodecs.Y_BAND,
+			VeinSpec::y,
+			ByteBufCodecs.INT,
+			VeinSpec::veinSize,
+			ByteBufCodecs.INT,
+			VeinSpec::veinsPerChunk,
+			ByteBufCodecs.FLOAT,
+			VeinSpec::wobbleScale,
+			ByteBufCodecs.FLOAT,
+			VeinSpec::verticality,
+			ByteBufCodecs.INT,
+			VeinSpec::branchCount,
+			ByteBufCodecs.FLOAT,
+			VeinSpec::densityFalloff,
+			VeinSpec::new
+	);
 	public static final MapCodec<VeinSpec> MAP_CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
 			ResourceLocation.CODEC.listOf().fieldOf("biomes").forGetter(VeinSpec::biomeTags),
 			Target.CODEC.listOf().fieldOf("targets").forGetter(VeinSpec::replaceables),

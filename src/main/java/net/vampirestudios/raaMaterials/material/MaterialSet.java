@@ -19,7 +19,7 @@ public record MaterialSet(List<MaterialDef> all) {
 	public static MaterialSet DEFAULT = new MaterialSet(List.of());
 
 	public Optional<MaterialDef> byId(ResourceLocation id) {
-		return all.stream().filter(m -> m.id().equals(id)).findFirst();
+		return all.stream().filter(m -> m.nameInformation().id().equals(id)).findFirst();
 	}
 
 	public Optional<MaterialDef> byIndex(int idx) {

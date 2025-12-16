@@ -40,16 +40,6 @@ public record GeodeSpec(
 	).apply(inst, GeodeSpec::new));
 	public static final Codec<GeodeSpec> CODEC = MAP_CODEC.codec();
 
-	public GeodeSpec(List<ResourceLocation> biomeTags, List<Target> replaceables, YBand y,
-					 int attemptsPerChunk, int outerRadius, int innerRadius) {
-		this.biomeTags = List.copyOf(biomeTags);
-		this.replaceables = List.copyOf(replaceables);
-		this.y = y;
-		this.attemptsPerChunk = attemptsPerChunk;
-		this.outerRadius = outerRadius;
-		this.innerRadius = innerRadius;
-	}
-
 	@Override
 	public Mode mode() {
 		return Mode.GEODE;

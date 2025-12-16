@@ -38,7 +38,7 @@ public final class MaterialRegistry {
 		if (set == null) return Optional.empty();
 		var all = set.all();
 		for (int i = 0; i < all.size(); i++) {
-			if (all.get(i).id().equals(id)) {
+			if (all.get(i).nameInformation().id().equals(id)) {
 				return Optional.of(i);
 			}
 		}

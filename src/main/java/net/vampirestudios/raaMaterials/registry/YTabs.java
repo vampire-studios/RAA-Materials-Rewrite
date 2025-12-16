@@ -34,14 +34,14 @@ public final class YTabs {
 
 	private static void add(CreativeModeTab.Output out, MaterialDef def, Item item) {
 		ItemStack s = new ItemStack(item);
-		s.set(YComponents.MATERIAL, def.id());
+		s.set(YComponents.MATERIAL, def.nameInformation().id());
 		out.accept(s);
 	}
 
 	private static void addBlock(CreativeModeTab.Output output, MaterialDef def, int idx, Form form, Item item) {
 		if (def.forms().contains(form)) {
 			ItemStack stack = new ItemStack(item);
-			stack.set(YComponents.MATERIAL, def.id());
+			stack.set(YComponents.MATERIAL, def.nameInformation().id());
 			stack.set(DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(ParametricBlock.MAT, idx));
 			output.accept(stack);
 		}

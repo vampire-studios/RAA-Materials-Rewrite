@@ -11,7 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.List;
 import java.util.Optional;
 
-public sealed interface SpawnSpec permits CaveLiningSpec, ColumnSpec, DripNoduleSpec, GiantNodeSpec, MagmaticSpec, PocketSpec, SheetVeinSpec, SurfaceNodeSpec, ClusterSpec, GeodeSpec, MeteoriteSpec, StrataSpec, VeinSpec {
+public interface SpawnSpec/* permits CaveLiningSpec, ColumnSpec, DripNoduleSpec, GiantNodeSpec, MagmaticSpec, PocketSpec, SheetVeinSpec, SurfaceNodeSpec, ClusterSpec, GeodeSpec, MeteoriteSpec, StrataSpec, VeinSpec*/ {
 	Mode mode();
 	List<ResourceLocation> biomeTags();      // e.g. #minecraft:is_overworld
 	List<Target> replaceables();             // tag or block targets

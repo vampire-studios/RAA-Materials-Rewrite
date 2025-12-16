@@ -70,11 +70,12 @@ public final class OverworldSpawnProfiles {
 	}
 
 	private static GeodeSpec geode(MaterialKind kind, Random rng) {
-		var y = YBand.triangle(-32, 70, 8 + rng.nextInt(24));
-		int attempts = 1 + rng.nextInt(2);
-		var repl = List.of(Target.tag(T_STONE), Target.tag(T_DEEPSLATE));
-		var biomes = List.of(OW);
-		return new GeodeSpec(biomes, repl, y, attempts);
+//		var y = YBand.triangle(-32, 70, 8 + rng.nextInt(24));
+//		int attempts = 1 + rng.nextInt(2);
+//		var repl = List.of(Target.tag(T_STONE), Target.tag(T_DEEPSLATE));
+//		var biomes = List.of(OW);
+//		return new GeodeSpec(biomes, repl, y, attempts);
+		return null;
 	}
 
 	// -------- NEW MODES (same pattern) --------------------------------------

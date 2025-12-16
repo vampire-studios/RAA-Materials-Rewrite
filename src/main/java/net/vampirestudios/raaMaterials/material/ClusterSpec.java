@@ -23,16 +23,23 @@ public record ClusterSpec(List<ResourceLocation> biomeTags, List<Target> replace
             Target.CODEC.listOf().fieldOf("targets").forGetter(ClusterSpec::replaceables),
             YBand.CODEC.fieldOf("y").forGetter(ClusterSpec::y),
             Codec.INT.fieldOf("cluster_size").forGetter(ClusterSpec::clusterSize),
-            Codec.INT.fieldOf("clusters_per_chunk").forGetter(ClusterSpec::clustersPerChunk)
+            Codec.INT.fieldOf("clusters_per_chunk").forGetter(ClusterSpec::clustersPerChunk),
+			Codec.INT.fieldOf("spread").forGetter(ClusterSpec::spread),
+			Codec.BOOL.fieldOf("attach_to_cave").forGetter(ClusterSpec::attachToCave),
+			Codec.FLOAT.fieldOf("spread").forGetter(ClusterSpec::sphericity)
     ).apply(inst, ClusterSpec::new));
     public static final Codec<ClusterSpec> CODEC = MAP_CODEC.codec();
 
-    public ClusterSpec(List<ResourceLocation> biomeTags, List<Target> replaceables, YBand y, int clusterSize, int clustersPerChunk) {
+    public ClusterSpec(List<ResourceLocation> biomeTags, List<Target> replaceables, YBand y, int clusterSize, int clustersPerChunk,
+					   int spread, boolean attachToCave, float sphericity) {
         this.biomeTags = List.copyOf(biomeTags);
         this.replaceables = List.copyOf(replaceables);
         this.y = y;
         this.clusterSize = clusterSize;
         this.clustersPerChunk = clustersPerChunk;
+		this.spread = spread;
+		this.attachToCave = attachToCave;
+		this.sphericity = sphericity;
     }
 
     @Override

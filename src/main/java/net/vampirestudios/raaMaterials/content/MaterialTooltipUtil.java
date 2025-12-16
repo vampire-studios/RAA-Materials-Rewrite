@@ -35,16 +35,16 @@ public final class MaterialTooltipUtil {
 		// line 2–4: Spawn
 		var s = def.spawn();
 		if (s != null) {
-			lines.accept(Component.translatable("text.raa_materials.spawn",
-							Component.translatable(spawnModeKey(s.mode())),
-							s.minY(), s.maxY())
-					.withStyle(ChatFormatting.DARK_GRAY));
+//			lines.accept(Component.translatable("text.raa_materials.spawn",
+//							Component.translatable(spawnModeKey(s)),
+//							s.minY(), s.maxY())
+//					.withStyle(ChatFormatting.DARK_GRAY));
 
 			if (Screen.hasShiftDown()) {
-				var host = tagsLineKeyed("text.raa_materials.tags.host", s.replaceableTag());
-				if (host != null) lines.accept(host.copy().withStyle(ChatFormatting.DARK_GRAY));
-				var biomes = tagsLineKeyed("text.raa_materials.tags.biomes", s.biomeTag());
-				if (biomes != null) lines.accept(biomes.copy().withStyle(ChatFormatting.DARK_GRAY));
+//				var host = tagsLineKeyed("text.raa_materials.tags.host", s.replaceables());
+//				if (host != null) lines.accept(host.copy().withStyle(ChatFormatting.DARK_GRAY));
+//				var biomes = tagsLineKeyed("text.raa_materials.tags.biomes", s.biomeTag());
+//				if (biomes != null) lines.accept(biomes.copy().withStyle(ChatFormatting.DARK_GRAY));
 			} else {
 				lines.accept(Component.translatable("text.raa_materials.hint.shift")
 						.withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
