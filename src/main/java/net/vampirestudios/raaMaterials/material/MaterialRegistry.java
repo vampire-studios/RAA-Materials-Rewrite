@@ -22,45 +22,29 @@ public final class MaterialRegistry {
 		return MAP.get(dim);
 	}
 
-	// --- Helpers for MAT property lookups ---
-
-	/** Get the material definition by its index for this level's dimension. */
 	public static Optional<MaterialDef> byIndex(ServerLevel level, int idx) {
 		var set = get(level.dimension());
-		if (set == null) return Optional.empty();
-		var all = set.all();
-		return (idx >= 0 && idx < all.size()) ? Optional.of(all.get(idx)) : Optional.empty();
+		return set != null ? set.byIndex(idx) : Optional.empty();
 	}
 
-	/** Resolve the index of a given material Identifier within this level's dimension set. */
 	public static Optional<Integer> indexOf(ServerLevel level, Identifier id) {
 		var set = get(level.dimension());
-		if (set == null) return Optional.empty();
-		var all = set.all();
-		for (int i = 0; i < all.size(); i++) {
-			if (all.get(i).nameInformation().id().equals(id)) {
-				return Optional.of(i);
-			}
-		}
-		return Optional.empty();
+		return set != null ? set.indexOf(id) : Optional.empty();
 	}
 
 	public static List<MaterialDef> all(ServerLevel level) {
 		var set = get(level.dimension());
 		if (set == null) return List.of();
-		var all = set.all();
-		if (all.isEmpty()) return List.of();
-		return all;
+		return set.all();
 	}
 
-	// --- NEW: level-agnostic overloads (server → registry, client → cache) ---
 	public static Optional<MaterialDef> byIndex(Level level, int idx) {
 		if (level instanceof ServerLevel sl) return byIndex(sl, idx);
-		return ClientMaterialCache.byIndex(idx); // client cache
+		return ClientMaterialCache.byIndex(idx);
 	}
 
 	public static Optional<Integer> indexOf(Level level, Identifier id) {
 		if (level instanceof ServerLevel sl) return indexOf(sl, id);
-		return ClientMaterialCache.indexOf(id); // client cache
+		return ClientMaterialCache.indexOf(id);
 	}
 }

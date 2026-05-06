@@ -5,7 +5,6 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.level.ServerLevel;
 import net.vampirestudios.raaMaterials.material.*;
 import net.vampirestudios.raaMaterials.net.NetworkInit;
 import net.vampirestudios.raaMaterials.net.ServerSend;
@@ -13,6 +12,7 @@ import net.vampirestudios.raaMaterials.registry.RAARegistries;
 import net.vampirestudios.raaMaterials.registry.YBlocks;
 import net.vampirestudios.raaMaterials.registry.YItems;
 import net.vampirestudios.raaMaterials.registry.YTabs;
+import net.vampirestudios.raaMaterials.worldgen.WorldgenInit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,39 +34,42 @@ public class RAAMaterials implements ModInitializer {
 		YItems.init();
 		NetworkInit.initCommon();
 		YTabs.init();
+		RAACommands.init();
+		WorldgenInit.init();
 
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			var overworld = server.overworld();
 
+			// Generate materials at server start so ores can spawn in fresh chunks.
+			var set = overworld.getAttached(MaterialAttachments.MATERIALS);
+			if (set == null || set.all().isEmpty()) {
+				set = MaterialGenerator.generate(overworld.getSeed());
+				overworld.setAttached(MaterialAttachments.MATERIALS, set);
+			}
+			MaterialRegistry.put(overworld.dimension(), set);
+
 			var a = overworld.getAttachedOrCreate(MaterialAttachments.LEGENDARIES);
 			if (a.byForm().isEmpty()) {
-				// Collect candidate materials (server-side IDs)
-				var mats = net.vampirestudios.raaMaterials.material.MaterialRegistry
+				var mats = MaterialRegistry
 						.all(overworld).stream().map(m -> m.nameInformation().id()).toList();
 
-				// Choose which forms participate in the lottery (put your unique forms here)
-				// NOTE: keep this list in data if you want it fully data-driven.
 				var uniqueForms = java.util.List.of(
-						// placeholder until you add real “legendary” forms:
 						Form.BATTLE_AXE, Form.WAR_HAMMER, Form.SPEAR, Form.SICKLE, Form.CROWN, Form.CLOAK,
 						Form.AMULET, Form.ORB, Form.MUSIC_DISC
 				);
 
-				var rng = new java.util.Random(server.overworld().getSeed());
+				var rng = new java.util.Random(overworld.getSeed());
 				var assigned = LegendaryAssignments.assign(rng, mats, uniqueForms);
 
 				overworld.setAttached(MaterialAttachments.LEGENDARIES, assigned);
 			}
 		});
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-			ServerLevel level = handler.player.level();
-			var set = level.getAttached(MaterialAttachments.MATERIALS);
-			if (set == null) {
-				set = MaterialGenerator.generate(level.getSeed());
-				level.setAttached(MaterialAttachments.MATERIALS, set); // persists
+			var overworld = server.overworld();
+			var set = overworld.getAttached(MaterialAttachments.MATERIALS);
+			if (set != null) {
+				ServerSend.materials(handler.player, set);
 			}
-			MaterialRegistry.put(level.dimension(), set);
-			ServerSend.materials(handler.player, set);
 		});
 	}
 }

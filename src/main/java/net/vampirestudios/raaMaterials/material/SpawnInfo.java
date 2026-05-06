@@ -68,6 +68,8 @@ public record SpawnInfo(
 		ORE_BLOB,
 		ORE_STRING,
 		ORE_SHEET,
+		/** Flat circular disk — veinMin/veinMax are the radius in blocks, not block count. */
+		ORE_DISK,
 		CRYSTAL_CLUSTER,
 		GEODE;
 

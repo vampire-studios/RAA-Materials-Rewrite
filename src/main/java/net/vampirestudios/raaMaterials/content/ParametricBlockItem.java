@@ -73,8 +73,7 @@ public class ParametricBlockItem extends BlockItem {
 		// 2) Else derive MAT index from YComponents.MATERIAL (ResourceLocation)
 		var rl = stack.get(YComponents.MATERIAL);
 		if (rl != null && s.hasProperty(ParametricBlock.MAT) && ctx.getLevel() instanceof ServerLevel serverLevel) {
-			int idx = MaterialRegistry.indexOf(serverLevel, rl) // server-safe lookup
-					.orElseGet(() -> ClientMaterialCache.indexOf(rl).orElse(0));
+			int idx = MaterialRegistry.indexOf(serverLevel, rl).orElse(0);
 			return s.setValue(ParametricBlock.MAT, Math.max(0, Math.min(4095, idx)));
 		}
 

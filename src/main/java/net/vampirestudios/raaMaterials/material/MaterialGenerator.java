@@ -2,6 +2,7 @@
 package net.vampirestudios.raaMaterials.material;
 
 import net.minecraft.resources.Identifier;
+import net.vampirestudios.raaMaterials.RAAConfig;
 import net.vampirestudios.raaMaterials.material.MaterialDef.OreHost;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,12 +15,13 @@ public final class MaterialGenerator {
 	public static MaterialSet generate(long worldSeed) {
 		var rng = new Random(hash(worldSeed));
 		var list = new ArrayList<MaterialDef>();
-		int count = rng.nextInt(15, 31);
+		var cfg = RAAConfig.active();
+		int count = rng.nextInt(cfg.materialsMin(), cfg.materialsMax() + 1);
 
 		for (int i = 0; i < count; i++) {
 			var kind = pickKind(rng);
 
-			int color = rng.nextInt(0xFFFFFF);
+			int color = randomColor(rng);
 			var tier = (kind == MaterialKind.METAL || kind == MaterialKind.ALLOY) ? pickTier(rng) : HarvestTier.IRON;
 
 			List<Form> forms = getForms(kind);
@@ -47,6 +49,8 @@ public final class MaterialGenerator {
 //				case CRYSTAL      -> toolSpec = ToolMaterialPresets.forCrystal(pickTier(rng));  // if you want crystal tools
 				default -> Optional.empty();
 			};
+
+			FormDependencies.validate(nm, forms);
 
 			list.add(new MaterialDef(
 					nm, kind, color,
@@ -185,6 +189,14 @@ public final class MaterialGenerator {
 		};
 	}
 
+	/** Generates a color that is always recognizable — no near-black or near-white results. */
+	private static int randomColor(Random rng) {
+		float hue        = rng.nextFloat();
+		float saturation = 0.45f + rng.nextFloat() * 0.55f; // 0.45–1.0: always somewhat vivid
+		float brightness = 0.50f + rng.nextFloat() * 0.40f; // 0.50–0.90: never too dark or washed out
+		return java.awt.Color.HSBtoRGB(hue, saturation, brightness) & 0xFFFFFF;
+	}
+
 	private static long hash(long seed) {
 		return seed ^ 0x9E3779B97F4A7C15L ^ "raa_materials:materials".hashCode();
 	}
@@ -275,15 +287,9 @@ public final class MaterialGenerator {
 		};
 	}
 
-	@SuppressWarnings("unchecked")
 	private static Map<MaterialKind, Integer> loadWeightsFromConfig() {
-		// Stub: replace with your real config access.
-		// Example JSON (weights.json):
-		// {
-		//   "METAL": 22, "ALLOY": 8, "GEM": 10, "CRYSTAL": 9, "STONE": 18,
-		//   "VOLCANIC": 2, "SAND": 9, "GRAVEL": 7, "CLAY": 6, "MUD": 5, "SALT": 2, "SOIL": 2
-		// }
-		return null;
+		var weights = RAAConfig.active().kindWeights();
+		return weights.isEmpty() ? null : weights;
 	}
 
 	private static HarvestTier pickTier(Random r) {

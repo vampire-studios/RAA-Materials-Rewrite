@@ -52,7 +52,7 @@ public final class MaterialCodecs {
 			SpawnInfo.CODEC.fieldOf("spawn_info").forGetter(MaterialDef::spawn),
 			ToolMaterialSpec.CODEC.optionalFieldOf("tool_spec").forGetter(MaterialDef::toolSpec),
 			Codec.LONG.fieldOf("asset_seed").forGetter(MaterialDef::assetSeed),
-			MaterialDef.OreHost.CODEC.fieldOf("forms").forGetter(MaterialDef::host)
+			MaterialDef.OreHost.CODEC.fieldOf("ore_host").forGetter(MaterialDef::host)
 	).apply(i, MaterialDef::new));
 	public static final StreamCodec<ByteBuf, MaterialDef> MATERIAL_DEF_STREAM_CODEC = StreamCodecExpanded.composite(
 			MaterialDef.NameInformation.STREAM_CODEC,

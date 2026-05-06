@@ -6,6 +6,14 @@ import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockColorRegistry;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.PackType;
 import net.vampirestudios.arrp.api.RuntimeResourcePack;
 import net.vampirestudios.arrp.json.blockstate.BlockstateTemplates;
 import net.vampirestudios.arrp.json.blockstate.JBlockModel;
@@ -20,14 +28,6 @@ import net.vampirestudios.arrp.json.iteminfo.tint.JTintConstant;
 import net.vampirestudios.arrp.json.iteminfo.tint.JTintDye;
 import net.vampirestudios.arrp.json.models.JModel;
 import net.vampirestudios.arrp.json.recipe.*;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.BlockColorRegistry;
-import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
-import net.minecraft.server.packs.PackType;
 import net.vampirestudios.raaMaterials.ARRPGenerationHelper;
 import net.vampirestudios.raaMaterials.RAAMaterials;
 import net.vampirestudios.raaMaterials.RRPGen;
@@ -46,15 +46,14 @@ import java.util.Map;
 public final class MaterialsAssets {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-	private static final java.util.Map<Identifier, MaterialAssetsDef> ASSETS = new java.util.HashMap<>();
-	// ---- Component + shared ids ----
+	// ---- Component + shared block ids ----
 	private static final JPropertyComponent MAT_COMP = JPropertyComponent.component("raa_materials:material");
 	private static final Identifier ORE_SHARED_ID = RAAMaterials.id("material_ore");
 	private static final Identifier BLOCK_SHARED_ID = RAAMaterials.id("material_block");
 	private static final Identifier RAW_BLOCK_SHARED_ID = RAAMaterials.id("material_raw_block");
 	private static final Identifier SHINGLES_SHARED_ID = RAAMaterials.id("material_shingles");
 	private static final Identifier PLATE_BLOCK_SHARED_ID = RAAMaterials.id("material_plate_block");
-	// New shared block IDs (cube-all)
+	// Building variant block IDs (WIP)
 	private static final Identifier SANDSTONE_SHARED_ID = RAAMaterials.id("material_sandstone");
 	private static final Identifier CUT_SANDSTONE_SHARED_ID = RAAMaterials.id("material_cut_sandstone");
 	private static final Identifier SMOOTH_SANDSTONE_SHARED_ID = RAAMaterials.id("material_smooth_sandstone");
@@ -67,7 +66,7 @@ public final class MaterialsAssets {
 	private static final Identifier SLAB_SHARED_ID = RAAMaterials.id("material_slab");
 	private static final Identifier STAIRS_SHARED_ID = RAAMaterials.id("material_stairs");
 	private static final Identifier WALL_SHARED_ID = RAAMaterials.id("material_wall");
-	// Variant shapes
+	// Variant shapes (WIP)
 	private static final Identifier SANDSTONE_SLAB_SHARED_ID = RAAMaterials.id("material_sandstone_slab");
 	private static final Identifier SANDSTONE_STAIRS_SHARED_ID = RAAMaterials.id("material_sandstone_stairs");
 	private static final Identifier SANDSTONE_WALL_SHARED_ID = RAAMaterials.id("material_sandstone_wall");
@@ -77,7 +76,8 @@ public final class MaterialsAssets {
 	private static final Identifier POLISHED_SLAB_SHARED_ID = RAAMaterials.id("material_polished_slab");
 	private static final Identifier POLISHED_STAIRS_SHARED_ID = RAAMaterials.id("material_polished_stairs");
 	private static final Identifier POLISHED_WALL_SHARED_ID = RAAMaterials.id("material_polished_wall");
-	// ---- Shared item IDs ----
+
+	// ---- Shared item ids ----
 	private static final Identifier INGOT_SHARED_ID = RAAMaterials.id("material_ingot");
 	private static final Identifier RAW_SHARED_ID = RAAMaterials.id("material_raw");
 	private static final Identifier NUGGET_SHARED_ID = RAAMaterials.id("material_nugget");
@@ -95,34 +95,26 @@ public final class MaterialsAssets {
 	private static final Identifier SWORD_SHARED_ID = RAAMaterials.id("material_sword");
 	private static final Identifier PICKAXE_SHARED_ID = RAAMaterials.id("material_pickaxe");
 	private static final Identifier AXE_SHARED_ID = RAAMaterials.id("material_axe");
+
 	private static boolean DIRTY = false;
 	private static boolean reloading = false;
-
-	private static Identifier texture(AssetsTheme.Slot slot, MaterialDef def) {
-		return FormTextureResolver.of(AssetsTheme.defaultTheme()).sheet(slot, def).orElseThrow();
-	}
 
 	private static MaterialAssetsDef texture(MaterialDef def) {
 		return MaterialAssets.generate(def);
 	}
 
-
-	/** Export all assets as individual JSON files under <gameDir>/dev_export. */
-	// 1) Simple one-liner you can call from buildAll()
+	/** Export all assets as individual JSON files under &lt;gameDir&gt;/dev_export. Only runs in dev. */
 	public static void saveDevExport(Path gameDir) throws IOException {
 		saveDevExport(gameDir, ClientMaterialCache.all());
 	}
 
-	// 2) Overload that works over any list of materials (no Pools / no Map)
 	public static void saveDevExport(Path gameDir, List<MaterialDef> materials) throws IOException {
 		Path root = gameDir.resolve("dev_export");
 		Files.createDirectories(root);
 
 		for (MaterialDef m : materials) {
-			// Generate using the new system
 			MaterialAssetsDef def = MaterialAssets.generate(m);
 
-			// dev-only path; keep it namespaced per material id
 			Path out = root
 					.resolve("data")
 					.resolve(m.nameInformation().id().getNamespace())
@@ -137,20 +129,16 @@ public final class MaterialsAssets {
 		}
 	}
 
-	// ---------- helpers ----------
-
 	private static <T> JsonElement encodeOrThrow(Codec<T> codec, T value) {
 		DataResult<JsonElement> dr = codec.encodeStart(JsonOps.INSTANCE, value);
 		return dr.getOrThrow();
 	}
 
 	public static void init() {
-		// Rebuild once per tick if marked dirty
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			if (!DIRTY || reloading || client.level == null) return;
 			DIRTY = false;
-			buildAll();           // write to RRPGen.PACK
-			// trigger one reload on main thread
+			buildAll();
 			reloading = true;
 			client.execute(() -> {
 				client.reloadResourcePacks();
@@ -159,7 +147,6 @@ public final class MaterialsAssets {
 			registerBlockColorProviders();
 		});
 
-		// Also rebuild whenever resources reload (F3+T etc.)
 		ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(RAAMaterials.id("materials_assets_rebuilder"),
 				(_, _, preparationBarrier, _) -> {
 					if (!ClientMaterialCache.all().isEmpty()) buildAll();
@@ -170,28 +157,23 @@ public final class MaterialsAssets {
 
 	private static void registerBlockColorProviders() {
 		var materials = ClientMaterialCache.all();
-
-		// Register color provider for each tinted block type
 		registerColorProviderForSharedBlock(ORE_SHARED_ID, materials);
 		registerColorProviderForSharedBlock(BLOCK_SHARED_ID, materials);
 		registerColorProviderForSharedBlock(RAW_BLOCK_SHARED_ID, materials);
 		registerColorProviderForSharedBlock(SHINGLES_SHARED_ID, materials);
 		registerColorProviderForSharedBlock(PLATE_BLOCK_SHARED_ID, materials);
-		// Add other tinted blocks as needed
 	}
 
 	private static void registerColorProviderForSharedBlock(Identifier sharedBlockId, List<MaterialDef> materials) {
 		var block = BuiltInRegistries.BLOCK.getValue(sharedBlockId);
 		if (block == null) {
-			System.err.println("[RAA] Block not found for id: " + sharedBlockId);
+			RAAMaterials.LOGGER.warn("[RAA] Block not found for id: {}", sharedBlockId);
 			return;
 		}
-
 		BlockColorRegistry.register((state, _, _, tintValues) -> {
 			int matIndex = state.getValue(ParametricBlock.MAT);
 			if (matIndex >= 0 && matIndex < materials.size()) {
-				var material = materials.get(matIndex);
-				tintValues.add(material.primaryColor());
+				tintValues.add(materials.get(matIndex).primaryColor());
 			}
 		}, block);
 	}
@@ -200,9 +182,7 @@ public final class MaterialsAssets {
 		DIRTY = true;
 	}
 
-	// Core generator: single place that writes blockstates/models/selectors
 	private static void buildAll() {
-
 		var rp = RRPGen.PACK;
 
 		// Fallback item models (avoid missing-model flashes)
@@ -216,10 +196,12 @@ public final class MaterialsAssets {
 
 		var def = ClientMaterialCache.all();
 
-		try {
-			saveDevExport(FabricLoader.getInstance().getGameDir());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
+			try {
+				saveDevExport(FabricLoader.getInstance().getGameDir());
+			} catch (IOException e) {
+				RAAMaterials.LOGGER.error("[RAA] Dev export failed", e);
+			}
 		}
 
 		// ---- BLOCK FAMILIES (cube-all) ----
@@ -253,14 +235,12 @@ public final class MaterialsAssets {
 				(idx) -> texture(def.get(idx)).textures3().bricks().orElseThrow());
 		buildBlockFamily(List.of(Form.POLISHED), RAAMaterials.id("material_polished"), "block/material_polished/",
 				(idx) -> texture(def.get(idx)).textures3().polished().orElseThrow());
-
 		buildBlockFamily(List.of(Form.SHINGLES), SHINGLES_SHARED_ID, "block/material_shingles/",
 				(idx) -> texture(def.get(idx)).textures1().shingles().orElseThrow());
-
 		buildBlockFamily(List.of(Form.PLATE_BLOCK), PLATE_BLOCK_SHARED_ID, "block/material_plate_block/",
 				(idx) -> texture(def.get(idx)).textures1().plateBlock().orElseThrow());
 
-		// Building families
+		// Building families — WIP (uses building atlas textures; wire up when assets are ready)
 //		buildBlockFamily(List.of(Form.SANDSTONE), SANDSTONE_SHARED_ID, "block/material_sandstone/",
 //				(idx) -> RAAMaterials.id("building/sandstone/sandstone_" + oneIndexed(idx, 10)));
 //		buildBlockFamily(List.of(Form.CUT), CUT_SANDSTONE_SHARED_ID, "block/material_cut_sandstone/",
@@ -269,46 +249,37 @@ public final class MaterialsAssets {
 //				(idx) -> RAAMaterials.id("building/sandstone/smooth_sandstone_" + oneIndexed(idx, 10)));
 //		buildBlockFamily(List.of(Form.CHISELED), CHISELED_SHARED_ID, "block/material_chiseled/",
 //				(idx) -> RAAMaterials.id("building/chiseled/chiseled_" + oneIndexed(idx, 12)));
-//		buildBlockFamily(List.of(Form.BRICKS), BRICKS_SHARED_ID, "block/material_bricks/",
-//				(idx) -> RAAMaterials.id("building/bricks/bricks_" + oneIndexed(idx, 12)));
-//		buildBlockFamily(List.of(Form.POLISHED), POLISHED_SHARED_ID, "block/material_polished/",
-//				(idx) -> RAAMaterials.id("building/polished/polished_" + oneIndexed(idx, 12)));
 //		buildBlockFamily(List.of(Form.DRIED), DRIED_SHARED_ID, "block/material_dried/",
 //				(idx) -> RAAMaterials.id("building/dried/dried_" + oneIndexed(idx, 8)));
 //		buildBlockFamily(List.of(Form.CERAMIC), CERAMIC_SHARED_ID, "block/material_ceramic/",
 //				(idx) -> RAAMaterials.id("building/ceramic/ceramic_" + oneIndexed(idx, 8)));
 
-		// ---- BASE SHAPES (BLOCK textures) ----
-		buildSlabFamilyForBlock(SLAB_SHARED_ID, "block/material_block/", blockTextures);
-		buildStairsFamilyForBlock(STAIRS_SHARED_ID, "block/material_block/", blockTextures);
-		buildWallFamilyForBlock(WALL_SHARED_ID, "block/material_block/", blockTextures);
+		// ---- SHAPES (use BLOCK textures) ----
+		buildSlabFamilyForBlock(SLAB_SHARED_ID, blockTextures);
+		buildStairsFamilyForBlock(STAIRS_SHARED_ID, blockTextures);
+		buildWallFamilyForBlock(WALL_SHARED_ID, blockTextures);
 
-		// ---- VARIANT SHAPES (per-variant textures) ----
-		// Sandstone shapes
-//		buildSlabFamilyVariant(SANDSTONE_SLAB_SHARED_ID,   "block/material_sandstone/",
-//				(idx) -> RAAMaterials.id(STR."building/sandstone/sandstone_\{oneIndexed(idx, 10)}"),
+		// Variant shapes — WIP (attach to per-variant atlas textures)
+//		buildSlabFamilyVariant(SANDSTONE_SLAB_SHARED_ID, "block/material_sandstone/",
+//				(idx) -> RAAMaterials.id("building/sandstone/sandstone_" + oneIndexed(idx, 10)),
 //				RAAMaterials.id("block/material_sandstone/"));
 //		buildStairsFamilyVariant(SANDSTONE_STAIRS_SHARED_ID, "block/material_sandstone/",
-//				(idx) -> RAAMaterials.id(STR."building/sandstone/sandstone_\{oneIndexed(idx, 10)}"));
-//		buildWallFamilyVariant(SANDSTONE_WALL_SHARED_ID,   "block/material_sandstone/",
-//				(idx) -> RAAMaterials.id(STR."building/sandstone/sandstone_\{oneIndexed(idx, 10)}"));
-//
-//		// Brick shapes
-//		buildSlabFamilyVariant(BRICK_SLAB_SHARED_ID,   "block/material_bricks/",
+//				(idx) -> RAAMaterials.id("building/sandstone/sandstone_" + oneIndexed(idx, 10)));
+//		buildWallFamilyVariant(SANDSTONE_WALL_SHARED_ID, "block/material_sandstone/",
+//				(idx) -> RAAMaterials.id("building/sandstone/sandstone_" + oneIndexed(idx, 10)));
+//		buildSlabFamilyVariant(BRICK_SLAB_SHARED_ID, "block/material_bricks/",
 //				(idx) -> RAAMaterials.id("building/bricks/bricks_" + oneIndexed(idx, 12)),
 //				RAAMaterials.id("block/material_bricks/"));
 //		buildStairsFamilyVariant(BRICK_STAIRS_SHARED_ID, "block/material_bricks/",
 //				(idx) -> RAAMaterials.id("building/bricks/bricks_" + oneIndexed(idx, 12)));
-//		buildWallFamilyVariant(BRICK_WALL_SHARED_ID,   "block/material_bricks/",
+//		buildWallFamilyVariant(BRICK_WALL_SHARED_ID, "block/material_bricks/",
 //				(idx) -> RAAMaterials.id("building/bricks/bricks_" + oneIndexed(idx, 12)));
-//
-//		// Polished shapes
-//		buildSlabFamilyVariant(POLISHED_SLAB_SHARED_ID,   "block/material_polished/",
+//		buildSlabFamilyVariant(POLISHED_SLAB_SHARED_ID, "block/material_polished/",
 //				(idx) -> RAAMaterials.id("building/polished/polished_" + oneIndexed(idx, 12)),
 //				RAAMaterials.id("block/material_polished/"));
 //		buildStairsFamilyVariant(POLISHED_STAIRS_SHARED_ID, "block/material_polished/",
 //				(idx) -> RAAMaterials.id("building/polished/polished_" + oneIndexed(idx, 12)));
-//		buildWallFamilyVariant(POLISHED_WALL_SHARED_ID,   "block/material_polished/",
+//		buildWallFamilyVariant(POLISHED_WALL_SHARED_ID, "block/material_polished/",
 //				(idx) -> RAAMaterials.id("building/polished/polished_" + oneIndexed(idx, 12)));
 
 		// ---- ITEM FAMILIES ----
@@ -322,18 +293,18 @@ public final class MaterialsAssets {
 				(idx) -> texture(def.get(idx)).textures2().dust().orElseThrow());
 		buildItemFamily(List.of(Form.SHEET), PLATE_SHARED_ID, "item/material_plate/",
 				(idx) -> texture(def.get(idx)).textures2().plate().orElseThrow());
-//		buildItemFamily(List.of(Form.CRYSTAL),CRYSTAL_SHARED_ID,"item/material_crystal/",
-//				(idx) -> assets(def.get(idx)).textures().flatMap(MaterialDef.TextureDef::).orElseThrow());
+//		buildItemFamily(List.of(Form.CRYSTAL), CRYSTAL_SHARED_ID, "item/material_crystal/",
+//				(idx) -> texture(def.get(idx)).textures2().crystal().orElseThrow());
 		buildItemFamily(List.of(Form.SHARD), SHARD_SHARED_ID, "item/material_shard/",
 				(idx) -> texture(def.get(idx)).textures2().shard().orElseThrow());
 		buildItemFamily(List.of(Form.GEAR), GEAR_SHARED_ID, "item/material_gear/",
 				(idx) -> texture(def.get(idx)).textures2().gear().orElseThrow());
-//		buildItemFamily(List.of(Form.CLUSTER),CLUSTER_SHARED_ID,"item/material_cluster/",
-//				(idx) -> assets(def.get(idx)).textures().flatMap(MaterialDef.TextureDef::cluster).orElseThrow());
+//		buildItemFamily(List.of(Form.CLUSTER), CLUSTER_SHARED_ID, "item/material_cluster/",
+//				(idx) -> texture(def.get(idx)).textures2().cluster().orElseThrow());
 		buildItemFamily(List.of(Form.GEM), GEM_SHARED_ID, "item/material_gem/",
 				(idx) -> texture(def.get(idx)).textures2().gem().orElseThrow());
-//		buildItemFamily(List.of(Form.BALL),   BALL_SHARED_ID,   "item/material_ball/",
-//				(idx) -> assets(def.get(idx)).textures2().ball().orElseThrow());
+//		buildItemFamily(List.of(Form.BALL), BALL_SHARED_ID, "item/material_ball/",
+//				(idx) -> texture(def.get(idx)).textures2().ball().orElseThrow());
 		buildLayeredItemFamily(Form.SHOVEL, SHOVEL_SHARED_ID, "item/material_shovel/",
 				(idx) -> texture(def.get(idx)).textures3().toolShovelHead().orElseThrow(),
 				(idx) -> texture(def.get(idx)).textures3().toolShovelStick().orElseThrow());
@@ -358,8 +329,19 @@ public final class MaterialsAssets {
 	// =========================================================
 
 	private static int oneIndexed(int idx, int max) {
-		// 1..max, wraps deterministically
 		return (Math.floorMod(idx, max) + 1);
+	}
+
+	/** Resolves a block texture for a material given the kind-to-picker map. */
+	private static Identifier pickBlockTex(MaterialDef def, int idx, Map<MaterialKind, TexPicker> pickers) {
+		return switch (def.kind()) {
+			case METAL, ALLOY, OTHER -> pickers.get(MaterialKind.METAL).pick(idx);
+			case GEM -> pickers.get(MaterialKind.GEM).pick(idx);
+			case CRYSTAL -> pickers.get(MaterialKind.CRYSTAL).pick(idx);
+			case STONE, CLAY, GRAVEL, SOIL, MUD, SALT, VOLCANIC -> pickers.get(MaterialKind.STONE).pick(idx);
+			case SAND -> RAAMaterials.id("building/sandstone/sandstone_" + oneIndexed(idx, 10));
+			case WOOD -> Identifier.withDefaultNamespace("block/oak_planks");
+		};
 	}
 
 	private static void buildBlockFamily(
@@ -370,7 +352,6 @@ public final class MaterialsAssets {
 
 		List<JBlockModelEntry> variants = new ArrayList<>();
 		var select = JItemModel.select().property(MAT_COMP);
-
 		int cases = 0;
 
 		for (int idx = 0; idx < mats.size(); idx++) {
@@ -386,7 +367,6 @@ public final class MaterialsAssets {
 		}
 
 		if (cases == 0) {
-			// Nothing to select on → emit a simple model
 			rp.addItemModelInfo(
 					new JItemInfo().model(JModelBasic.of(sharedBlockId.withPrefix("block/").toString())),
 					sharedBlockId
@@ -416,21 +396,7 @@ public final class MaterialsAssets {
 			if (hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), forms)) continue;
 
 			var perModelId = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath());
-			var tex = switch (def.kind()) {
-				case METAL, ALLOY, OTHER -> pickers.get(MaterialKind.METAL).pick(idx);
-				case GEM -> pickers.get(MaterialKind.GEM).pick(idx);
-				case CRYSTAL -> pickers.get(MaterialKind.CRYSTAL).pick(idx);
-				case STONE -> pickers.get(MaterialKind.STONE).pick(idx);
-				// If you have SAND or other kinds that don't get a block texture prefilled:
-				case SAND -> pickers.get(MaterialKind.SAND).pick(idx);
-				case MUD -> pickers.get(MaterialKind.MUD).pick(idx);
-				case GRAVEL -> pickers.get(MaterialKind.GRAVEL).pick(idx);
-				case CLAY -> pickers.get(MaterialKind.CLAY).pick(idx);
-				default -> Identifier.withDefaultNamespace("stone");
-//				default -> {
-//					throw new IllegalStateException("No block texture for " + def.nameInformation().id() + " (kind=" + def.kind() + ")");
-//				}
-			};
+			var tex = pickBlockTex(def, idx, pickers);
 			addCubeAllTintedBlockModel(rp, perModelId, tex);
 			variants.add(new JBlockModelEntry(idx, JState.model(perModelId)));
 			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(perModelId.toString()).tint(JTint.constant(def.primaryColor()))));
@@ -444,19 +410,8 @@ public final class MaterialsAssets {
 		rp.addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
 	}
 
-	private static void addCubeAllBlockModel(RuntimeResourcePack rp, Identifier modelId, Identifier texture) {
-		ARRPGenerationHelper.generateAllBlockModel(rp, modelId, texture);
-	}
-
 	private static void addCubeAllTintedBlockModel(RuntimeResourcePack rp, Identifier modelId, Identifier texture) {
 		ARRPGenerationHelper.generateAllTintedBlockModel(rp, modelId, texture);
-	}
-
-	private static void addOreModel(RuntimeResourcePack rp, Identifier modelId, TextureDef1 def, Identifier host) {
-		rp.addModel(JModel.model("minecraft:block/ore").textures(JModel.textures()
-				.var("base", host.toString())
-				.var("overlay", def.oreVein().toString())
-		), modelId);
 	}
 
 	private static boolean hasAny(List<Form> actual, List<Form> wanted) {
@@ -468,26 +423,19 @@ public final class MaterialsAssets {
 		return !actual.contains(wanted);
 	}
 
-	private static void buildSlabFamilyForBlock(Identifier sharedSlabId, String perModelPrefixBlockTex, Map<MaterialKind, TexPicker> pickers) {
+	private static void buildSlabFamilyForBlock(Identifier sharedSlabId, Map<MaterialKind, TexPicker> pickers) {
 		var rp = RRPGen.PACK;
 		var mats = ClientMaterialCache.all();
 		var select = JItemModel.select().property(MAT_COMP);
 		var v = JState.variant();
+		int cases = 0;
 
 		for (int idx = 0; idx < mats.size(); idx++) {
 			var def = mats.get(idx);
-			if (!FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.SLAB) || !FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.BLOCK))
-				continue;
+			var forms = FormsRuntime.activeForms(Minecraft.getInstance().level, def);
+			if (!forms.contains(Form.SLAB) || !forms.contains(Form.BLOCK)) continue;
 
-			Identifier baseTex = switch (def.kind()) {
-				case METAL, ALLOY, OTHER -> pickers.get(MaterialKind.METAL).pick(idx);
-				case GEM -> pickers.get(MaterialKind.GEM).pick(idx);
-				case CRYSTAL -> pickers.get(MaterialKind.CRYSTAL).pick(idx);
-				case STONE, CLAY, GRAVEL, SOIL, MUD, SALT, VOLCANIC -> pickers.get(MaterialKind.STONE).pick(idx);
-				case SAND -> RAAMaterials.id("building/sandstone/sandstone_" + oneIndexed(idx, 10));
-				// If WOOD can have slabs, map it here, or skip:
-				case WOOD -> Identifier.withDefaultNamespace("block/oak_planks"); // Assumption: placeholder
-			};
+			var baseTex = pickBlockTex(def, idx, pickers);
 			var modelBottom = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath() + "_slab");
 			var modelTop = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath() + "_slab_top");
 			var fullModel = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath());
@@ -504,11 +452,12 @@ public final class MaterialsAssets {
 							.var("side", baseTex.toString())), modelTop);
 
 			BlockstateTemplates.addSlab(v, Map.of("mat", idx), JState.model(modelBottom), JState.model(modelTop), JState.model(fullModel));
-
 			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(modelBottom.toString())));
+			cases++;
 		}
 
 		rp.addBlockState(JState.state(v), sharedSlabId);
+		if (cases == 0) return;
 		select.fallback(JModelBasic.of("minecraft:block/stone"));
 		rp.addItemModelInfo(new JItemInfo().model(select), sharedSlabId);
 	}
@@ -517,26 +466,19 @@ public final class MaterialsAssets {
 	// Helpers — SHAPES (BLOCK-based)
 	// =========================================================
 
-	private static void buildStairsFamilyForBlock(Identifier sharedStairsId, String perModelPrefixBlockTex, Map<MaterialKind, TexPicker> pickers) {
+	private static void buildStairsFamilyForBlock(Identifier sharedStairsId, Map<MaterialKind, TexPicker> pickers) {
 		var rp = RRPGen.PACK;
 		var mats = ClientMaterialCache.all();
 		var select = JItemModel.select().property(MAT_COMP);
 		var v = JState.variant();
+		int cases = 0;
 
 		for (int idx = 0; idx < mats.size(); idx++) {
 			var def = mats.get(idx);
-			if (!FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.STAIRS) || !FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.BLOCK))
-				continue;
+			var forms = FormsRuntime.activeForms(Minecraft.getInstance().level, def);
+			if (!forms.contains(Form.STAIRS) || !forms.contains(Form.BLOCK)) continue;
 
-			Identifier tex = switch (def.kind()) {
-				case METAL, ALLOY, OTHER -> pickers.get(MaterialKind.METAL).pick(idx);
-				case GEM -> pickers.get(MaterialKind.GEM).pick(idx);
-				case CRYSTAL -> pickers.get(MaterialKind.CRYSTAL).pick(idx);
-				case STONE, CLAY, GRAVEL, SOIL, MUD, SALT, VOLCANIC -> pickers.get(MaterialKind.STONE).pick(idx);
-				case SAND -> RAAMaterials.id("building/sandstone/sandstone_" + oneIndexed(idx, 10));
-				// If WOOD can have slabs, map it here, or skip:
-				case WOOD -> Identifier.withDefaultNamespace("block/oak_planks"); // Assumption: placeholder
-			};
+			var tex = pickBlockTex(def, idx, pickers);
 			var model = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath() + "_stairs");
 			var modelIn = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath() + "_stairs_inner");
 			var modelOut = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath() + "_stairs_outer");
@@ -547,35 +489,29 @@ public final class MaterialsAssets {
 			rp.addModel(JModel.model("minecraft:block/outer_stairs").textures(texs), modelOut);
 
 			BlockstateTemplates.addStairs(v, Map.of("mat", idx), JState.model(model), JState.model(modelIn), JState.model(modelOut));
-
 			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(model.toString())));
+			cases++;
 		}
 
 		rp.addBlockState(JState.state(v), sharedStairsId);
+		if (cases == 0) return;
 		select.fallback(JModelBasic.of("minecraft:block/stone"));
 		rp.addItemModelInfo(new JItemInfo().model(select), sharedStairsId);
 	}
 
-	private static void buildWallFamilyForBlock(Identifier sharedWallId, String perModelPrefixBlockTex, Map<MaterialKind, TexPicker> pickers) {
+	private static void buildWallFamilyForBlock(Identifier sharedWallId, Map<MaterialKind, TexPicker> pickers) {
 		var rp = RRPGen.PACK;
 		var mats = ClientMaterialCache.all();
 		var select = JItemModel.select().property(MAT_COMP);
 		var multipart = JState.multipart();
+		int cases = 0;
 
 		for (int idx = 0; idx < mats.size(); idx++) {
 			var def = mats.get(idx);
-			if (!FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.WALL) || !FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.BLOCK))
-				continue;
+			var forms = FormsRuntime.activeForms(Minecraft.getInstance().level, def);
+			if (!forms.contains(Form.WALL) || !forms.contains(Form.BLOCK)) continue;
 
-			Identifier tex = switch (def.kind()) {
-				case METAL, ALLOY, OTHER -> pickers.get(MaterialKind.METAL).pick(idx);
-				case GEM -> pickers.get(MaterialKind.GEM).pick(idx);
-				case CRYSTAL -> pickers.get(MaterialKind.CRYSTAL).pick(idx);
-				case STONE, CLAY, GRAVEL, SOIL, MUD, SALT, VOLCANIC -> pickers.get(MaterialKind.STONE).pick(idx);
-				case SAND -> RAAMaterials.id("building/sandstone/sandstone_" + oneIndexed(idx, 10));
-				// If WOOD can have slabs, map it here, or skip:
-				case WOOD -> Identifier.withDefaultNamespace("block/oak_planks"); // Assumption: placeholder
-			};
+			var tex = pickBlockTex(def, idx, pickers);
 			var post = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath() + "_wall_post");
 			var side = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath() + "_wall_side");
 			var sideT = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath() + "_wall_side_tall");
@@ -588,11 +524,12 @@ public final class MaterialsAssets {
 					.textures(JModel.textures().var("wall", tex.toString())), sideT);
 
 			BlockstateTemplates.addWall(multipart, Map.of("mat", idx), JState.model(post), JState.model(side), JState.model(sideT));
-
 			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(side.toString())));
+			cases++;
 		}
 
 		rp.addBlockState(JState.state(multipart), sharedWallId);
+		if (cases == 0) return;
 		select.fallback(JModelBasic.of("minecraft:block/stone"));
 		rp.addItemModelInfo(new JItemInfo().model(select), sharedWallId);
 	}
@@ -731,8 +668,7 @@ public final class MaterialsAssets {
 		var rp = RRPGen.PACK;
 		var mats = ClientMaterialCache.all();
 
-		// Guard: 0 materials → just use the fallback model
-		if (mats == null || mats.isEmpty()) {
+		if (mats.isEmpty()) {
 			rp.addItemModelInfo(
 					new JItemInfo().model(JModelBasic.of(logicalItemId.withPrefix("item/").toString())),
 					logicalItemId
@@ -755,7 +691,6 @@ public final class MaterialsAssets {
 		}
 
 		if (cases == 0) {
-			// Nothing to select on → emit a simple model
 			rp.addItemModelInfo(
 					new JItemInfo().model(JModelBasic.of(logicalItemId.withPrefix("item/").toString())),
 					logicalItemId
@@ -768,7 +703,7 @@ public final class MaterialsAssets {
 	}
 
 	private static void buildLayeredItemFamily(
-			Form forms,
+			Form form,
 			Identifier logicalItemId,
 			String perModelPrefix,
 			TexPicker layer0,
@@ -777,9 +712,7 @@ public final class MaterialsAssets {
 		var rp = RRPGen.PACK;
 		var mats = ClientMaterialCache.all();
 
-		// Guard: no materials → plain fallback
-		if (mats == null || mats.isEmpty()) {
-			IO.println("This is a test");
+		if (mats.isEmpty()) {
 			rp.addItemModelInfo(
 					new JItemInfo().model(JModelBasic.of(logicalItemId.withPrefix("item/").toString())),
 					logicalItemId
@@ -792,17 +725,14 @@ public final class MaterialsAssets {
 
 		for (int idx = 0; idx < mats.size(); idx++) {
 			var def = mats.get(idx);
-			if (hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), forms)) continue;
+			if (hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), form)) continue;
 
 			var perModelId = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath());
-
-			// Build a generated model with 2 layers
 			var model = JModel.model("item/handheld")
 					.textures(JModel.textures()
 							.var("layer0", layer0.pick(idx).toString().replace(".png", ""))
 							.var("layer1", layer1.pick(idx).toString().replace(".png", ""))
 					);
-
 			rp.addModel(model, perModelId);
 
 			select.addCase(
@@ -815,7 +745,6 @@ public final class MaterialsAssets {
 		}
 
 		if (cases == 0) {
-			IO.println("0 cases");
 			rp.addItemModelInfo(
 					new JItemInfo().model(JModelBasic.of(logicalItemId.withPrefix("item/").toString())),
 					logicalItemId
@@ -838,16 +767,18 @@ public final class MaterialsAssets {
 		);
 	}
 
+	// =========================================================
+	// Helpers — RECIPES (WIP: uncomment buildRecipes() when recipe system is ready)
+	// =========================================================
+
 	private static void addRecipe(Identifier id, JRecipe recipe) {
 		var file = Identifier.fromNamespaceAndPath(id.getNamespace(), "recipes/" + id.getPath() + ".json");
 		RRPGen.PACK.addRecipe(file, recipe);
 	}
 
-	// ---- Custom ingredient matching a specific material component ----
-	// Shape: { "type":"raa_materials:component", "item":"<shared>", "components":{"raa_materials:material":{"id":"<mat>"}} }
 	private static JIngredient ingredientWithMaterial(Identifier sharedItemId, Identifier mat) {
 		return JIngredient.ingredient().fabricCustom(
-				RAAMaterials.id("component"), // ← MUST equal your CustomIngredientSerializer id
+				RAAMaterials.id("component"),
 				obj -> {
 					obj.addProperty("item", sharedItemId.toString());
 					var comps = new com.google.gson.JsonObject();
@@ -860,219 +791,6 @@ public final class MaterialsAssets {
 		);
 	}
 
-	/*private static void buildRecipes() {
-		var mats = ClientMaterialCache.all();
-
-		for (MaterialDef def : mats) {
-			var matId = def.nameInformation().id(); // raa_materials:<material_registry_key>
-
-			// ---------- Compression: ingot <-> block, nugget <-> ingot ----------
-			if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.INGOT) && FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.BLOCK)) {
-				// 9 ingots -> 1 block
-				addRecipe(
-						recipeId("compression/block_from_ingots", BLOCK_SHARED_ID, matId),
-						shaped(BLOCK_SHARED_ID, matId, 1,
-								"###", "###", "###")
-				);
-				// 1 block -> 9 ingots
-				addRecipe(
-						recipeId("decompression/ingots_from_block", INGOT_SHARED_ID, matId),
-						shapeless(INGOT_SHARED_ID, matId, 9, BLOCK_SHARED_ID, 1)
-				);
-			}
-			if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.NUGGET) && FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.INGOT)) {
-				// 9 nuggets -> 1 ingot
-				JsonObject nineNuggets = new JsonObject();
-				nineNuggets.addProperty("type", "raa_materials:parametric_shaped");
-				JsonArray pat = new JsonArray();
-				pat.add("###");
-				pat.add("###");
-				pat.add("###");
-				nineNuggets.add("pattern", pat);
-				JsonObject key = new JsonObject();
-				key.add("#", componentHolder(NUGGET_SHARED_ID, matId));
-				nineNuggets.add("key", key);
-				nineNuggets.add("result", resultWithCount(INGOT_SHARED_ID, matId, 1));
-				addRecipe(recipeId("compression/ingot_from_nuggets", INGOT_SHARED_ID, matId), nineNuggets);
-
-				// 1 ingot -> 9 nuggets
-				addRecipe(
-						recipeId("decompression/nuggets_from_ingot", NUGGET_SHARED_ID, matId),
-						shapeless(NUGGET_SHARED_ID, matId, 9, INGOT_SHARED_ID, 1)
-				);
-			}
-
-			// ---------- Plates & Gears (optional simple patterns) ----------
-			if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.PLATE) && FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.INGOT)) {
-				// 1 ingot -> 1 plate (shapeless) — swap to hammer recipe if you have a tool
-				addRecipe(
-						recipeId("processing/plate_from_ingot", PLATE_SHARED_ID, matId),
-						shapeless(PLATE_SHARED_ID, matId, 1, INGOT_SHARED_ID, 1)
-				);
-			}
-			if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.GEAR) && FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.PLATE) && FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.INGOT)) {
-				// #
-				//#X#
-				// #
-				JsonObject gear = new JsonObject();
-				gear.addProperty("type", "raa_materials:parametric_shaped");
-				JsonArray pat = new JsonArray();
-				pat.add(" # ");
-				pat.add("#X#");
-				pat.add(" # ");
-				gear.add("pattern", pat);
-				JsonObject key = new JsonObject();
-				key.add("#", componentHolder(INGOT_SHARED_ID, matId));
-				key.add("X", componentHolder(PLATE_SHARED_ID, matId));
-				gear.add("key", key);
-				gear.add("result", resultWithCount(GEAR_SHARED_ID, matId, 1));
-				JRecipe recipe = JRecipe.shaped(JPattern.pattern(" # ", "###", " # "), JKeys.keys().key("#", JIngredient.ingredient().item(INGOT_SHARED_ID)));
-				addRecipe(recipeId("processing/gear", GEAR_SHARED_ID, matId), gear);
-			}
-
-			// ---------- Slab / Stairs / Wall from BLOCK ----------
-			if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.BLOCK)) {
-				if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.SLAB)) {
-					// 3 blocks -> 6 slabs
-					JsonObject r = shaped(SLAB_SHARED_ID, matId, 6, "###");
-					addRecipe(recipeId("building/slab_from_block", SLAB_SHARED_ID, matId), r);
-					// stonecutting 1 block -> 2 slabs
-					addRecipe(recipeId("stonecutting/slab_from_block", SLAB_SHARED_ID, matId),
-							stonecutting(SLAB_SHARED_ID, matId, 2, BLOCK_SHARED_ID));
-				}
-				if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.STAIRS)) {
-					// 6 blocks -> 4 stairs
-					JsonObject r = shaped(STAIRS_SHARED_ID, matId, 4,
-							"#  ", "## ", "###");
-					addRecipe(recipeId("building/stairs_from_block", STAIRS_SHARED_ID, matId), r);
-					// stonecutting 1 block -> 1 stairs
-					addRecipe(recipeId("stonecutting/stairs_from_block", STAIRS_SHARED_ID, matId),
-							stonecutting(STAIRS_SHARED_ID, matId, 1, BLOCK_SHARED_ID));
-				}
-				if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.WALL)) {
-					// 6 blocks -> 6 walls
-					JsonObject r = shaped(WALL_SHARED_ID, matId, 6,
-							"###", "###");
-					addRecipe(recipeId("building/wall_from_block", WALL_SHARED_ID, matId), r);
-					// stonecutting 1 block -> 1 wall
-					addRecipe(recipeId("stonecutting/wall_from_block", WALL_SHARED_ID, matId),
-							stonecutting(WALL_SHARED_ID, matId, 1, BLOCK_SHARED_ID));
-				}
-				// Polished / Bricks / Chiseled (generic)
-				if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.POLISHED)) {
-					// 4 block -> 4 polished
-					addRecipe(recipeId("processing/polished_from_block", POLISHED_SHARED_ID, matId),
-							shaped(POLISHED_SHARED_ID, matId, 4, "##", "##"));
-					// stonecutting 1 block -> 1 polished
-					addRecipe(recipeId("stonecutting/polished_from_block", POLISHED_SHARED_ID, matId),
-							stonecutting(POLISHED_SHARED_ID, matId, 1, BLOCK_SHARED_ID));
-				}
-				if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.BRICKS)) {
-					addRecipe(recipeId("processing/bricks_from_block", BRICKS_SHARED_ID, matId),
-							shaped(BRICKS_SHARED_ID, matId, 4, "##", "##"));
-					addRecipe(recipeId("stonecutting/bricks_from_block", BRICKS_SHARED_ID, matId),
-							stonecutting(BRICKS_SHARED_ID, matId, 1, BLOCK_SHARED_ID));
-				}
-				if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.CHISELED)) {
-					// 2 slabs (vertical) -> 1 chiseled (mirrors vanilla stone chiseled)
-					JsonObject chis = new JsonObject();
-					chis.addProperty("type", "raa_materials:parametric_shaped");
-					JsonArray pat = new JsonArray();
-					pat.add("#");
-					pat.add("#");
-					chis.add("pattern", pat);
-					JsonObject key = new JsonObject();
-					key.add("#", componentHolder(SLAB_SHARED_ID, matId));
-					chis.add("key", key);
-					chis.add("result", resultWithCount(CHISELED_SHARED_ID, matId, 1));
-					addRecipe(recipeId("processing/chiseled_from_slabs", CHISELED_SHARED_ID, matId), chis);
-				}
-			}
-
-			// ---------- Sandstone line (SAND → SANDSTONE → CUT/SMOOTH) ----------
-			if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.SANDSTONE)) {
-				// 4 sand -> 1 sandstone
-				JsonObject ss = new JsonObject();
-				ss.addProperty("type", "raa_materials:parametric_shaped");
-				JsonArray pat = new JsonArray();
-				pat.add("##");
-				pat.add("##");
-				ss.add("pattern", pat);
-				JsonObject key = new JsonObject();
-				key.add("#", componentHolder(BLOCK_SHARED_ID, matId)); // assuming your SAND block uses BLOCK_SHARED_ID
-				ss.add("key", key);
-				ss.add("result", resultWithCount(SANDSTONE_SHARED_ID, matId, 1));
-				addRecipe(recipeId("processing/sandstone_from_sand", SANDSTONE_SHARED_ID, matId), ss);
-
-				// stonecutting: 1 sand -> 1 sandstone (QoL)
-				addRecipe(recipeId("stonecutting/sandstone_from_sand", SANDSTONE_SHARED_ID, matId),
-						stonecutting(SANDSTONE_SHARED_ID, matId, 1, BLOCK_SHARED_ID));
-			}
-			if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.CUT_SANDSTONE)) {
-				// from sandstone via stonecutting
-				addRecipe(recipeId("stonecutting/cut_sandstone", CUT_SANDSTONE_SHARED_ID, matId),
-						stonecutting(CUT_SANDSTONE_SHARED_ID, matId, 1, SANDSTONE_SHARED_ID));
-			}
-			if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.SMOOTH_SANDSTONE)) {
-				// smelt sandstone -> smooth sandstone
-				addRecipe(recipeId("smelting/smooth_sandstone", SMOOTH_SANDSTONE_SHARED_ID, matId),
-						smelting(SMOOTH_SANDSTONE_SHARED_ID, matId, 0.1f, 200, SANDSTONE_SHARED_ID, "raa_materials:parametric_smelting"));
-				addRecipe(recipeId("blasting/smooth_sandstone", SMOOTH_SANDSTONE_SHARED_ID, matId),
-						smelting(SMOOTH_SANDSTONE_SHARED_ID, matId, 0.1f, 100, SANDSTONE_SHARED_ID, "raa_materials:parametric_blasting"));
-			}
-
-			// ---------- Mud / Dried / Bricks ----------
-			if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.DRIED) && FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.BLOCK)) {
-				// smelt block -> dried
-				addRecipe(recipeId("smelting/dried_from_block", DRIED_SHARED_ID, matId),
-						smelting(DRIED_SHARED_ID, matId, 0.1f, 200, BLOCK_SHARED_ID, "raa_materials:parametric_smelting"));
-				addRecipe(recipeId("blasting/dried_from_block", DRIED_SHARED_ID, matId),
-						smelting(DRIED_SHARED_ID, matId, 0.1f, 100, BLOCK_SHARED_ID, "raa_materials:parametric_blasting"));
-			}
-			if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.BRICKS) && FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.DRIED)) {
-				// 4 dried -> 4 bricks
-				addRecipe(recipeId("processing/bricks_from_dried", BRICKS_SHARED_ID, matId),
-						shaped(BRICKS_SHARED_ID, matId, 4, "##", "##"));
-			}
-
-			// ---------- Clay / Ceramic ----------
-			if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.CERAMIC) && FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.BALL)) {
-				// smelt clay ball -> ceramic block (vanilla-ish)
-				addRecipe(recipeId("smelting/ceramic_from_ball", CERAMIC_SHARED_ID, matId),
-						smelting(CERAMIC_SHARED_ID, matId, 0.3f, 200, BALL_SHARED_ID, "raa_materials:parametric_smelting"));
-				addRecipe(recipeId("blasting/ceramic_from_ball", CERAMIC_SHARED_ID, matId),
-						smelting(CERAMIC_SHARED_ID, matId, 0.3f, 100, BALL_SHARED_ID, "raa_materials:parametric_blasting"));
-			}
-
-			// ---------- Ore/raw → ingot (metals/alloys) ----------
-			boolean metalish = switch (def.kind()) {
-				case METAL, ALLOY -> true;
-				default -> false;
-			};
-			if (metalish && FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.INGOT)) {
-				// ORE -> INGOT (xp 0.7)
-				if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.ORE)) {
-					addRecipe(recipeId("smelting/ingot_from_ore", INGOT_SHARED_ID, matId),
-							smelting(INGOT_SHARED_ID, matId, 0.7f, 200, ORE_SHARED_ID, "raa_materials:parametric_smelting"));
-					addRecipe(recipeId("blasting/ingot_from_ore", INGOT_SHARED_ID, matId),
-							smelting(INGOT_SHARED_ID, matId, 0.7f, 100, ORE_SHARED_ID, "raa_materials:parametric_blasting"));
-				}
-				// RAW -> INGOT (xp 0.7)
-				if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.RAW)) {
-					addRecipe(recipeId("smelting/ingot_from_raw", INGOT_SHARED_ID, matId),
-							smelting(INGOT_SHARED_ID, matId, 0.7f, 200, RAW_SHARED_ID, "raa_materials:parametric_smelting"));
-					addRecipe(recipeId("blasting/ingot_from_raw", INGOT_SHARED_ID, matId),
-							smelting(INGOT_SHARED_ID, matId, 0.7f, 100, RAW_SHARED_ID, "raa_materials:parametric_blasting"));
-				}
-			}
-		}
-	}*/
-
-	// =========================================================
-	// Helpers — RECIPES (generic JSON emitters)
-	// =========================================================
-
-	// ---- Result with components (vanilla supports this in 1.20.5+) ----
 	private static JResult resultWithMaterial(Identifier itemId, Identifier mat) {
 		var res = JResult.result(itemId);
 		res.components(builder -> builder.set(YComponents.MATERIAL, mat));
@@ -1085,7 +803,6 @@ public final class MaterialsAssets {
 		return res;
 	}
 
-	// ---- Vanilla shaped (single key char '#') using our custom ingredient ----
 	private static JShapedRecipe shapedVanilla(Identifier outId, Identifier mat, int count,
 											   Identifier inSharedItem, String... pattern) {
 		return JRecipe.shaped(
@@ -1095,7 +812,6 @@ public final class MaterialsAssets {
 		);
 	}
 
-	// ---- Vanilla shapeless (optionally with count on the ingredient) ----
 	private static JShapelessRecipe shapelessVanilla(Identifier outId, Identifier mat, int count,
 													 Identifier inSharedItem, int inCount) {
 		return JRecipe.shapeless(
@@ -1104,13 +820,11 @@ public final class MaterialsAssets {
 		);
 	}
 
-	// ---- Vanilla stonecutting ----
 	private static JStonecuttingRecipe stonecuttingVanilla(Identifier outId, Identifier mat, int count,
 														   Identifier inSharedItem) {
 		return JRecipe.stonecutting(ingredientWithMaterial(inSharedItem, mat), resultWithMaterial(outId, mat, count));
 	}
 
-	// ---- Vanilla smelting / blasting ----
 	private static JCookingRecipe furnaceVanilla(String type, Identifier outId, Identifier mat,
 												 float xp, int time, Identifier inSharedItem) {
 		JCookingRecipe r;
@@ -1123,6 +837,72 @@ public final class MaterialsAssets {
 		}
 		return r;
 	}
+
+	/*
+	private static void buildRecipes() {
+		var mats = ClientMaterialCache.all();
+
+		for (MaterialDef def : mats) {
+			var matId = def.nameInformation().id();
+
+			if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.INGOT)
+					&& FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.BLOCK)) {
+				addRecipe(Identifier.fromNamespaceAndPath(matId.getNamespace(), "compression/block_from_ingots_" + matId.getPath()),
+						shapedVanilla(BLOCK_SHARED_ID, matId, 1, INGOT_SHARED_ID, "###", "###", "###"));
+				addRecipe(Identifier.fromNamespaceAndPath(matId.getNamespace(), "decompression/ingots_from_block_" + matId.getPath()),
+						shapelessVanilla(INGOT_SHARED_ID, matId, 9, BLOCK_SHARED_ID, 1));
+			}
+			if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.NUGGET)
+					&& FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.INGOT)) {
+				addRecipe(Identifier.fromNamespaceAndPath(matId.getNamespace(), "compression/ingot_from_nuggets_" + matId.getPath()),
+						shapedVanilla(INGOT_SHARED_ID, matId, 1, NUGGET_SHARED_ID, "###", "###", "###"));
+				addRecipe(Identifier.fromNamespaceAndPath(matId.getNamespace(), "decompression/nuggets_from_ingot_" + matId.getPath()),
+						shapelessVanilla(NUGGET_SHARED_ID, matId, 9, INGOT_SHARED_ID, 1));
+			}
+			if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.SHEET)
+					&& FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.INGOT)) {
+				addRecipe(Identifier.fromNamespaceAndPath(matId.getNamespace(), "processing/plate_from_ingot_" + matId.getPath()),
+						shapelessVanilla(PLATE_SHARED_ID, matId, 1, INGOT_SHARED_ID, 1));
+			}
+			if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.BLOCK)) {
+				if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.SLAB)) {
+					addRecipe(Identifier.fromNamespaceAndPath(matId.getNamespace(), "building/slab_" + matId.getPath()),
+							shapedVanilla(SLAB_SHARED_ID, matId, 6, BLOCK_SHARED_ID, "###"));
+					addRecipe(Identifier.fromNamespaceAndPath(matId.getNamespace(), "stonecutting/slab_" + matId.getPath()),
+							stonecuttingVanilla(SLAB_SHARED_ID, matId, 2, BLOCK_SHARED_ID));
+				}
+				if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.STAIRS)) {
+					addRecipe(Identifier.fromNamespaceAndPath(matId.getNamespace(), "building/stairs_" + matId.getPath()),
+							shapedVanilla(STAIRS_SHARED_ID, matId, 4, BLOCK_SHARED_ID, "#  ", "## ", "###"));
+					addRecipe(Identifier.fromNamespaceAndPath(matId.getNamespace(), "stonecutting/stairs_" + matId.getPath()),
+							stonecuttingVanilla(STAIRS_SHARED_ID, matId, 1, BLOCK_SHARED_ID));
+				}
+				if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.WALL)) {
+					addRecipe(Identifier.fromNamespaceAndPath(matId.getNamespace(), "building/wall_" + matId.getPath()),
+							shapedVanilla(WALL_SHARED_ID, matId, 6, BLOCK_SHARED_ID, "###", "###"));
+					addRecipe(Identifier.fromNamespaceAndPath(matId.getNamespace(), "stonecutting/wall_" + matId.getPath()),
+							stonecuttingVanilla(WALL_SHARED_ID, matId, 1, BLOCK_SHARED_ID));
+				}
+			}
+			var forms = FormsRuntime.activeForms(Minecraft.getInstance().level, def);
+			boolean metalish = def.kind() == MaterialKind.METAL || def.kind() == MaterialKind.ALLOY;
+			if (metalish && forms.contains(Form.INGOT)) {
+				if (forms.contains(Form.ORE)) {
+					addRecipe(Identifier.fromNamespaceAndPath(matId.getNamespace(), "smelting/ingot_from_ore_" + matId.getPath()),
+							furnaceVanilla("smelting", INGOT_SHARED_ID, matId, 0.7f, 200, ORE_SHARED_ID));
+					addRecipe(Identifier.fromNamespaceAndPath(matId.getNamespace(), "blasting/ingot_from_ore_" + matId.getPath()),
+							furnaceVanilla("blasting", INGOT_SHARED_ID, matId, 0.7f, 100, ORE_SHARED_ID));
+				}
+				if (forms.contains(Form.RAW)) {
+					addRecipe(Identifier.fromNamespaceAndPath(matId.getNamespace(), "smelting/ingot_from_raw_" + matId.getPath()),
+							furnaceVanilla("smelting", INGOT_SHARED_ID, matId, 0.7f, 200, RAW_SHARED_ID));
+					addRecipe(Identifier.fromNamespaceAndPath(matId.getNamespace(), "blasting/ingot_from_raw_" + matId.getPath()),
+							furnaceVanilla("blasting", INGOT_SHARED_ID, matId, 0.7f, 100, RAW_SHARED_ID));
+				}
+			}
+		}
+	}
+	*/
 
 	@FunctionalInterface
 	private interface TexPicker {
