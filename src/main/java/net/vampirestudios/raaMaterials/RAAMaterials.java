@@ -46,7 +46,7 @@ public class RAAMaterials implements ModInitializer {
 
 				// Choose which forms participate in the lottery (put your unique forms here)
 				// NOTE: keep this list in data if you want it fully data-driven.
-				var uniqueForms = java.util.List.<net.vampirestudios.raaMaterials.material.Form>of(
+				var uniqueForms = java.util.List.of(
 						// placeholder until you add real “legendary” forms:
 						Form.BATTLE_AXE, Form.WAR_HAMMER, Form.SPEAR, Form.SICKLE, Form.CROWN, Form.CLOAK,
 						Form.AMULET, Form.ORB, Form.MUSIC_DISC

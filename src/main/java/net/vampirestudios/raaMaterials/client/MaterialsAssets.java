@@ -188,14 +188,11 @@ public final class MaterialsAssets {
 		}
 
 		BlockColorRegistry.register((state, _, _, tintValues) -> {
-			if (tintValues.getInt(0) == 0) {
-				int matIndex = state.getValue(ParametricBlock.MAT); // This returns an Integer
-				if (matIndex >= 0 && matIndex < materials.size()) {
-					var material = materials.get(matIndex);
-					tintValues.add(material.primaryColor());
-				}
+			int matIndex = state.getValue(ParametricBlock.MAT);
+			if (matIndex >= 0 && matIndex < materials.size()) {
+				var material = materials.get(matIndex);
+				tintValues.add(material.primaryColor());
 			}
-			tintValues.add(-1);
 		}, block);
 	}
 
