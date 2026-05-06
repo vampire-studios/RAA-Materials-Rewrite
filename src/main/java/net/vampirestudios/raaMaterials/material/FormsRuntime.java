@@ -11,7 +11,7 @@ public final class FormsRuntime {
     /** Merge a material’s declared forms with any world-assigned unique forms. */
     public static List<Form> activeForms(Level level, MaterialDef def) {
         var list = new ArrayList<>(def.forms());
-        var extras = level.getAttachedOrCreate(MaterialAttachments.LEGENDARIES).extrasFor(def.id());
+        var extras = level.getAttachedOrCreate(MaterialAttachments.LEGENDARIES).extrasFor(def.nameInformation().id());
         for (var f : extras) if (!list.contains(f)) list.add(f);
         return list;
     }
@@ -20,6 +20,6 @@ public final class FormsRuntime {
     public static boolean has(Level level, MaterialDef def, Form f) {
         return def.forms().contains(f) ||
                level.getAttachedOrCreate(MaterialAttachments.LEGENDARIES).byForm().get(f) != null &&
-               level.getAttachedOrCreate(MaterialAttachments.LEGENDARIES).byForm().get(f).equals(def.id());
+               level.getAttachedOrCreate(MaterialAttachments.LEGENDARIES).byForm().get(f).equals(def.nameInformation().id());
     }
 }

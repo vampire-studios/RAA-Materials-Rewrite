@@ -6,30 +6,28 @@ import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
-import net.devtech.arrp.api.RuntimeResourcePack;
-import net.devtech.arrp.json.blockstate.BlockstateTemplates;
-import net.devtech.arrp.json.blockstate.JBlockModel;
-import net.devtech.arrp.json.blockstate.JState;
-import net.devtech.arrp.json.iteminfo.JItemInfo;
-import net.devtech.arrp.json.iteminfo.model.JItemModel;
-import net.devtech.arrp.json.iteminfo.model.JModelBasic;
-import net.devtech.arrp.json.iteminfo.model.JSelectCase;
-import net.devtech.arrp.json.iteminfo.property.JPropertyComponent;
-import net.devtech.arrp.json.iteminfo.tint.JTint;
-import net.devtech.arrp.json.iteminfo.tint.JTintConstant;
-import net.devtech.arrp.json.iteminfo.tint.JTintDye;
-import net.devtech.arrp.json.models.JModel;
-import net.devtech.arrp.json.recipe.*;
+import net.vampirestudios.arrp.api.RuntimeResourcePack;
+import net.vampirestudios.arrp.json.blockstate.BlockstateTemplates;
+import net.vampirestudios.arrp.json.blockstate.JBlockModel;
+import net.vampirestudios.arrp.json.blockstate.JState;
+import net.vampirestudios.arrp.json.iteminfo.JItemInfo;
+import net.vampirestudios.arrp.json.iteminfo.model.JItemModel;
+import net.vampirestudios.arrp.json.iteminfo.model.JModelBasic;
+import net.vampirestudios.arrp.json.iteminfo.model.JSelectCase;
+import net.vampirestudios.arrp.json.iteminfo.property.JPropertyComponent;
+import net.vampirestudios.arrp.json.iteminfo.tint.JTint;
+import net.vampirestudios.arrp.json.iteminfo.tint.JTintConstant;
+import net.vampirestudios.arrp.json.iteminfo.tint.JTintDye;
+import net.vampirestudios.arrp.json.models.JModel;
+import net.vampirestudios.arrp.json.recipe.*;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockColorRegistry;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.vampirestudios.raaMaterials.ARRPGenerationHelper;
 import net.vampirestudios.raaMaterials.RAAMaterials;
 import net.vampirestudios.raaMaterials.RRPGen;
@@ -48,59 +46,59 @@ import java.util.Map;
 public final class MaterialsAssets {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-	private static final java.util.Map<ResourceLocation, MaterialAssetsDef> ASSETS = new java.util.HashMap<>();
+	private static final java.util.Map<Identifier, MaterialAssetsDef> ASSETS = new java.util.HashMap<>();
 	// ---- Component + shared ids ----
 	private static final JPropertyComponent MAT_COMP = JPropertyComponent.component("raa_materials:material");
-	private static final ResourceLocation ORE_SHARED_ID = RAAMaterials.id("material_ore");
-	private static final ResourceLocation BLOCK_SHARED_ID = RAAMaterials.id("material_block");
-	private static final ResourceLocation RAW_BLOCK_SHARED_ID = RAAMaterials.id("material_raw_block");
-	private static final ResourceLocation SHINGLES_SHARED_ID = RAAMaterials.id("material_shingles");
-	private static final ResourceLocation PLATE_BLOCK_SHARED_ID = RAAMaterials.id("material_plate_block");
+	private static final Identifier ORE_SHARED_ID = RAAMaterials.id("material_ore");
+	private static final Identifier BLOCK_SHARED_ID = RAAMaterials.id("material_block");
+	private static final Identifier RAW_BLOCK_SHARED_ID = RAAMaterials.id("material_raw_block");
+	private static final Identifier SHINGLES_SHARED_ID = RAAMaterials.id("material_shingles");
+	private static final Identifier PLATE_BLOCK_SHARED_ID = RAAMaterials.id("material_plate_block");
 	// New shared block IDs (cube-all)
-	private static final ResourceLocation SANDSTONE_SHARED_ID = RAAMaterials.id("material_sandstone");
-	private static final ResourceLocation CUT_SANDSTONE_SHARED_ID = RAAMaterials.id("material_cut_sandstone");
-	private static final ResourceLocation SMOOTH_SANDSTONE_SHARED_ID = RAAMaterials.id("material_smooth_sandstone");
-	private static final ResourceLocation CHISELED_SHARED_ID = RAAMaterials.id("material_chiseled");
-	private static final ResourceLocation BRICKS_SHARED_ID = RAAMaterials.id("material_bricks");
-	private static final ResourceLocation POLISHED_SHARED_ID = RAAMaterials.id("material_polished");
-	private static final ResourceLocation DRIED_SHARED_ID = RAAMaterials.id("material_dried");
-	private static final ResourceLocation CERAMIC_SHARED_ID = RAAMaterials.id("material_ceramic");
+	private static final Identifier SANDSTONE_SHARED_ID = RAAMaterials.id("material_sandstone");
+	private static final Identifier CUT_SANDSTONE_SHARED_ID = RAAMaterials.id("material_cut_sandstone");
+	private static final Identifier SMOOTH_SANDSTONE_SHARED_ID = RAAMaterials.id("material_smooth_sandstone");
+	private static final Identifier CHISELED_SHARED_ID = RAAMaterials.id("material_chiseled");
+	private static final Identifier BRICKS_SHARED_ID = RAAMaterials.id("material_bricks");
+	private static final Identifier POLISHED_SHARED_ID = RAAMaterials.id("material_polished");
+	private static final Identifier DRIED_SHARED_ID = RAAMaterials.id("material_dried");
+	private static final Identifier CERAMIC_SHARED_ID = RAAMaterials.id("material_ceramic");
 	// Base shapes (BLOCK)
-	private static final ResourceLocation SLAB_SHARED_ID = RAAMaterials.id("material_slab");
-	private static final ResourceLocation STAIRS_SHARED_ID = RAAMaterials.id("material_stairs");
-	private static final ResourceLocation WALL_SHARED_ID = RAAMaterials.id("material_wall");
+	private static final Identifier SLAB_SHARED_ID = RAAMaterials.id("material_slab");
+	private static final Identifier STAIRS_SHARED_ID = RAAMaterials.id("material_stairs");
+	private static final Identifier WALL_SHARED_ID = RAAMaterials.id("material_wall");
 	// Variant shapes
-	private static final ResourceLocation SANDSTONE_SLAB_SHARED_ID = RAAMaterials.id("material_sandstone_slab");
-	private static final ResourceLocation SANDSTONE_STAIRS_SHARED_ID = RAAMaterials.id("material_sandstone_stairs");
-	private static final ResourceLocation SANDSTONE_WALL_SHARED_ID = RAAMaterials.id("material_sandstone_wall");
-	private static final ResourceLocation BRICK_SLAB_SHARED_ID = RAAMaterials.id("material_brick_slab");
-	private static final ResourceLocation BRICK_STAIRS_SHARED_ID = RAAMaterials.id("material_brick_stairs");
-	private static final ResourceLocation BRICK_WALL_SHARED_ID = RAAMaterials.id("material_brick_wall");
-	private static final ResourceLocation POLISHED_SLAB_SHARED_ID = RAAMaterials.id("material_polished_slab");
-	private static final ResourceLocation POLISHED_STAIRS_SHARED_ID = RAAMaterials.id("material_polished_stairs");
-	private static final ResourceLocation POLISHED_WALL_SHARED_ID = RAAMaterials.id("material_polished_wall");
+	private static final Identifier SANDSTONE_SLAB_SHARED_ID = RAAMaterials.id("material_sandstone_slab");
+	private static final Identifier SANDSTONE_STAIRS_SHARED_ID = RAAMaterials.id("material_sandstone_stairs");
+	private static final Identifier SANDSTONE_WALL_SHARED_ID = RAAMaterials.id("material_sandstone_wall");
+	private static final Identifier BRICK_SLAB_SHARED_ID = RAAMaterials.id("material_brick_slab");
+	private static final Identifier BRICK_STAIRS_SHARED_ID = RAAMaterials.id("material_brick_stairs");
+	private static final Identifier BRICK_WALL_SHARED_ID = RAAMaterials.id("material_brick_wall");
+	private static final Identifier POLISHED_SLAB_SHARED_ID = RAAMaterials.id("material_polished_slab");
+	private static final Identifier POLISHED_STAIRS_SHARED_ID = RAAMaterials.id("material_polished_stairs");
+	private static final Identifier POLISHED_WALL_SHARED_ID = RAAMaterials.id("material_polished_wall");
 	// ---- Shared item IDs ----
-	private static final ResourceLocation INGOT_SHARED_ID = RAAMaterials.id("material_ingot");
-	private static final ResourceLocation RAW_SHARED_ID = RAAMaterials.id("material_raw");
-	private static final ResourceLocation NUGGET_SHARED_ID = RAAMaterials.id("material_nugget");
-	private static final ResourceLocation DUST_SHARED_ID = RAAMaterials.id("material_dust");
-	private static final ResourceLocation PLATE_SHARED_ID = RAAMaterials.id("material_sheet");
-	private static final ResourceLocation CRYSTAL_SHARED_ID = RAAMaterials.id("material_crystal");
-	private static final ResourceLocation SHARD_SHARED_ID = RAAMaterials.id("material_shard");
-	private static final ResourceLocation GEAR_SHARED_ID = RAAMaterials.id("material_gear");
-	private static final ResourceLocation CLUSTER_SHARED_ID = RAAMaterials.id("material_cluster");
-	private static final ResourceLocation GEM_SHARED_ID = RAAMaterials.id("material_gem");
-	private static final ResourceLocation BALL_SHARED_ID = RAAMaterials.id("material_ball");
-	private static final ResourceLocation ROD_SHARED_ID = RAAMaterials.id("material_rod");
-	private static final ResourceLocation SHOVEL_SHARED_ID = RAAMaterials.id("material_shovel");
-	private static final ResourceLocation HOE_SHARED_ID = RAAMaterials.id("material_hoe");
-	private static final ResourceLocation SWORD_SHARED_ID = RAAMaterials.id("material_sword");
-	private static final ResourceLocation PICKAXE_SHARED_ID = RAAMaterials.id("material_pickaxe");
-	private static final ResourceLocation AXE_SHARED_ID = RAAMaterials.id("material_axe");
+	private static final Identifier INGOT_SHARED_ID = RAAMaterials.id("material_ingot");
+	private static final Identifier RAW_SHARED_ID = RAAMaterials.id("material_raw");
+	private static final Identifier NUGGET_SHARED_ID = RAAMaterials.id("material_nugget");
+	private static final Identifier DUST_SHARED_ID = RAAMaterials.id("material_dust");
+	private static final Identifier PLATE_SHARED_ID = RAAMaterials.id("material_sheet");
+	private static final Identifier CRYSTAL_SHARED_ID = RAAMaterials.id("material_crystal");
+	private static final Identifier SHARD_SHARED_ID = RAAMaterials.id("material_shard");
+	private static final Identifier GEAR_SHARED_ID = RAAMaterials.id("material_gear");
+	private static final Identifier CLUSTER_SHARED_ID = RAAMaterials.id("material_cluster");
+	private static final Identifier GEM_SHARED_ID = RAAMaterials.id("material_gem");
+	private static final Identifier BALL_SHARED_ID = RAAMaterials.id("material_ball");
+	private static final Identifier ROD_SHARED_ID = RAAMaterials.id("material_rod");
+	private static final Identifier SHOVEL_SHARED_ID = RAAMaterials.id("material_shovel");
+	private static final Identifier HOE_SHARED_ID = RAAMaterials.id("material_hoe");
+	private static final Identifier SWORD_SHARED_ID = RAAMaterials.id("material_sword");
+	private static final Identifier PICKAXE_SHARED_ID = RAAMaterials.id("material_pickaxe");
+	private static final Identifier AXE_SHARED_ID = RAAMaterials.id("material_axe");
 	private static boolean DIRTY = false;
 	private static boolean reloading = false;
 
-	private static ResourceLocation texture(AssetsTheme.Slot slot, MaterialDef def) {
+	private static Identifier texture(AssetsTheme.Slot slot, MaterialDef def) {
 		return FormTextureResolver.of(AssetsTheme.defaultTheme()).sheet(slot, def).orElseThrow();
 	}
 
@@ -127,10 +125,9 @@ public final class MaterialsAssets {
 			// dev-only path; keep it namespaced per material id
 			Path out = root
 					.resolve("data")
-					.resolve(m.id().getNamespace())
-					.resolve("raa_materials")   // keep a stable bucket
+					.resolve(m.nameInformation().id().getNamespace())
 					.resolve("assets")
-					.resolve(m.id().getPath() + ".json");
+					.resolve(m.nameInformation().id().getPath() + ".json");
 
 			Files.createDirectories(out.getParent());
 			JsonElement json = encodeOrThrow(MaterialAssetsDef.CODEC, def);
@@ -163,18 +160,10 @@ public final class MaterialsAssets {
 		});
 
 		// Also rebuild whenever resources reload (F3+T etc.)
-		ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(
-				new SimpleSynchronousResourceReloadListener() {
-					@Override
-					public ResourceLocation getFabricId() {
-						return RAAMaterials.id("materials_assets_rebuilder");
-					}
-
-					@Override
-					public void onResourceManagerReload(ResourceManager rm) {
-						// If cache already loaded, rebuild so JSON matches current cache
-						if (!ClientMaterialCache.all().isEmpty()) buildAll();
-					}
+		ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(RAAMaterials.id("materials_assets_rebuilder"),
+				(_, _, preparationBarrier, _) -> {
+					if (!ClientMaterialCache.all().isEmpty()) buildAll();
+					return preparationBarrier.wait(null);
 				}
 		);
 	}
@@ -191,24 +180,22 @@ public final class MaterialsAssets {
 		// Add other tinted blocks as needed
 	}
 
-	private static void registerColorProviderForSharedBlock(ResourceLocation sharedBlockId, List<MaterialDef> materials) {
+	private static void registerColorProviderForSharedBlock(Identifier sharedBlockId, List<MaterialDef> materials) {
 		var block = BuiltInRegistries.BLOCK.getValue(sharedBlockId);
 		if (block == null) {
 			System.err.println("[RAA] Block not found for id: " + sharedBlockId);
 			return;
 		}
 
-		ColorProviderRegistry.BLOCK.register((state, world, pos, tintIndex) -> {
-			if (tintIndex == 0 && world != null && pos != null) {
-				// Get the material INDEX from the block state (it's an int, not ResourceLocation)
+		BlockColorRegistry.register((state, _, _, tintValues) -> {
+			if (tintValues.getInt(0) == 0) {
 				int matIndex = state.getValue(ParametricBlock.MAT); // This returns an Integer
 				if (matIndex >= 0 && matIndex < materials.size()) {
-					// Use the index to get the material definition and return its primary color
 					var material = materials.get(matIndex);
-					return material.primaryColor();
+					tintValues.add(material.primaryColor());
 				}
 			}
-			return -1; // Default to white/no tint
+			tintValues.add(-1);
 		}, block);
 	}
 
@@ -243,14 +230,14 @@ public final class MaterialsAssets {
 				(idx) -> texture(def.get(idx)).textures1().oreVein().orElseThrow());
 
 		Map<MaterialKind, TexPicker> blockTextures = Map.of(
-				MaterialKind.METAL, (idx) -> RAAMaterials.id(STR."storage_blocks/metals/metal_\{oneIndexed(idx, 23)}"),
-				MaterialKind.CRYSTAL, (idx) -> RAAMaterials.id(STR."crystal/crystal_block_\{oneIndexed(idx, 5)}"),
-				MaterialKind.GEM, (idx) -> RAAMaterials.id(STR."storage_blocks/gems/gem_\{oneIndexed(idx, 16)}"),
-				MaterialKind.STONE, (idx) -> RAAMaterials.id(STR."stone/a/stone_\{oneIndexed(idx, 23)}"),
-				MaterialKind.SAND, (idx) -> RAAMaterials.id(STR."storage_blocks/sand_\{oneIndexed(idx, 3)}"),
-				MaterialKind.MUD, (idx) -> ResourceLocation.withDefaultNamespace("mud"),
-				MaterialKind.GRAVEL, (idx) -> ResourceLocation.withDefaultNamespace("gravel"),
-				MaterialKind.CLAY, (idx) -> ResourceLocation.withDefaultNamespace("clay")
+				MaterialKind.METAL,   (idx) -> RAAMaterials.id("storage_blocks/metals/metal_" + oneIndexed(idx, 23)),
+				MaterialKind.CRYSTAL, (idx) -> RAAMaterials.id("crystal/crystal_block_" + oneIndexed(idx, 5)),
+				MaterialKind.GEM,     (idx) -> RAAMaterials.id("storage_blocks/gems/gem_" + oneIndexed(idx, 16)),
+				MaterialKind.STONE,   (idx) -> RAAMaterials.id("stone/a/stone_" + oneIndexed(idx, 23)),
+				MaterialKind.SAND,    (idx) -> RAAMaterials.id("storage_blocks/sand_" + oneIndexed(idx, 3)),
+				MaterialKind.MUD,     (idx) -> Identifier.withDefaultNamespace("mud"),
+				MaterialKind.GRAVEL,  (idx) -> Identifier.withDefaultNamespace("gravel"),
+				MaterialKind.CLAY,    (idx) -> Identifier.withDefaultNamespace("clay")
 		);
 
 		buildBlockFamily(List.of(Form.BLOCK), BLOCK_SHARED_ID, "block/material_block/", blockTextures);
@@ -379,7 +366,7 @@ public final class MaterialsAssets {
 	}
 
 	private static void buildBlockFamily(
-			List<Form> forms, ResourceLocation sharedBlockId, String perModelPrefix, TexPicker picker
+			List<Form> forms, Identifier sharedBlockId, String perModelPrefix, TexPicker picker
 	) {
 		var rp = RRPGen.PACK;
 		var mats = ClientMaterialCache.all();
@@ -393,11 +380,11 @@ public final class MaterialsAssets {
 			var def = mats.get(idx);
 			if (hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), forms)) continue;
 
-			var perModelId = RAAMaterials.id(perModelPrefix + def.id().getPath());
+			var perModelId = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath());
 			var tex = picker.pick(idx);
 			addCubeAllTintedBlockModel(rp, perModelId, tex);
 			variants.add(new JBlockModelEntry(idx, JState.model(perModelId)));
-			select.addCase(JSelectCase.of(def.id().toString(), JModelBasic.model(perModelId.toString())));
+			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(perModelId.toString())));
 			cases++;
 		}
 
@@ -419,7 +406,7 @@ public final class MaterialsAssets {
 	}
 
 	private static void buildBlockFamily(
-			List<Form> forms, ResourceLocation sharedBlockId, String perModelPrefix,
+			List<Form> forms, Identifier sharedBlockId, String perModelPrefix,
 			Map<MaterialKind, TexPicker> pickers
 	) {
 		var rp = RRPGen.PACK;
@@ -431,7 +418,7 @@ public final class MaterialsAssets {
 			var def = mats.get(idx);
 			if (hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), forms)) continue;
 
-			var perModelId = RAAMaterials.id(perModelPrefix + def.id().getPath());
+			var perModelId = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath());
 			var tex = switch (def.kind()) {
 				case METAL, ALLOY, OTHER -> pickers.get(MaterialKind.METAL).pick(idx);
 				case GEM -> pickers.get(MaterialKind.GEM).pick(idx);
@@ -442,14 +429,14 @@ public final class MaterialsAssets {
 				case MUD -> pickers.get(MaterialKind.MUD).pick(idx);
 				case GRAVEL -> pickers.get(MaterialKind.GRAVEL).pick(idx);
 				case CLAY -> pickers.get(MaterialKind.CLAY).pick(idx);
-				default -> ResourceLocation.withDefaultNamespace("stone");
+				default -> Identifier.withDefaultNamespace("stone");
 //				default -> {
-//					throw new IllegalStateException("No block texture for " + def.id() + " (kind=" + def.kind() + ")");
+//					throw new IllegalStateException("No block texture for " + def.nameInformation().id() + " (kind=" + def.kind() + ")");
 //				}
 			};
 			addCubeAllTintedBlockModel(rp, perModelId, tex);
 			variants.add(new JBlockModelEntry(idx, JState.model(perModelId)));
-			select.addCase(JSelectCase.of(def.id().toString(), JModelBasic.model(perModelId.toString()).tint(JTint.constant(def.primaryColor()))));
+			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(perModelId.toString()).tint(JTint.constant(def.primaryColor()))));
 		}
 
 		var v = JState.variant();
@@ -460,15 +447,15 @@ public final class MaterialsAssets {
 		rp.addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
 	}
 
-	private static void addCubeAllBlockModel(RuntimeResourcePack rp, ResourceLocation modelId, ResourceLocation texture) {
+	private static void addCubeAllBlockModel(RuntimeResourcePack rp, Identifier modelId, Identifier texture) {
 		ARRPGenerationHelper.generateAllBlockModel(rp, modelId, texture);
 	}
 
-	private static void addCubeAllTintedBlockModel(RuntimeResourcePack rp, ResourceLocation modelId, ResourceLocation texture) {
+	private static void addCubeAllTintedBlockModel(RuntimeResourcePack rp, Identifier modelId, Identifier texture) {
 		ARRPGenerationHelper.generateAllTintedBlockModel(rp, modelId, texture);
 	}
 
-	private static void addOreModel(RuntimeResourcePack rp, ResourceLocation modelId, TextureDef1 def, ResourceLocation host) {
+	private static void addOreModel(RuntimeResourcePack rp, Identifier modelId, TextureDef1 def, Identifier host) {
 		rp.addModel(JModel.model("minecraft:block/ore").textures(JModel.textures()
 				.var("base", host.toString())
 				.var("overlay", def.oreVein().toString())
@@ -484,7 +471,7 @@ public final class MaterialsAssets {
 		return !actual.contains(wanted);
 	}
 
-	private static void buildSlabFamilyForBlock(ResourceLocation sharedSlabId, String perModelPrefixBlockTex, Map<MaterialKind, TexPicker> pickers) {
+	private static void buildSlabFamilyForBlock(Identifier sharedSlabId, String perModelPrefixBlockTex, Map<MaterialKind, TexPicker> pickers) {
 		var rp = RRPGen.PACK;
 		var mats = ClientMaterialCache.all();
 		var select = JItemModel.select().property(MAT_COMP);
@@ -495,18 +482,18 @@ public final class MaterialsAssets {
 			if (!FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.SLAB) || !FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.BLOCK))
 				continue;
 
-			ResourceLocation baseTex = switch (def.kind()) {
+			Identifier baseTex = switch (def.kind()) {
 				case METAL, ALLOY, OTHER -> pickers.get(MaterialKind.METAL).pick(idx);
 				case GEM -> pickers.get(MaterialKind.GEM).pick(idx);
 				case CRYSTAL -> pickers.get(MaterialKind.CRYSTAL).pick(idx);
 				case STONE, CLAY, GRAVEL, SOIL, MUD, SALT, VOLCANIC -> pickers.get(MaterialKind.STONE).pick(idx);
-				case SAND -> RAAMaterials.id(STR."building/sandstone/sandstone_\{oneIndexed(idx, 10)}");
+				case SAND -> RAAMaterials.id("building/sandstone/sandstone_" + oneIndexed(idx, 10));
 				// If WOOD can have slabs, map it here, or skip:
-				case WOOD -> ResourceLocation.withDefaultNamespace("block/oak_planks"); // Assumption: placeholder
+				case WOOD -> Identifier.withDefaultNamespace("block/oak_planks"); // Assumption: placeholder
 			};
-			var modelBottom = RAAMaterials.id("block/material_block/" + def.id().getPath() + "_slab");
-			var modelTop = RAAMaterials.id("block/material_block/" + def.id().getPath() + "_slab_top");
-			var fullModel = RAAMaterials.id("block/material_block/" + def.id().getPath());
+			var modelBottom = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath() + "_slab");
+			var modelTop = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath() + "_slab_top");
+			var fullModel = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath());
 
 			rp.addModel(JModel.model("minecraft:block/slab")
 					.textures(JModel.textures()
@@ -521,7 +508,7 @@ public final class MaterialsAssets {
 
 			BlockstateTemplates.addSlab(v, Map.of("mat", idx), JState.model(modelBottom), JState.model(modelTop), JState.model(fullModel));
 
-			select.addCase(JSelectCase.of(def.id().toString(), JModelBasic.model(modelBottom.toString())));
+			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(modelBottom.toString())));
 		}
 
 		rp.addBlockState(JState.state(v), sharedSlabId);
@@ -533,7 +520,7 @@ public final class MaterialsAssets {
 	// Helpers — SHAPES (BLOCK-based)
 	// =========================================================
 
-	private static void buildStairsFamilyForBlock(ResourceLocation sharedStairsId, String perModelPrefixBlockTex, Map<MaterialKind, TexPicker> pickers) {
+	private static void buildStairsFamilyForBlock(Identifier sharedStairsId, String perModelPrefixBlockTex, Map<MaterialKind, TexPicker> pickers) {
 		var rp = RRPGen.PACK;
 		var mats = ClientMaterialCache.all();
 		var select = JItemModel.select().property(MAT_COMP);
@@ -544,18 +531,18 @@ public final class MaterialsAssets {
 			if (!FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.STAIRS) || !FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.BLOCK))
 				continue;
 
-			ResourceLocation tex = switch (def.kind()) {
+			Identifier tex = switch (def.kind()) {
 				case METAL, ALLOY, OTHER -> pickers.get(MaterialKind.METAL).pick(idx);
 				case GEM -> pickers.get(MaterialKind.GEM).pick(idx);
 				case CRYSTAL -> pickers.get(MaterialKind.CRYSTAL).pick(idx);
 				case STONE, CLAY, GRAVEL, SOIL, MUD, SALT, VOLCANIC -> pickers.get(MaterialKind.STONE).pick(idx);
-				case SAND -> RAAMaterials.id(STR."building/sandstone/sandstone_\{oneIndexed(idx, 10)}");
+				case SAND -> RAAMaterials.id("building/sandstone/sandstone_" + oneIndexed(idx, 10));
 				// If WOOD can have slabs, map it here, or skip:
-				case WOOD -> ResourceLocation.withDefaultNamespace("block/oak_planks"); // Assumption: placeholder
+				case WOOD -> Identifier.withDefaultNamespace("block/oak_planks"); // Assumption: placeholder
 			};
-			var model = RAAMaterials.id("block/material_block/" + def.id().getPath() + "_stairs");
-			var modelIn = RAAMaterials.id("block/material_block/" + def.id().getPath() + "_stairs_inner");
-			var modelOut = RAAMaterials.id("block/material_block/" + def.id().getPath() + "_stairs_outer");
+			var model = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath() + "_stairs");
+			var modelIn = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath() + "_stairs_inner");
+			var modelOut = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath() + "_stairs_outer");
 
 			var texs = JModel.textures().var("bottom", tex.toString()).var("top", tex.toString()).var("side", tex.toString());
 			rp.addModel(JModel.model("minecraft:block/stairs").textures(texs), model);
@@ -564,7 +551,7 @@ public final class MaterialsAssets {
 
 			BlockstateTemplates.addStairs(v, Map.of("mat", idx), JState.model(model), JState.model(modelIn), JState.model(modelOut));
 
-			select.addCase(JSelectCase.of(def.id().toString(), JModelBasic.model(model.toString())));
+			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(model.toString())));
 		}
 
 		rp.addBlockState(JState.state(v), sharedStairsId);
@@ -572,7 +559,7 @@ public final class MaterialsAssets {
 		rp.addItemModelInfo(new JItemInfo().model(select), sharedStairsId);
 	}
 
-	private static void buildWallFamilyForBlock(ResourceLocation sharedWallId, String perModelPrefixBlockTex, Map<MaterialKind, TexPicker> pickers) {
+	private static void buildWallFamilyForBlock(Identifier sharedWallId, String perModelPrefixBlockTex, Map<MaterialKind, TexPicker> pickers) {
 		var rp = RRPGen.PACK;
 		var mats = ClientMaterialCache.all();
 		var select = JItemModel.select().property(MAT_COMP);
@@ -583,18 +570,18 @@ public final class MaterialsAssets {
 			if (!FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.WALL) || !FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.BLOCK))
 				continue;
 
-			ResourceLocation tex = switch (def.kind()) {
+			Identifier tex = switch (def.kind()) {
 				case METAL, ALLOY, OTHER -> pickers.get(MaterialKind.METAL).pick(idx);
 				case GEM -> pickers.get(MaterialKind.GEM).pick(idx);
 				case CRYSTAL -> pickers.get(MaterialKind.CRYSTAL).pick(idx);
 				case STONE, CLAY, GRAVEL, SOIL, MUD, SALT, VOLCANIC -> pickers.get(MaterialKind.STONE).pick(idx);
-				case SAND -> RAAMaterials.id(STR."building/sandstone/sandstone_\{oneIndexed(idx, 10)}");
+				case SAND -> RAAMaterials.id("building/sandstone/sandstone_" + oneIndexed(idx, 10));
 				// If WOOD can have slabs, map it here, or skip:
-				case WOOD -> ResourceLocation.withDefaultNamespace("block/oak_planks"); // Assumption: placeholder
+				case WOOD -> Identifier.withDefaultNamespace("block/oak_planks"); // Assumption: placeholder
 			};
-			var post = RAAMaterials.id("block/material_block/" + def.id().getPath() + "_wall_post");
-			var side = RAAMaterials.id("block/material_block/" + def.id().getPath() + "_wall_side");
-			var sideT = RAAMaterials.id("block/material_block/" + def.id().getPath() + "_wall_side_tall");
+			var post = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath() + "_wall_post");
+			var side = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath() + "_wall_side");
+			var sideT = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath() + "_wall_side_tall");
 
 			rp.addModel(JModel.model("minecraft:block/template_wall_post")
 					.textures(JModel.textures().var("wall", tex.toString())), post);
@@ -605,7 +592,7 @@ public final class MaterialsAssets {
 
 			BlockstateTemplates.addWall(multipart, Map.of("mat", idx), JState.model(post), JState.model(side), JState.model(sideT));
 
-			select.addCase(JSelectCase.of(def.id().toString(), JModelBasic.model(side.toString())));
+			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(side.toString())));
 		}
 
 		rp.addBlockState(JState.state(multipart), sharedWallId);
@@ -613,8 +600,8 @@ public final class MaterialsAssets {
 		rp.addItemModelInfo(new JItemInfo().model(select), sharedWallId);
 	}
 
-	private static void buildSlabFamilyVariant(ResourceLocation sharedSlabId, String perModelPrefixVariant,
-											   TexPicker variantTex, ResourceLocation fullBlockModelsFolder) {
+	private static void buildSlabFamilyVariant(Identifier sharedSlabId, String perModelPrefixVariant,
+											   TexPicker variantTex, Identifier fullBlockModelsFolder) {
 		var rp = RRPGen.PACK;
 		var mats = ClientMaterialCache.all();
 		var select = JItemModel.select().property(MAT_COMP);
@@ -625,8 +612,8 @@ public final class MaterialsAssets {
 			if (!FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.SLAB)) continue;
 
 			var tex = variantTex.pick(idx);
-			var modelBottom = RAAMaterials.id(perModelPrefixVariant + def.id().getPath() + "_slab");
-			var modelTop = RAAMaterials.id(perModelPrefixVariant + def.id().getPath() + "_slab_top");
+			var modelBottom = RAAMaterials.id(perModelPrefixVariant + def.nameInformation().id().getPath() + "_slab");
+			var modelTop = RAAMaterials.id(perModelPrefixVariant + def.nameInformation().id().getPath() + "_slab_top");
 
 			rp.addModel(JModel.model("minecraft:block/slab")
 					.textures(JModel.textures()
@@ -641,10 +628,10 @@ public final class MaterialsAssets {
 
 			v.put(Map.of("mat", idx, "type", "bottom"), JState.model(modelBottom));
 			v.put(Map.of("mat", idx, "type", "top"), JState.model(modelTop));
-			var fullModel = RAAMaterials.id(fullBlockModelsFolder.getPath() + def.id().getPath());
+			var fullModel = RAAMaterials.id(fullBlockModelsFolder.getPath() + def.nameInformation().id().getPath());
 			v.put(Map.of("mat", idx, "type", "double"), JState.model(fullModel));
 
-			select.addCase(JSelectCase.of(def.id().toString(), JModelBasic.model(modelBottom.toString())));
+			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(modelBottom.toString())));
 		}
 
 		rp.addBlockState(JState.state(v), sharedSlabId);
@@ -652,7 +639,7 @@ public final class MaterialsAssets {
 		rp.addItemModelInfo(new JItemInfo().model(select), sharedSlabId);
 	}
 
-	private static void buildStairsFamilyVariant(ResourceLocation sharedStairsId, String perModelPrefixVariant,
+	private static void buildStairsFamilyVariant(Identifier sharedStairsId, String perModelPrefixVariant,
 												 TexPicker variantTex) {
 		var rp = RRPGen.PACK;
 		var mats = ClientMaterialCache.all();
@@ -664,9 +651,9 @@ public final class MaterialsAssets {
 			if (!FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.STAIRS)) continue;
 
 			var tex = variantTex.pick(idx);
-			var model = RAAMaterials.id(perModelPrefixVariant + def.id().getPath() + "_stairs");
-			var modelIn = RAAMaterials.id(perModelPrefixVariant + def.id().getPath() + "_stairs_inner");
-			var modelOut = RAAMaterials.id(perModelPrefixVariant + def.id().getPath() + "_stairs_outer");
+			var model = RAAMaterials.id(perModelPrefixVariant + def.nameInformation().id().getPath() + "_stairs");
+			var modelIn = RAAMaterials.id(perModelPrefixVariant + def.nameInformation().id().getPath() + "_stairs_inner");
+			var modelOut = RAAMaterials.id(perModelPrefixVariant + def.nameInformation().id().getPath() + "_stairs_outer");
 
 			var texs = JModel.textures().var("bottom", tex.toString()).var("top", tex.toString()).var("side", tex.toString());
 			rp.addModel(JModel.model("minecraft:block/stairs").textures(texs), model);
@@ -685,7 +672,7 @@ public final class MaterialsAssets {
 					}
 				}
 			}
-			select.addCase(JSelectCase.of(def.id().toString(), JModelBasic.model(model.toString())));
+			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(model.toString())));
 		}
 
 		rp.addBlockState(JState.state(v), sharedStairsId);
@@ -697,7 +684,7 @@ public final class MaterialsAssets {
 	// Helpers — SHAPES (Variant-based)
 	// =========================================================
 
-	private static void buildWallFamilyVariant(ResourceLocation sharedWallId, String perModelPrefixVariant,
+	private static void buildWallFamilyVariant(Identifier sharedWallId, String perModelPrefixVariant,
 											   TexPicker variantTex) {
 		var rp = RRPGen.PACK;
 		var mats = ClientMaterialCache.all();
@@ -709,10 +696,10 @@ public final class MaterialsAssets {
 			if (!FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.WALL)) continue;
 
 			var tex = variantTex.pick(idx);
-			var post = RAAMaterials.id(perModelPrefixVariant + def.id().getPath() + "_wall_post");
-			var side = RAAMaterials.id(perModelPrefixVariant + def.id().getPath() + "_wall_side");
-			var sideT = RAAMaterials.id(perModelPrefixVariant + def.id().getPath() + "_wall_side_tall");
-			var inventory = RAAMaterials.id(perModelPrefixVariant + def.id().getPath() + "_wall_inventory");
+			var post = RAAMaterials.id(perModelPrefixVariant + def.nameInformation().id().getPath() + "_wall_post");
+			var side = RAAMaterials.id(perModelPrefixVariant + def.nameInformation().id().getPath() + "_wall_side");
+			var sideT = RAAMaterials.id(perModelPrefixVariant + def.nameInformation().id().getPath() + "_wall_side_tall");
+			var inventory = RAAMaterials.id(perModelPrefixVariant + def.nameInformation().id().getPath() + "_wall_inventory");
 
 			rp.addModel(JModel.model("minecraft:block/template_wall_post")
 					.textures(JModel.textures().var("wall", tex.toString())), post);
@@ -733,7 +720,7 @@ public final class MaterialsAssets {
 			multipart.when(Map.of("mat", idx, "south", "tall")).addModel(JState.model(sideT).uvlock().y(180));
 			multipart.when(Map.of("mat", idx, "west", "tall")).addModel(JState.model(sideT).uvlock().y(270));
 
-			select.addCase(JSelectCase.of(def.id().toString(), JModelBasic.model(inventory.toString()).tint(JTint.constant(def.primaryColor()))));
+			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(inventory.toString()).tint(JTint.constant(def.primaryColor()))));
 		}
 
 		rp.addBlockState(JState.state(multipart), sharedWallId);
@@ -742,7 +729,7 @@ public final class MaterialsAssets {
 	}
 
 	private static void buildItemFamily(
-			List<Form> forms, ResourceLocation logicalItemId, String perModelPrefix, TexPicker layer0
+			List<Form> forms, Identifier logicalItemId, String perModelPrefix, TexPicker layer0
 	) {
 		var rp = RRPGen.PACK;
 		var mats = ClientMaterialCache.all();
@@ -763,9 +750,9 @@ public final class MaterialsAssets {
 			var def = mats.get(idx);
 			if (hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), forms)) continue;
 
-			var perModelId = RAAMaterials.id(perModelPrefix + def.id().getPath());
+			var perModelId = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath());
 			addGeneratedItemModel(rp, perModelId, layer0.pick(idx));
-			select.addCase(JSelectCase.of(def.id().toString(), JModelBasic.model(perModelId.toString())
+			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(perModelId.toString())
 					.tint(new JTintConstant(def.primaryColor()))));
 			cases++;
 		}
@@ -785,7 +772,7 @@ public final class MaterialsAssets {
 
 	private static void buildLayeredItemFamily(
 			Form forms,
-			ResourceLocation logicalItemId,
+			Identifier logicalItemId,
 			String perModelPrefix,
 			TexPicker layer0,
 			TexPicker layer1
@@ -795,6 +782,7 @@ public final class MaterialsAssets {
 
 		// Guard: no materials → plain fallback
 		if (mats == null || mats.isEmpty()) {
+			IO.println("This is a test");
 			rp.addItemModelInfo(
 					new JItemInfo().model(JModelBasic.of(logicalItemId.withPrefix("item/").toString())),
 					logicalItemId
@@ -809,20 +797,20 @@ public final class MaterialsAssets {
 			var def = mats.get(idx);
 			if (hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), forms)) continue;
 
-			var perModelId = RAAMaterials.id(perModelPrefix + def.id().getPath());
+			var perModelId = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath());
 
 			// Build a generated model with 2 layers
-			var model = JModel.model("item/generated")
+			var model = JModel.model("item/handheld")
 					.textures(JModel.textures()
-							.var("layer0", layer0.pick(idx).toString())
-							.var("layer1", layer1.pick(idx).toString())
+							.var("layer0", layer0.pick(idx).toString().replace(".png", ""))
+							.var("layer1", layer1.pick(idx).toString().replace(".png", ""))
 					);
 
 			rp.addModel(model, perModelId);
 
 			select.addCase(
 					JSelectCase.of(
-							def.id().toString(),
+							def.nameInformation().id().toString(),
 							JModelBasic.model(perModelId.toString()).tint(new JTintDye(0xFF00FF))
 					)
 			);
@@ -830,6 +818,7 @@ public final class MaterialsAssets {
 		}
 
 		if (cases == 0) {
+			IO.println("0 cases");
 			rp.addItemModelInfo(
 					new JItemInfo().model(JModelBasic.of(logicalItemId.withPrefix("item/").toString())),
 					logicalItemId
@@ -837,7 +826,7 @@ public final class MaterialsAssets {
 			return;
 		}
 
-		select.fallback(JModelBasic.of(logicalItemId.withPrefix("item/").toString()));
+		select.fallback(JModelBasic.of("minecraft:item/stone_axe"));
 		rp.addItemModelInfo(new JItemInfo().model(select), logicalItemId);
 	}
 
@@ -845,21 +834,21 @@ public final class MaterialsAssets {
 	// Helpers — ITEMS
 	// =========================================================
 
-	private static void addGeneratedItemModel(RuntimeResourcePack rp, ResourceLocation modelId, ResourceLocation layer0) {
+	private static void addGeneratedItemModel(RuntimeResourcePack rp, Identifier modelId, Identifier layer0) {
 		rp.addModel(JModel.model("minecraft:item/generated")
 						.textures(JModel.textures().var("layer0", layer0.withPrefix("item/").toString().replace(".png", ""))),
 				modelId
 		);
 	}
 
-	private static void addRecipe(ResourceLocation id, JRecipe recipe) {
-		var file = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "recipes/" + id.getPath() + ".json");
+	private static void addRecipe(Identifier id, JRecipe recipe) {
+		var file = Identifier.fromNamespaceAndPath(id.getNamespace(), "recipes/" + id.getPath() + ".json");
 		RRPGen.PACK.addRecipe(file, recipe);
 	}
 
 	// ---- Custom ingredient matching a specific material component ----
 	// Shape: { "type":"raa_materials:component", "item":"<shared>", "components":{"raa_materials:material":{"id":"<mat>"}} }
-	private static JIngredient ingredientWithMaterial(ResourceLocation sharedItemId, ResourceLocation mat) {
+	private static JIngredient ingredientWithMaterial(Identifier sharedItemId, Identifier mat) {
 		return JIngredient.ingredient().fabricCustom(
 				RAAMaterials.id("component"), // ← MUST equal your CustomIngredientSerializer id
 				obj -> {
@@ -878,7 +867,7 @@ public final class MaterialsAssets {
 		var mats = ClientMaterialCache.all();
 
 		for (MaterialDef def : mats) {
-			var matId = def.id(); // raa_materials:<material_registry_key>
+			var matId = def.nameInformation().id(); // raa_materials:<material_registry_key>
 
 			// ---------- Compression: ingot <-> block, nugget <-> ingot ----------
 			if (FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.INGOT) && FormsRuntime.activeForms(Minecraft.getInstance().level, def).contains(Form.BLOCK)) {
@@ -1087,21 +1076,21 @@ public final class MaterialsAssets {
 	// =========================================================
 
 	// ---- Result with components (vanilla supports this in 1.20.5+) ----
-	private static JResult resultWithMaterial(ResourceLocation itemId, ResourceLocation mat) {
+	private static JResult resultWithMaterial(Identifier itemId, Identifier mat) {
 		var res = JResult.result(itemId);
 		res.components(builder -> builder.set(YComponents.MATERIAL, mat));
 		return res;
 	}
 
-	private static JStackedResult resultWithMaterial(ResourceLocation itemId, ResourceLocation mat, int count) {
+	private static JStackedResult resultWithMaterial(Identifier itemId, Identifier mat, int count) {
 		var res = JResult.stackedResult(itemId, count);
 		res.components(builder -> builder.set(YComponents.MATERIAL, mat));
 		return res;
 	}
 
 	// ---- Vanilla shaped (single key char '#') using our custom ingredient ----
-	private static JShapedRecipe shapedVanilla(ResourceLocation outId, ResourceLocation mat, int count,
-											   ResourceLocation inSharedItem, String... pattern) {
+	private static JShapedRecipe shapedVanilla(Identifier outId, Identifier mat, int count,
+											   Identifier inSharedItem, String... pattern) {
 		return JRecipe.shaped(
 				JPattern.pattern(pattern),
 				JKeys.keys().key("#", ingredientWithMaterial(inSharedItem, mat)),
@@ -1110,8 +1099,8 @@ public final class MaterialsAssets {
 	}
 
 	// ---- Vanilla shapeless (optionally with count on the ingredient) ----
-	private static JShapelessRecipe shapelessVanilla(ResourceLocation outId, ResourceLocation mat, int count,
-													 ResourceLocation inSharedItem, int inCount) {
+	private static JShapelessRecipe shapelessVanilla(Identifier outId, Identifier mat, int count,
+													 Identifier inSharedItem, int inCount) {
 		return JRecipe.shapeless(
 				JIngredients.ingredients().add(ingredientWithMaterial(inSharedItem, mat)),
 				resultWithMaterial(outId, mat, count)
@@ -1119,14 +1108,14 @@ public final class MaterialsAssets {
 	}
 
 	// ---- Vanilla stonecutting ----
-	private static JStonecuttingRecipe stonecuttingVanilla(ResourceLocation outId, ResourceLocation mat, int count,
-														   ResourceLocation inSharedItem) {
+	private static JStonecuttingRecipe stonecuttingVanilla(Identifier outId, Identifier mat, int count,
+														   Identifier inSharedItem) {
 		return JRecipe.stonecutting(ingredientWithMaterial(inSharedItem, mat), resultWithMaterial(outId, mat, count));
 	}
 
 	// ---- Vanilla smelting / blasting ----
-	private static JCookingRecipe furnaceVanilla(String type, ResourceLocation outId, ResourceLocation mat,
-												 float xp, int time, ResourceLocation inSharedItem) {
+	private static JCookingRecipe furnaceVanilla(String type, Identifier outId, Identifier mat,
+												 float xp, int time, Identifier inSharedItem) {
 		JCookingRecipe r;
 		if (type.equals("blasting")) {
 			r = JRecipe.blasting(ingredientWithMaterial(inSharedItem, mat), resultWithMaterial(outId, mat, 1))
@@ -1138,14 +1127,9 @@ public final class MaterialsAssets {
 		return r;
 	}
 
-	// Namespace-friendly recipe id helper
-	private static ResourceLocation recipeId(String family, ResourceLocation sharedId, ResourceLocation mat) {
-		return RAAMaterials.id(STR."\{STR."\{family}/" + sharedId.getPath()}/" + mat.getPath());
-	}
-
 	@FunctionalInterface
 	private interface TexPicker {
-		ResourceLocation pick(int idx);
+		Identifier pick(int idx);
 	}
 
 	private record JBlockModelEntry(int idx, JBlockModel model) {

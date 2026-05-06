@@ -17,12 +17,11 @@ final class TargetMatcher {
         final List<Block> ids = new ArrayList<>();
         final List<TagKey<Block>> tags = new ArrayList<>();
         for (Target t : targets) {
-            // Assumes your Target has either id() or tag() accessors — adjust to your class.
-            if (t.id() != null) {
+            if (t.type() == Target.Type.BLOCK && t.id() != null) {
                 ids.add(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(t.id()));
             }
-            if (t.tag() != null) {
-                tags.add(TagKey.create(net.minecraft.core.registries.Registries.BLOCK, t.tag()));
+            if (t.type() == Target.Type.TAG && t.id() != null) {
+				tags.add(TagKey.create(net.minecraft.core.registries.Registries.BLOCK, t.id()));
             }
         }
         return state -> {

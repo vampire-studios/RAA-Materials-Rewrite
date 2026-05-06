@@ -20,7 +20,7 @@ public final class LangKeys {
 	public static String keyFor(Form form, MaterialKind kind, List<Form> forms) {
 		if (BASE_AWARE.contains(form)) {
 			Form base = IdSuffixes.shapeBaseFor(forms);
-			return STR."block.raa_materials.form.\{IdSuffixes.shapeSuffix(form, base)}";
+			return String.format("block.raa_materials.form.%s", IdSuffixes.shapeSuffix(form, base));
 		}
 
 		if (form == CUT) {

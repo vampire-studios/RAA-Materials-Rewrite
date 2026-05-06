@@ -100,6 +100,6 @@ public final class IdSuffixes {
             case WALL -> "wall";
             default -> shape.name().toLowerCase(Locale.ROOT);
         };
-        return baseToken.isEmpty() ? shapeToken : STR."\{baseToken}_" + shapeToken;
+        return baseToken.isEmpty() ? shapeToken : String.format("%s_", baseToken) + shapeToken;
     }
 }

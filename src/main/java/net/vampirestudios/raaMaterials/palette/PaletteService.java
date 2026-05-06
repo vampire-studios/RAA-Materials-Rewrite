@@ -1,9 +1,9 @@
 // src/main/java/your/mod/palette/PaletteService.java
 package net.vampirestudios.raaMaterials.palette;
 
-import net.devtech.arrp.api.RRPCallback;
-import net.devtech.arrp.api.RuntimeResourcePack;
-import net.minecraft.resources.ResourceLocation;
+import net.vampirestudios.arrp.api.RRPCallback;
+import net.vampirestudios.arrp.api.RuntimeResourcePack;
+import net.minecraft.resources.Identifier;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static net.devtech.arrp.api.RuntimeResourcePack.create;
+import static net.vampirestudios.arrp.api.RuntimeResourcePack.create;
 
 public final class PaletteService {
 	private static final RuntimeResourcePack RRP = create("raa_materials:palettes");
@@ -25,9 +25,9 @@ public final class PaletteService {
 	
 	public static void registerMaterial(String materialKey,
 										PaletteRules rules,
-										ResourceLocation baseTexture,           // e.g. "raa_materials:materials/base_ingot"
-										ResourceLocation outTexturePath,        // e.g. "raa_materials:textures/item/ingot_myrite.png"
-										ResourceLocation outItemModelPath) {    // e.g. "raa_materials:item/myrite_ingot"
+										Identifier baseTexture,           // e.g. "raa_materials:materials/base_ingot"
+										Identifier outTexturePath,        // e.g. "raa_materials:textures/item/ingot_myrite.png"
+										Identifier outItemModelPath) {    // e.g. "raa_materials:item/myrite_ingot"
 		Palette p = CACHE.computeIfAbsent(materialKey, k -> PaletteDeriver.derive(k, rules));
 		int[] ramp = RAMPS.computeIfAbsent(materialKey, k -> Recolor.buildRamp(p.stops()));
 

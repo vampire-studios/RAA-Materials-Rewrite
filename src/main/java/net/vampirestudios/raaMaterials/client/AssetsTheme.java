@@ -1,22 +1,22 @@
 // src/main/java/net/vampirestudios/raaMaterials/client/AssetsTheme.java
 package net.vampirestudios.raaMaterials.client;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.vampirestudios.raaMaterials.material.*;
 
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.random.RandomGenerator;
 
-import static net.minecraft.resources.ResourceLocation.withDefaultNamespace;
+import static net.minecraft.resources.Identifier.withDefaultNamespace;
 import static net.vampirestudios.raaMaterials.RAAMaterials.id;
 
 public final class AssetsTheme {
-	private final Map<Slot, List<ResourceLocation>> global = new EnumMap<>(Slot.class);
-	private final Map<MaterialKind, Map<Slot, List<ResourceLocation>>> perKind = new EnumMap<>(MaterialKind.class);
-	private final Map<Slot, ResourceLocation> fallbacks = new EnumMap<>(Slot.class);
-	private final Map<Form, List<ResourceLocation>> globalForm = new EnumMap<>(Form.class);
-	private final Map<MaterialKind, Map<Form, List<ResourceLocation>>> perKindForm = new EnumMap<>(MaterialKind.class);
+	private final Map<Slot, List<Identifier>> global = new EnumMap<>(Slot.class);
+	private final Map<MaterialKind, Map<Slot, List<Identifier>>> perKind = new EnumMap<>(MaterialKind.class);
+	private final Map<Slot, Identifier> fallbacks = new EnumMap<>(Slot.class);
+	private final Map<Form, List<Identifier>> globalForm = new EnumMap<>(Form.class);
+	private final Map<MaterialKind, Map<Form, List<Identifier>>> perKindForm = new EnumMap<>(MaterialKind.class);
 
 	private AssetsTheme() {
 		// Initialize fallbacks
@@ -43,7 +43,7 @@ public final class AssetsTheme {
 	}
 
 	// ---------- Internal resolvers ----------
-	private Optional<ResourceLocation> pick(MaterialKind k, Slot s, RandomGenerator rnd) {
+	private Optional<Identifier> pick(MaterialKind k, Slot s, RandomGenerator rnd) {
 		var km = perKind.get(k);
 		if (km != null) {
 			var rls = km.get(s);
@@ -56,7 +56,7 @@ public final class AssetsTheme {
 		return Optional.ofNullable(fallbacks.get(s));
 	}
 
-	private Optional<ResourceLocation> pickForm(MaterialKind k, Form f, RandomGenerator rnd) {
+	private Optional<Identifier> pickForm(MaterialKind k, Form f, RandomGenerator rnd) {
 		var km = perKindForm.get(k);
 		if (km != null) {
 			var rls = km.get(f);
@@ -69,12 +69,12 @@ public final class AssetsTheme {
 		return Optional.empty();
 	}
 
-	public Optional<ResourceLocation> resolveSlot(MaterialKind kind, Slot slot, Random rnd) {
+	public Optional<Identifier> resolveSlot(MaterialKind kind, Slot slot, Random rnd) {
 		return pick(kind, slot, rnd);
 	}
 
 	// Public bridge for generators
-	public Optional<ResourceLocation> formTexture(MaterialKind k, Form f, long seed) {
+	public Optional<Identifier> formTexture(MaterialKind k, Form f, long seed) {
 		return pickForm(k, f, new Random(seed));
 	}
 
@@ -83,7 +83,7 @@ public final class AssetsTheme {
 		return (int) (Math.abs(seed) % max);
 	}
 
-	private static ResourceLocation numbered(String base, Random rnd, int max) {
+	private static Identifier numbered(String base, Random rnd, int max) {
 		return id(base + (rnd.nextInt(max) + 1) + ".png");
 	}
 
@@ -92,14 +92,14 @@ public final class AssetsTheme {
 		var k = m.kind();
 
 		// Ore vein: metals vs gems
-		Optional<ResourceLocation> oreVein = switch (k) {
+		Optional<Identifier> oreVein = switch (k) {
 			case METAL, ALLOY, OTHER -> Optional.of(numbered("ores/metals/ore_", rnd, 40));
 			case GEM -> Optional.of(numbered("ores/gems/ore_", rnd, 33));
 			default -> Optional.of(withDefaultNamespace("block/stone"));
 		};
 
 		// Storage block textures by kind
-		Optional<ResourceLocation> storageBlock = switch (k) {
+		Optional<Identifier> storageBlock = switch (k) {
 			case METAL, ALLOY, OTHER -> Optional.of(numbered("storage_blocks/metals/metal_", rnd, 23));
 			case GEM -> Optional.of(numbered("storage_blocks/gems/gem_", rnd, 16));
 			case CRYSTAL -> Optional.of(numbered("crystal/crystal_block_", rnd, 5));
@@ -107,37 +107,37 @@ public final class AssetsTheme {
 		};
 
 		// Raw block (metals-like)
-		Optional<ResourceLocation> rawBlock = switch (k) {
+		Optional<Identifier> rawBlock = switch (k) {
 			case METAL, GEM, OTHER -> Optional.of(numbered("storage_blocks/metals/raw_", rnd, 15));
 			default -> Optional.empty();
 		};
 
 		// Metal decor
-		Optional<ResourceLocation> plateBlock = Optional.of(id("metal/metal_plate.png"));
-		Optional<ResourceLocation> shingles = Optional.of(id("metal/metal_shingles.png"));
+		Optional<Identifier> plateBlock = Optional.of(id("metal/metal_plate.png"));
+		Optional<Identifier> shingles = Optional.of(id("metal/metal_shingles.png"));
 
 		// Sandstone family (vanilla parity)
-		Optional<ResourceLocation> sandstoneTop = Optional.of(withDefaultNamespace("block/sandstone_top"));
-		Optional<ResourceLocation> sandstoneSide = Optional.of(withDefaultNamespace("block/sandstone"));
-		Optional<ResourceLocation> sandstoneBottom = Optional.of(withDefaultNamespace("block/sandstone_bottom"));
-		Optional<ResourceLocation> cut = Optional.of(withDefaultNamespace("block/cut_sandstone"));
-		Optional<ResourceLocation> chiseled = switch (k) {
+		Optional<Identifier> sandstoneTop = Optional.of(withDefaultNamespace("block/sandstone_top"));
+		Optional<Identifier> sandstoneSide = Optional.of(withDefaultNamespace("block/sandstone"));
+		Optional<Identifier> sandstoneBottom = Optional.of(withDefaultNamespace("block/sandstone_bottom"));
+		Optional<Identifier> cut = Optional.of(withDefaultNamespace("block/cut_sandstone"));
+		Optional<Identifier> chiseled = switch (k) {
 			case STONE -> Optional.of(numbered("stone/stone_chiseled_", rnd, 4));
 			case SAND -> Optional.of(withDefaultNamespace("block/chiseled_sandstone"));
 			default -> Optional.empty();
 		};
 
 		// Budding & buds (crystal-like)
-		Optional<ResourceLocation> budding = (k == MaterialKind.CRYSTAL) ?
+		Optional<Identifier> budding = (k == MaterialKind.CRYSTAL) ?
 				Optional.of(id("crystal/budding_crystal_block_1.png")) : Optional.empty();
-		Optional<ResourceLocation> budSmall = Optional.of(withDefaultNamespace("block/small_amethyst_bud"));
-		Optional<ResourceLocation> budMedium = Optional.of(withDefaultNamespace("block/medium_amethyst_bud"));
-		Optional<ResourceLocation> budLarge = Optional.of(withDefaultNamespace("block/large_amethyst_bud"));
+		Optional<Identifier> budSmall = Optional.of(withDefaultNamespace("block/small_amethyst_bud"));
+		Optional<Identifier> budMedium = Optional.of(withDefaultNamespace("block/medium_amethyst_bud"));
+		Optional<Identifier> budLarge = Optional.of(withDefaultNamespace("block/large_amethyst_bud"));
 
 		// Cluster + tinted glass overlay
-		Optional<ResourceLocation> cluster = (k == MaterialKind.CRYSTAL) ?
+		Optional<Identifier> cluster = (k == MaterialKind.CRYSTAL) ?
 				Optional.of(numbered("crystal/crystal_", rnd, 9)) : Optional.empty();
-		Optional<ResourceLocation> tintedGlass = Optional.of(id("crystal/tinted_glass_1.png"));
+		Optional<Identifier> tintedGlass = Optional.of(id("crystal/tinted_glass_1.png"));
 
 		return new TextureDef1(
 				oreVein, storageBlock, rawBlock, plateBlock, shingles,
@@ -147,24 +147,24 @@ public final class AssetsTheme {
 	}
 
 	private TextureDef2 buildTextureDef2(MaterialDef m, Random rnd) {
-		Optional<ResourceLocation> crystalGlass = Optional.of(id("crystal/crystal_glass.png"));
-		Optional<ResourceLocation> crystalBricks = Optional.of(id("crystal/crystal_bricks.png"));
-		Optional<ResourceLocation> lampOverlay1 = Optional.of(id("crystal/lamp_overlay1.png"));
-		Optional<ResourceLocation> lampOverlay2 = Optional.of(id("crystal/lamp_overlay2.png"));
+		Optional<Identifier> crystalGlass = Optional.of(id("crystal/crystal_glass.png"));
+		Optional<Identifier> crystalBricks = Optional.of(id("crystal/crystal_bricks.png"));
+		Optional<Identifier> lampOverlay1 = Optional.of(id("crystal/lamp_overlay1.png"));
+		Optional<Identifier> lampOverlay2 = Optional.of(id("crystal/lamp_overlay2.png"));
 
-		Optional<ResourceLocation> raw = Optional.of(numbered("raw/raw_", rnd, 18));
-		Optional<ResourceLocation> ingot = Optional.of(numbered("ingots/ingot_", rnd, 29));
-		Optional<ResourceLocation> dust = Optional.of(numbered("dusts/dust_", rnd, 5));
-		Optional<ResourceLocation> nugget = Optional.of(numbered("nuggets/nugget_", rnd, 10));
-		Optional<ResourceLocation> plate = Optional.of(numbered("plates/plate_", rnd, 3));
-		Optional<ResourceLocation> gear = Optional.of(id("gears/gear_1.png"));
-		Optional<ResourceLocation> gem = Optional.of(numbered("gems/gem_", rnd, 33));
-		Optional<ResourceLocation> shard = Optional.of(numbered("crystal_items/shard_", rnd, 7));
-		Optional<ResourceLocation> clayBall = Optional.of(withDefaultNamespace("item/clay_ball"));
+		Optional<Identifier> raw = Optional.of(numbered("raw/raw_", rnd, 18));
+		Optional<Identifier> ingot = Optional.of(numbered("ingots/ingot_", rnd, 29));
+		Optional<Identifier> dust = Optional.of(numbered("dusts/dust_", rnd, 5));
+		Optional<Identifier> nugget = Optional.of(numbered("nuggets/nugget_", rnd, 10));
+		Optional<Identifier> plate = Optional.of(numbered("plates/plate_", rnd, 3));
+		Optional<Identifier> gear = Optional.of(id("gears/gear_1.png"));
+		Optional<Identifier> gem = Optional.of(numbered("gems/gem_", rnd, 33));
+		Optional<Identifier> shard = Optional.of(numbered("crystal_items/shard_", rnd, 7));
+		Optional<Identifier> clayBall = Optional.of(withDefaultNamespace("item/clay_ball"));
 
 		// Tool parts
-		Optional<ResourceLocation> pickHead = Optional.of(numbered("tools/pickaxe/pickaxe_", rnd, 11));
-		Optional<ResourceLocation> pickHandle = Optional.of(numbered("tools/pickaxe/stick_", rnd, 10));
+		Optional<Identifier> pickHead = Optional.of(numbered("tools/pickaxe/pickaxe_", rnd, 11));
+		Optional<Identifier> pickHandle = Optional.of(numbered("tools/pickaxe/stick_", rnd, 10));
 
 		return new TextureDef2(
 				crystalGlass, crystalBricks, lampOverlay1, lampOverlay2,
@@ -174,20 +174,20 @@ public final class AssetsTheme {
 	}
 
 	private TextureDef3 buildTextureDef3(MaterialDef m, Random rnd) {
-		Optional<ResourceLocation> axeHead = Optional.of(numbered("tools/axe/axe_head_", rnd, 11));
-		Optional<ResourceLocation> axeHandle = Optional.of(numbered("tools/axe/axe_stick_", rnd, 8));
-		Optional<ResourceLocation> swordBlade = Optional.of(numbered("tools/sword/blade_", rnd, 13));
-		Optional<ResourceLocation> swordHandle = Optional.of(numbered("tools/sword/handle_", rnd, 11));
-		Optional<ResourceLocation> shovelHead = Optional.of(numbered("tools/shovel/shovel_head_", rnd, 11));
-		Optional<ResourceLocation> shovelHandle = Optional.of(numbered("tools/shovel/shovel_stick_", rnd, 11));
-		Optional<ResourceLocation> hoeHead = Optional.of(numbered("tools/hoe/hoe_head_", rnd, 9));
-		Optional<ResourceLocation> hoeHandle = Optional.of(numbered("tools/hoe/hoe_stick_", rnd, 9));
-		Optional<ResourceLocation> cobblestone = Optional.of(numbered("stone/stone_cobbled_", rnd, 13));
-		Optional<ResourceLocation> chiseled = Optional.of(numbered("stone/stone_chiseled_", rnd, 4));
-		Optional<ResourceLocation> bricks = Optional.of(numbered("stone/stone_bricks_", rnd, 24));
-		Optional<ResourceLocation> polished = Optional.of(numbered("stone/stone_frame_", rnd, 9));
-		Optional<ResourceLocation> nail = Optional.of(id("nail"));
-		Optional<ResourceLocation> ring = Optional.of(id("ring"));
+		Optional<Identifier> axeHead = Optional.of(numbered("tools/axe/axe_head_", rnd, 11));
+		Optional<Identifier> axeHandle = Optional.of(numbered("tools/axe/axe_stick_", rnd, 8));
+		Optional<Identifier> swordBlade = Optional.of(numbered("tools/sword/blade_", rnd, 13));
+		Optional<Identifier> swordHandle = Optional.of(numbered("tools/sword/handle_", rnd, 11));
+		Optional<Identifier> shovelHead = Optional.of(numbered("tools/shovel/shovel_head_", rnd, 11));
+		Optional<Identifier> shovelHandle = Optional.of(numbered("tools/shovel/shovel_stick_", rnd, 11));
+		Optional<Identifier> hoeHead = Optional.of(numbered("tools/hoe/hoe_head_", rnd, 9));
+		Optional<Identifier> hoeHandle = Optional.of(numbered("tools/hoe/hoe_stick_", rnd, 9));
+		Optional<Identifier> cobblestone = Optional.of(numbered("stone/stone_cobbled_", rnd, 13));
+		Optional<Identifier> chiseled = Optional.of(numbered("stone/stone_chiseled_", rnd, 4));
+		Optional<Identifier> bricks = Optional.of(numbered("stone/stone_bricks_", rnd, 24));
+		Optional<Identifier> polished = Optional.of(numbered("stone/stone_frame_", rnd, 9));
+		Optional<Identifier> nail = Optional.of(id("nail"));
+		Optional<Identifier> ring = Optional.of(id("ring"));
 
 		return new TextureDef3(
 				axeHead, axeHandle, swordBlade, swordHandle,
@@ -285,17 +285,17 @@ public final class AssetsTheme {
 			this.theme = theme;
 		}
 
-		public Builder set(Slot slot, ResourceLocation rl) {
+		public Builder set(Slot slot, Identifier rl) {
 			theme.global.put(slot, List.of(rl));
 			return this;
 		}
 
-		public Builder choose(Slot slot, List<ResourceLocation> rls) {
+		public Builder choose(Slot slot, List<Identifier> rls) {
 			theme.global.put(slot, List.copyOf(rls));
 			return this;
 		}
 
-		public Builder fallback(Slot slot, ResourceLocation rl) {
+		public Builder fallback(Slot slot, Identifier rl) {
 			theme.fallbacks.put(slot, rl);
 			return this;
 		}
@@ -306,12 +306,12 @@ public final class AssetsTheme {
 			return this;
 		}
 
-		public Builder set(Form form, ResourceLocation rl) {
+		public Builder set(Form form, Identifier rl) {
 			theme.globalForm.put(form, List.of(rl));
 			return this;
 		}
 
-		public Builder choose(Form form, List<ResourceLocation> rls) {
+		public Builder choose(Form form, List<Identifier> rls) {
 			theme.globalForm.put(form, List.copyOf(rls));
 			return this;
 		}
@@ -328,18 +328,18 @@ public final class AssetsTheme {
 	}
 
 	public static final class KindBuilder {
-		private final Map<Slot, List<ResourceLocation>> kindMap;
+		private final Map<Slot, List<Identifier>> kindMap;
 
-		private KindBuilder(Map<Slot, List<ResourceLocation>> kindMap) {
+		private KindBuilder(Map<Slot, List<Identifier>> kindMap) {
 			this.kindMap = kindMap;
 		}
 
-		public KindBuilder set(Slot slot, ResourceLocation rl) {
+		public KindBuilder set(Slot slot, Identifier rl) {
 			kindMap.put(slot, List.of(rl));
 			return this;
 		}
 
-		public KindBuilder choose(Slot slot, List<ResourceLocation> rls) {
+		public KindBuilder choose(Slot slot, List<Identifier> rls) {
 			kindMap.put(slot, List.copyOf(rls));
 			return this;
 		}
@@ -351,18 +351,18 @@ public final class AssetsTheme {
 	}
 
 	public static final class FormKindBuilder {
-		private final Map<Form, List<ResourceLocation>> formMap;
+		private final Map<Form, List<Identifier>> formMap;
 
-		private FormKindBuilder(Map<Form, List<ResourceLocation>> formMap) {
+		private FormKindBuilder(Map<Form, List<Identifier>> formMap) {
 			this.formMap = formMap;
 		}
 
-		public FormKindBuilder set(Form form, ResourceLocation rl) {
+		public FormKindBuilder set(Form form, Identifier rl) {
 			formMap.put(form, List.of(rl));
 			return this;
 		}
 
-		public FormKindBuilder choose(Form form, List<ResourceLocation> rls) {
+		public FormKindBuilder choose(Form form, List<Identifier> rls) {
 			formMap.put(form, List.copyOf(rls));
 			return this;
 		}

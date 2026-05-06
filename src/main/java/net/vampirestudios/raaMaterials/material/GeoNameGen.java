@@ -1,10 +1,9 @@
 // src/main/java/net/vampirestudios/raaMaterials/material/GeoNameGen.java
 package net.vampirestudios.raaMaterials.material;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.vampirestudios.raaMaterials.RAAMaterials;
 import net.vampirestudios.raaMaterials.material.MaterialDef.NameInformation;
-import net.vampirestudios.raaMaterials.worldgen.SpawnMode;
 
 import java.security.SecureRandom;
 import java.text.Normalizer;
@@ -160,18 +159,16 @@ public final class GeoNameGen {
 		Random rng = new Random(mix(worldSeed, 0x6A09E667F3BCC909L, def.kind().ordinal(), index));
 		var spawn = def.spawn();
 		String display = genDisplay(
-				rng, def.kind(), def.primaryColor(),
-				spawn.mode(), spawn.biomeTag(), spawn.replaceableTag(), spawn.minY(), spawn.maxY()
+				rng, def.kind(), def.primaryColor(), spawn.y().minY(), spawn.y().maxY()
 		);
 		String id = slug(display) + "_" + shortHash(mix(worldSeed, display.hashCode(), def.kind().ordinal()));
 		return new NameInformation(RAAMaterials.id(id), display);
 	}
 
-	public static NameInformation generate(long worldSeed, int index, MaterialKind kind, int primaryColor, SpawnSpec spawn) {
+	public static NameInformation generate(long worldSeed, int index, MaterialKind kind, int primaryColor, SpawnInfo spawn) {
 		Random rng = new Random(mix(worldSeed, 0x6A09E667F3BCC909L, kind.ordinal(), index));
 		String display = genDisplay(
-				rng, kind, primaryColor,
-				spawn.mode(), spawn.biomeTags(), spawn.replaceables(), spawn.y().minY(), spawn.y().maxY()
+				rng, kind, primaryColor, spawn.y().minY(), spawn.y().maxY()
 		);
 		String id = slug(display) + "_" + shortHash(mix(worldSeed, display.hashCode(), kind.ordinal()));
 		return new NameInformation(RAAMaterials.id(id), display);
@@ -179,8 +176,8 @@ public final class GeoNameGen {
 
 	// ===== Kind configuration =====
 
-	private static String genDisplay(Random rng, MaterialKind kind, Integer rgb, SpawnMode mode,
-									 List<ResourceLocation> biomeTags, List<ResourceLocation> replaceables,
+	private static String genDisplay(Random rng, MaterialKind kind, Integer rgb,
+//									 List<Identifier> biomeTags, List<SpawnSpec.Target> replaceables,
 									 int minY, int maxY) {
 		final KindCfg cfg = KIND_CFG.getOrDefault(kind, KIND_CFG.get(MaterialKind.OTHER));
 
@@ -188,21 +185,21 @@ public final class GeoNameGen {
 		int arche = weighted(rng, cfg.archetypeWeights);
 
 		String prefix = switch (arche) {
-			case 0 -> pickWeightedPrefix(rng, rgb, kind, biomeTags, replaceables, minY, maxY, cfg);
-			case 1 -> cfg.preferChemPrefix ? pick(rng, CHEM) : pick(rng, CHEM);
+			case 0 -> pickWeightedPrefix(rng, rgb, kind, /*biomeTags, replaceables, */minY, maxY, cfg);
+			case 1 -> pick(rng, CHEM);
 			default -> "";
 		};
 		prefix = normalizeCombiningPrefix(prefix);
 
 		// --- CHANGED: core selection (species bias for WOOD) ---
 		String core = (kind == MaterialKind.WOOD)
-				? pickWoodCore(rng, biomeTags)
+				? /*pickWoodCore(rng*//*, biomeTags*//*)*/pick(rng, CORES_WOOD)
 				: pick(rng, cfg.cores);
 
 		if (prefix.isEmpty() && rng.nextInt(100) < 35) core = smooth(core, rng);
 
 		String link = pick(rng, LINKS);
-		String suffix = pickSuffixWithMode(rng, kind, mode, cfg);
+		String suffix = pickSuffixWithMode(rng, kind, cfg);
 		suffix = coerceSuffixSmart(suffix, kind); // coarse coercion on suffix token
 		String raw = compose(prefix, link, core, suffix, kind);
 		raw = mineralOrthography(raw);
@@ -225,15 +222,15 @@ public final class GeoNameGen {
 		return weights.length - 1;
 	}
 
-	private static String pickSuffixWithMode(Random rng, MaterialKind kind, SpawnMode mode, KindCfg cfg) {
-		String[] bank;
-		if (mode == null) {
-			bank = cfg.suffixesDefault;
-		} else if (mode == SpawnMode.GEODE || mode == SpawnMode.CLUSTER) {
-			bank = cfg.suffixesCrystalLike != null ? cfg.suffixesCrystalLike : cfg.suffixesDefault;
-		} else {
-			bank = cfg.suffixesOreLike != null ? cfg.suffixesOreLike : cfg.suffixesDefault;
-		}
+	private static String pickSuffixWithMode(Random rng, MaterialKind kind, KindCfg cfg) {
+//		if (mode == null) {
+//			bank = cfg.suffixesDefault;
+//		} else if (mode == SpawnMode.GEODE || mode == SpawnMode.CLUSTER) {
+//			bank = cfg.suffixesCrystalLike != null ? cfg.suffixesCrystalLike : cfg.suffixesDefault;
+//		} else {
+//			bank = cfg.suffixesOreLike != null ? cfg.suffixesOreLike : cfg.suffixesDefault;
+//		}
+		String[] bank = cfg.suffixesOreLike != null ? cfg.suffixesOreLike : cfg.suffixesDefault;
 		if (kind == MaterialKind.WOOD) bank = SUF_WOOD;
 		return pick(rng, bank);
 	}
@@ -241,7 +238,7 @@ public final class GeoNameGen {
 	// ===== Core generation =====
 
 	private static String pickWeightedPrefix(Random rng, Integer rgb, MaterialKind kind,
-											 List<ResourceLocation> biomeTags, List<ResourceLocation> replaceables,
+//											 List<Identifier> biomeTags, List<SpawnSpec.Target> replaceables,
 											 int minY, int maxY, KindCfg cfg) {
 		List<Choice> pool = new ArrayList<>();
 
@@ -259,8 +256,9 @@ public final class GeoNameGen {
 		else add(pool, CHEM, 1);
 
 		addDepthBias(pool, minY, maxY);
-		if (replaceables != null) for (ResourceLocation rep : replaceables) addReplaceableBias(pool, rep);
-		if (biomeTags != null) for (ResourceLocation tag : biomeTags) addBiomeBias(pool, tag);
+//		if (replaceables != null) replaceables.forEach(target -> addReplaceableBias(pool, target.id()));
+//		if (replaceables != null) for (Identifier rep : replaceables) addReplaceableBias(pool, rep);
+//		if (biomeTags != null) for (Identifier tag : biomeTags) addBiomeBias(pool, tag);
 
 		String[] bank = pickWeighted(rng, pool);
 		return bank[rng.nextInt(bank.length)];
@@ -350,9 +348,9 @@ public final class GeoNameGen {
 		return arr[r.nextInt(arr.length)];
 	}
 
-	private static String pickWoodCore(Random rng, List<ResourceLocation> biomeTags) {
+	private static String pickWoodCore(Random rng, List<Identifier> biomeTags) {
 		if (biomeTags != null) {
-			for (ResourceLocation tag : biomeTags) {
+			for (Identifier tag : biomeTags) {
 				String key = tag.getPath().toLowerCase(Locale.ROOT);
 				// direct species hints by biome key
 				if (key.contains("birch"))   return "betul";
@@ -421,7 +419,7 @@ public final class GeoNameGen {
 	}
 
 	// Replaceables (stone, deepslate, sand, gravel, etc.)
-	private static void addReplaceableBias(List<Choice> pool, ResourceLocation replaceableTag) {
+	private static void addReplaceableBias(List<Choice> pool, Identifier replaceableTag) {
 		if (replaceableTag == null) return;
 		String key = replaceableTag.getPath().toLowerCase(Locale.ROOT);
 
@@ -446,7 +444,7 @@ public final class GeoNameGen {
 		}
 	}
 
-	private static void addBiomeBias(List<Choice> pool, ResourceLocation biomeKey) {
+	private static void addBiomeBias(List<Choice> pool, Identifier biomeKey) {
 		if (biomeKey == null) return;
 		String key = biomeKey.getPath().toLowerCase(Locale.ROOT);
 
@@ -673,23 +671,47 @@ public final class GeoNameGen {
 		MaterialSet set = MaterialGenerator.generate(seed);
 		for (int i = 0; i < set.all().size(); i++) {
 			var mat = set.all().get(i);
-			System.out.println("Type: " + mat.kind().getSerializedName() + " " + generate(seed, i, mat) + " " + mat.spawn().biomeTag());
+			System.out.println("Type: " + mat.kind().getSerializedName() + " " + generate(seed, i, mat));
 		}
 		// Extra smoke test for new families:
 		var kinds = List.of(MaterialKind.SAND, MaterialKind.GRAVEL, MaterialKind.CLAY, MaterialKind.MUD, MaterialKind.SALT, MaterialKind.VOLCANIC, MaterialKind.SOIL);
 		for (int i = 0; i < 8; i++) {
-			for (var k : kinds) {
+			for (var k : List.of(MaterialKind.METAL, MaterialKind.GEM, MaterialKind.CRYSTAL)) {
 				// SpawnRules(SpawnMode mode, int veinSize, int veinsPerChunk, int minY, int maxY, int yPeak, List<String> biomeTag, List<String> replaceableTag)
-				var n = generate(seed, i, k, 0x7fbf5f,
-						new VeinSpec(
-								List.of(ResourceLocation.withDefaultNamespace("desert")),
-								List.of(SpawnSpec.Target.block(ResourceLocation.withDefaultNamespace("sand"))),
-								SpawnSpec.YBand.triangle(32, 64, 48),
-								7,
-								18
-						)
-				);
-				System.out.println(k + " -> " + n.displayName() + " [" + n.id() + "]");
+				if (k.equals(MaterialKind.METAL) || k.equals(MaterialKind.GEM) || k.equals(MaterialKind.CRYSTAL)) {
+					// === CREATE SPAWN PROFILE HERE ===
+					SpawnInfo spawn = new SpawnInfo(
+							6,                      // attemptsPerChunk
+							0.75f,                  // successChance
+
+							4,                      // veinMin
+							10,                     // veinMax
+							SpawnInfo.VeinShape.ORE_BLOB,
+
+							new SpawnInfo.YDistribution(
+									-32,            // minY
+									64,             // maxY
+									16,             // centerY
+									20              // spread
+							),
+
+							new SpawnInfo.NoiseGate(
+									0.002f,          // region frequency
+									0.0f             // threshold
+							),
+							new SpawnInfo.NoiseGate(
+									0.03f,           // pocket frequency
+									0.25f            // threshold
+							),
+
+							false,                  // mustTouchAir
+							false,                  // nearWater
+							false                   // nearLava
+					);
+
+					var n = generate(seed, i, k, 0x7fbf5f, spawn);
+					System.out.println(k + " -> " + n.displayName() + " [" + n.id() + "]");
+				}
 			}
 		}
 	}

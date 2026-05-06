@@ -4,7 +4,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.vampirestudios.raaMaterials.material.*;
 import net.vampirestudios.raaMaterials.net.NetworkInit;
@@ -21,8 +21,8 @@ public class RAAMaterials implements ModInitializer {
 
 //	public static RAAConfig CONFIG;
 
-	public static ResourceLocation id(String path) {
-		return ResourceLocation.fromNamespaceAndPath("raa_materials", path);
+	public static Identifier id(String path) {
+		return Identifier.fromNamespaceAndPath("raa_materials", path);
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class RAAMaterials implements ModInitializer {
 						Form.AMULET, Form.ORB, Form.MUSIC_DISC
 				);
 
-				var rng = new java.util.Random(server.getWorldData().worldGenOptions().seed());
+				var rng = new java.util.Random(server.overworld().getSeed());
 				var assigned = LegendaryAssignments.assign(rng, mats, uniqueForms);
 
 				overworld.setAttached(MaterialAttachments.LEGENDARIES, assigned);

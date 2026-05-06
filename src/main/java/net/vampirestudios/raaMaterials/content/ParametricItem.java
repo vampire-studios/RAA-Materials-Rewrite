@@ -36,14 +36,14 @@ public class ParametricItem extends Item {
 
 		String key = LangKeys.keyFor(form, kind, forms);
 
-		String base  = def.map(MaterialDef::displayName).orElse("");
+		String base  = def.map(def1 -> def1.nameInformation().displayName()).orElse("");
 		String lower = base.toLowerCase(Locale.ROOT);
 
 		Object[] icuArgs = {
 				base,                                   // {0} full material name
 				lower,                                  // {1} lowercase
-				lower.isEmpty() ? "" : STR."\{lower.charAt(0)}",   // {2} first char
-				lower.isEmpty() ? "" : STR."\{lower.charAt(lower.length() - 1)}" // {3} last char
+				lower.isEmpty() ? "" : String.format("%s", lower.charAt(0)),   // {2} first char
+				lower.isEmpty() ? "" : String.format("%s", lower.charAt(lower.length() - 1))
 		};
 
 		String cooked = NameGen2.format(key, icuArgs);

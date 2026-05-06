@@ -1,9 +1,8 @@
 // MaterialGenerator.java
 package net.vampirestudios.raaMaterials.material;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.vampirestudios.raaMaterials.material.MaterialDef.OreHost;
-import net.vampirestudios.raaMaterials.material.SpawnSpec.Mode;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -25,18 +24,10 @@ public final class MaterialGenerator {
 
 			List<Form> forms = getForms(kind);
 
-			var mode = switch (kind) {
-				case METAL, ALLOY, GEM -> Mode.CLUSTER;  // cluster by default
-				case CRYSTAL -> rng.nextBoolean() ? Mode.GEODE : Mode.CLUSTER;
-				case VOLCANIC -> rng.nextInt(100) < 70 ? Mode.CLUSTER : Mode.MAGMATIC;
-				case STONE -> rng.nextInt(100) < 50 ? Mode.STRATA : Mode.VEIN;
-				case SAND, GRAVEL -> rng.nextInt(100) < 60 ? Mode.POCKET : Mode.SURFACE_NODE;
-				default -> Mode.VEIN;
-			};
-			SpawnSpec spawn = OverworldSpawnProfiles.pick(kind, mode, rng);
+			SpawnInfo spawn = OverworldSpawnProfiles.pick(kind, rng);
 
 			// >>> NEW: choose host and force its target into replaceables
-			OreHost host = pickOreHost(rng, spawn.biomeTags(), spawn.y().minY(), spawn.y().maxY());
+			OreHost host = pickOreHost(rng, spawn.y().minY(), spawn.y().maxY());
 //			spawn = spawn.withReplaceables(java.util.List.of(host.target()));
 
 			// --- NEW: generate a plausible displayName (registry-safe id + display) ---
@@ -71,29 +62,29 @@ public final class MaterialGenerator {
 		return new MaterialSet(list);
 	}
 
-	private static boolean isNether(List<ResourceLocation> biomes) {
+	private static boolean isNether(List<Identifier> biomes) {
 		if (biomes == null) return false;
-		for (ResourceLocation b : biomes) if (b.getPath().toLowerCase(Locale.ROOT).contains("nether")) return true;
+		for (Identifier b : biomes) if (b.getPath().toLowerCase(Locale.ROOT).contains("nether")) return true;
 		return false;
 	}
-	private static boolean isEnd(List<ResourceLocation> biomes) {
+	private static boolean isEnd(List<Identifier> biomes) {
 		if (biomes == null) return false;
-		for (ResourceLocation b : biomes) if (b.getPath().toLowerCase(Locale.ROOT).contains("end")) return true;
+		for (Identifier b : biomes) if (b.getPath().toLowerCase(Locale.ROOT).contains("end")) return true;
 		return false;
 	}
 
 	/** Picks a reasonable host based on dimension-ish biome keys + depth band. */
-	private static OreHost pickOreHost(Random rng, List<ResourceLocation> biomeTags, int minY, int maxY) {
+	private static OreHost pickOreHost(Random rng, /*List<Identifier> biomeTags, */int minY, int maxY) {
 		// Dimension buckets
-		if (isEnd(biomeTags)) {
-			return OreHost.END_STONE;
-		}
-		if (isNether(biomeTags)) {
-			int r = rng.nextInt(100);
-			if (r < 65) return OreHost.NETHERRACK;
-			if (r < 85) return OreHost.BLACKSTONE;
-			return OreHost.BASALT;
-		}
+//		if (isEnd(biomeTags)) {
+//			return OreHost.END_STONE;
+//		}
+//		if (isNether(biomeTags)) {
+//			int r = rng.nextInt(100);
+//			if (r < 65) return OreHost.NETHERRACK;
+//			if (r < 85) return OreHost.BLACKSTONE;
+//			return OreHost.BASALT;
+//		}
 
 		// Overworld by depth + cave features
 		int mid = (minY + maxY) / 2;
@@ -109,9 +100,9 @@ public final class MaterialGenerator {
 			if (r < 80) return OreHost.DIORITE;
 			return OreHost.ANDESITE;
 		} else { // mid
-			boolean drip = biomeTags != null && biomeTags.stream().anyMatch(s -> s.getPath().toLowerCase(Locale.ROOT).contains("dripstone"));
+//			boolean drip = biomeTags != null && biomeTags.stream().anyMatch(s -> s.getPath().toLowerCase(Locale.ROOT).contains("dripstone"));
 			int r = rng.nextInt(100);
-			if (drip && r < 25) return OreHost.DRIPSTONE;
+//			if (drip && r < 25) return OreHost.DRIPSTONE;
 			if (r < 45) return OreHost.STONE;
 			if (r < 63) return OreHost.GRANITE;
 			if (r < 81) return OreHost.DIORITE;
@@ -120,7 +111,7 @@ public final class MaterialGenerator {
 		}
 	}
 
-	private static long mix(long worldSeed, ResourceLocation id) {
+	private static long mix(long worldSeed, Identifier id) {
 		long h = worldSeed ^ 0x9E3779B97F4A7C15L; // golden ratio
 		h ^= id.getNamespace().hashCode() * 0x9E3779B97F4A7C15L;
 		h ^= id.getPath().hashCode() * 0xBF58476D1CE4E5B9L;

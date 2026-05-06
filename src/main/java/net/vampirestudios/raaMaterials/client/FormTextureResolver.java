@@ -1,7 +1,7 @@
 // src/main/java/net/vampirestudios/raaMaterials/material/FormTextureResolver.java
 package net.vampirestudios.raaMaterials.client;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.vampirestudios.raaMaterials.material.Form;
 import net.vampirestudios.raaMaterials.material.MaterialDef;
 import net.vampirestudios.raaMaterials.material.MaterialKind;
@@ -9,15 +9,15 @@ import net.vampirestudios.raaMaterials.material.MaterialKind;
 import java.util.Optional;
 import java.util.Random;
 
-import static net.minecraft.resources.ResourceLocation.withDefaultNamespace;
+import static net.minecraft.resources.Identifier.withDefaultNamespace;
 
 public interface FormTextureResolver {
     /** Returns a sheet for a given Form, with fallback to storage/base. */
-    Optional<ResourceLocation> sheet(AssetsTheme.Slot form, MaterialDef mat);
+    Optional<Identifier> sheet(AssetsTheme.Slot form, MaterialDef mat);
 
     /** Optional convenience: pillar parts as separate lookups. */
-    default Optional<ResourceLocation> pillarSide(MaterialDef mat) { return sheet(AssetsTheme.Slot.PILLAR_SIDE, mat); }
-    default Optional<ResourceLocation> pillarTop (MaterialDef mat) { return sheet(AssetsTheme.Slot.PILLAR_TOP,  mat); }
+    default Optional<Identifier> pillarSide(MaterialDef mat) { return sheet(AssetsTheme.Slot.PILLAR_SIDE, mat); }
+    default Optional<Identifier> pillarTop (MaterialDef mat) { return sheet(AssetsTheme.Slot.PILLAR_TOP,  mat); }
 
     static FormTextureResolver of(AssetsTheme theme) { return new Default(theme); }
 
@@ -26,7 +26,7 @@ public interface FormTextureResolver {
         public Default(AssetsTheme theme) { this.theme = theme; }
 
         @Override
-        public Optional<ResourceLocation> sheet(AssetsTheme.Slot slot, MaterialDef mat) {
+        public Optional<Identifier> sheet(AssetsTheme.Slot slot, MaterialDef mat) {
             var kind = mat.kind();
             var rnd  = new Random(mat.assetSeed());
 
@@ -47,11 +47,11 @@ public interface FormTextureResolver {
             };
         }
 
-        private Optional<ResourceLocation> themeResolveSlot(MaterialKind k, AssetsTheme.Slot s, Random rnd) {
+        private Optional<Identifier> themeResolveSlot(MaterialKind k, AssetsTheme.Slot s, Random rnd) {
             return theme.resolveSlot(k, s, rnd);
         }
 
-        private ResourceLocation baseFallback(MaterialKind k) {
+        private Identifier baseFallback(MaterialKind k) {
             return switch (k) {
                 case SAND     -> withDefaultNamespace("sandstone.png");
                 case CLAY     -> withDefaultNamespace("clay.png");

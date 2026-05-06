@@ -1,14 +1,14 @@
 /*
 package net.vampirestudios.raaMaterials;
 
-import net.devtech.arrp.json.recipe.*;
-import net.minecraft.resources.ResourceLocation;
+import net.vampirestudios.arrp.json.recipe.*;
+import net.minecraft.resources.Identifier;
 
 import static net.vampirestudios.raaMaterials.RRPGen.PACK;
 
 public final class FormRecipes {
     // 9 plates → 1 plate_block ; and back
-    public static void emitPlateBlockRecipes(ResourceLocation matId) {
+    public static void emitPlateBlockRecipes(Identifier matId) {
         // craft/<material>/plate_block_from_plates
         JShapedRecipe shaped = JShapedRecipe.shaped(
                 JPattern.pattern("PPP","PPP","PPP"),
@@ -26,7 +26,7 @@ public final class FormRecipes {
     }
 
     // 3 plates → 6 shingles ; and back (2x2 shingles → 3 plates)
-    public static void emitShinglesRecipes(ResourceLocation matId) {
+    public static void emitShinglesRecipes(Identifier matId) {
         JShapedRecipe make = JShapedRecipe.shaped(
                 JPattern.pattern("PPP"),
                 JKeys.keys().key("P", JIngredient.ingredient().item(RAAMaterials.id("material_plate").toString())),

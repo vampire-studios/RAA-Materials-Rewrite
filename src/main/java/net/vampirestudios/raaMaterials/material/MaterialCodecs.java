@@ -49,7 +49,7 @@ public final class MaterialCodecs {
 			Codec.FLOAT.fieldOf("tool_efficiency").forGetter(MaterialDef::toolEfficiency),
 			HarvestTier.CODEC.fieldOf("tier").forGetter(MaterialDef::tier),
 			Form.CODEC.listOf().fieldOf("forms").forGetter(MaterialDef::forms),
-			SpawnSpec.CODEC.fieldOf("spawn").forGetter(MaterialDef::spawn),
+			SpawnInfo.CODEC.fieldOf("spawn_info").forGetter(MaterialDef::spawn),
 			ToolMaterialSpec.CODEC.optionalFieldOf("tool_spec").forGetter(MaterialDef::toolSpec),
 			Codec.LONG.fieldOf("asset_seed").forGetter(MaterialDef::assetSeed),
 			MaterialDef.OreHost.CODEC.fieldOf("forms").forGetter(MaterialDef::host)
@@ -71,7 +71,7 @@ public final class MaterialCodecs {
 			MaterialDef::tier,
 			Form.STREAM_CODEC.apply(ByteBufCodecs.list()),
 			MaterialDef::forms,
-			SpawnSpec.STREAM_CODEC,
+			SpawnInfo.STREAM_CODEC,
 			MaterialDef::spawn,
 			ByteBufCodecs.optional(ToolMaterialSpec.STREAM_CODEC),
 			MaterialDef::toolSpec,

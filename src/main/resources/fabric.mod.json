@@ -7,7 +7,7 @@
 	"authors": [],
 	"contact": {},
 	"license": "MIT",
-	"icon": "assets/raa-materials/icon.png",
+	"icon": "assets/raa_materials/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"client": [
@@ -22,7 +22,7 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.17.0",
-		"fabric": "*",
-		"minecraft": ">=1.21.8"
+		"fabric-api": "*",
+		"minecraft": "26.1.2"
 	}
 }

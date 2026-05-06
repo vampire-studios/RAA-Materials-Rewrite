@@ -332,7 +332,7 @@ public final class YBlocks {
 						.mapColor(MapColor.STONE)
 						.forceSolidOn()
 						.instrument(NoteBlockInstrument.BASEDRUM)
-						.noCollission()
+						.noCollision()
 						.strength(0.5F)
 						.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_pressure_plate_stone")))
 		);
@@ -343,7 +343,7 @@ public final class YBlocks {
 						.mapColor(PARAM_BLOCK.defaultMapColor())
 						.forceSolidOn()
 						.instrument(NoteBlockInstrument.BASS)
-						.noCollission()
+						.noCollision()
 						.strength(0.5F)
 						.ignitedByLava()
 						.pushReaction(PushReaction.DESTROY)
@@ -352,7 +352,7 @@ public final class YBlocks {
 		PARAM_PRESSURE_PLATE_METAL = regBlock(
 				"material_pressure_plate_metal",
 				ParametricMetalPressurePlateBlock::new,
-				BlockBehaviour.Properties.of().mapColor(MapColor.METAL).forceSolidOn().noCollission()
+				BlockBehaviour.Properties.of().mapColor(MapColor.METAL).forceSolidOn().noCollision()
 						.strength(0.5F).pushReaction(PushReaction.DESTROY)
 						.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_pressure_plate_metal")))
 		);
@@ -375,7 +375,7 @@ public final class YBlocks {
 	}
 
 	public static BlockBehaviour.Properties buttonProperties(String name) {
-		return BlockBehaviour.Properties.of().noCollission().strength(0.5F).pushReaction(PushReaction.DESTROY)
+		return BlockBehaviour.Properties.of().noCollision().strength(0.5F).pushReaction(PushReaction.DESTROY)
 				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id(name)));
 	}
 }

@@ -1,7 +1,7 @@
 // YTabs.java
 package net.vampirestudios.raaMaterials.registry;
 
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -111,7 +111,7 @@ public final class YTabs {
 		NATURAL = Registry.register(
 				BuiltInRegistries.CREATIVE_MODE_TAB,
 				RAAMaterials.id("natural"),
-				FabricItemGroup.builder()
+				FabricCreativeModeTab.builder()
 						.title(Component.translatable("tab.raa_materials.natural"))
 						.icon(() -> new ItemStack(YItems.PARAM_ORE_ITEM))
 						.displayItems((params, output) -> {
@@ -133,7 +133,7 @@ public final class YTabs {
 		RESOURCES = Registry.register(
 				BuiltInRegistries.CREATIVE_MODE_TAB,
 				RAAMaterials.id("resources"),
-				FabricItemGroup.builder()
+				FabricCreativeModeTab.builder()
 						.title(Component.translatable("tab.raa_materials.resources"))
 						.icon(() -> new ItemStack(YItems.PARAM_INGOT))
 						.displayItems((params, output) -> {
@@ -165,7 +165,7 @@ public final class YTabs {
 		BUILDING = Registry.register(
 				BuiltInRegistries.CREATIVE_MODE_TAB,
 				RAAMaterials.id("building"),
-				FabricItemGroup.builder()
+				FabricCreativeModeTab.builder()
 						.title(Component.translatable("tab.raa_materials.building"))
 						.icon(() -> new ItemStack(YItems.PARAM_BLOCK_ITEM))
 						.displayItems((params, output) -> {
@@ -324,7 +324,7 @@ public final class YTabs {
 		TOOLS = Registry.register(
 				BuiltInRegistries.CREATIVE_MODE_TAB,
 				RAAMaterials.id("tools"),
-				FabricItemGroup.builder()
+				FabricCreativeModeTab.builder()
 						.title(Component.translatable("tab.raa_materials.tools"))
 						.icon(() -> new ItemStack(YItems.PARAM_PICKAXE))
 						.displayItems((params, output) -> {
@@ -344,7 +344,7 @@ public final class YTabs {
 		WEAPONS = Registry.register(
 				BuiltInRegistries.CREATIVE_MODE_TAB,
 				RAAMaterials.id("weapons"),
-				FabricItemGroup.builder()
+				FabricCreativeModeTab.builder()
 						.title(Component.translatable("tab.raa_materials.weapons"))
 						.icon(() -> new ItemStack(YItems.PARAM_SWORD))
 						.displayItems((params, output) -> {

@@ -1,9 +1,9 @@
 package net.vampirestudios.raaMaterials.palette;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import net.devtech.arrp.api.RuntimeResourcePack;
+import net.vampirestudios.arrp.api.RuntimeResourcePack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -37,8 +37,8 @@ public final class PaletteTint {
 
     /** Generate a tinted texture and add it to the pack at targetPath ("textures/…​.png"). */
     public static void generateTintedTexture(RuntimeResourcePack rp,
-                                             ResourceLocation baseMask,     // e.g. raa_materials:base/ingot_mask
-                                             ResourceLocation targetPath,   // e.g. raa_materials:textures/item/material_ingot/<mat>.png
+                                             Identifier baseMask,     // e.g. raa_materials:base/ingot_mask
+                                             Identifier targetPath,   // e.g. raa_materials:textures/item/material_ingot/<mat>.png
                                              MaterialPalette palette) throws IOException {
         NativeImage src = readNativeImage(baseMask);
         NativeImage out = new NativeImage(src.getWidth(), src.getHeight(), false);
@@ -79,7 +79,7 @@ public final class PaletteTint {
 
     // ===== Utils =====
 
-    private static NativeImage readNativeImage(ResourceLocation rl) throws IOException {
+    private static NativeImage readNativeImage(Identifier rl) throws IOException {
         var rm = Minecraft.getInstance().getResourceManager();
         try (InputStream in = rm.getResource(rl).orElseThrow().open()) {
             return NativeImage.read(in);

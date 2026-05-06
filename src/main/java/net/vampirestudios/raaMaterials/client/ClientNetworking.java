@@ -15,7 +15,6 @@ public final class ClientNetworking {
 			var set = payload.set();
 			ctx.client().execute(() -> {
 				ClientMaterialCache.load(set);
-
 				MaterialsAssets.markDirty();
 			});
 		});

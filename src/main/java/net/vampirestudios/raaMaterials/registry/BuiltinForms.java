@@ -1,7 +1,7 @@
 // registry/BuiltinForms.java
 package net.vampirestudios.raaMaterials.registry;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.vampirestudios.raaMaterials.RAAMaterials;
@@ -42,9 +42,9 @@ public final class BuiltinForms {
     // ------------------------------------------------------------------------
 
     private static void registerSimple(String name, Item item, java.util.function.Predicate<MaterialDef> supports) {
-        ResourceLocation id = RAAMaterials.id(name);
+        Identifier id = RAAMaterials.id(name);
         FormRegistry.register(new MaterialForm() {
-            @Override public ResourceLocation id() { return id; }
+            @Override public Identifier id() { return id; }
             @Override public boolean supports(MaterialDef def) { return supports.test(def); }
             @Override public Optional<Item> createItem() { return Optional.of(item); }
             @Override public Optional<Block> createBlock() { return Optional.empty(); }
@@ -62,9 +62,9 @@ public final class BuiltinForms {
 
     private static void registerBlock(String name, Block block, Item blockItem,
                                       java.util.function.Predicate<MaterialDef> supports) {
-        ResourceLocation id = RAAMaterials.id(name);
+        Identifier id = RAAMaterials.id(name);
         FormRegistry.register(new MaterialForm() {
-            @Override public ResourceLocation id() { return id; }
+            @Override public Identifier id() { return id; }
             @Override public boolean supports(MaterialDef def) { return supports.test(def); }
             @Override public Optional<Item> createItem() { return Optional.of(blockItem); }
             @Override public Optional<Block> createBlock() { return Optional.of(block); }

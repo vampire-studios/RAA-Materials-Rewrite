@@ -1,6 +1,6 @@
 package net.vampirestudios.raaMaterials.material;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.vampirestudios.raaMaterials.client.AssetsTheme;
 
 import java.util.Optional;
@@ -16,7 +16,7 @@ public final class MaterialAssets {
     }
 
     /** Get texture for a specific form */
-    public static Optional<ResourceLocation> texture(Form form, MaterialDef material) {
+    public static Optional<Identifier> texture(Form form, MaterialDef material) {
         AssetsTheme generator = AssetsTheme.defaultTheme();
         return generator.formTexture(material.kind(), form, material.assetSeed());
     }

@@ -1,7 +1,7 @@
 // material/ToolMaterialPresets.java
 package net.vampirestudios.raaMaterials.material;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public final class ToolMaterialPresets {
     private ToolMaterialPresets(){}
@@ -45,5 +45,5 @@ public final class ToolMaterialPresets {
         };
     }
 
-    private static ResourceLocation rl(String s){ return ResourceLocation.tryParse(s); }
+    private static Identifier rl(String s){ return Identifier.tryParse(s); }
 }

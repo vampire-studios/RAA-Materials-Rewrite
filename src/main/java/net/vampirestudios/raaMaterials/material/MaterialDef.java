@@ -7,7 +7,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.util.StringRepresentable;
@@ -30,18 +30,18 @@ public record MaterialDef(
 		float toolEfficiency,
 		HarvestTier tier,
 		List<Form> forms,
-		SpawnSpec spawn,
+		SpawnInfo spawn,
 		Optional<ToolMaterialSpec> toolSpec,
 		long assetSeed,
 		OreHost host
 ) {
-	public record NameInformation(ResourceLocation id, String displayName) {
+	public record NameInformation(Identifier id, String displayName) {
 		public static final Codec<NameInformation> CODEC = RecordCodecBuilder.create(i -> i.group(
-				ResourceLocation.CODEC.fieldOf("id").forGetter(NameInformation::id),
+				Identifier.CODEC.fieldOf("id").forGetter(NameInformation::id),
 				Codec.STRING.fieldOf("display_name").forGetter(NameInformation::displayName)
 		).apply(i, NameInformation::new));
 		public static final StreamCodec<ByteBuf, NameInformation> STREAM_CODEC = StreamCodec.composite(
-				ResourceLocation.STREAM_CODEC,
+				Identifier.STREAM_CODEC,
 				NameInformation::id,
 				ByteBufCodecs.STRING_UTF8,
 				NameInformation::displayName,
@@ -65,15 +65,15 @@ public record MaterialDef(
 		DRIPSTONE("minecraft:block/dripstone_block", Target.block("minecraft:dripstone_block")),
 		SMOOTH_BASALT("minecraft:block/smooth_basalt", Target.block("minecraft:smooth_basalt"));
 
-		private final ResourceLocation baseTexture;
+		private final Identifier baseTexture;
 		private final Target target;
 
 		OreHost(String tex, Target target) {
-			this.baseTexture = ResourceLocation.tryParse(tex);
+			this.baseTexture = Identifier.tryParse(tex);
 			this.target = target;
 		}
 
-		public ResourceLocation baseTexture() {
+		public Identifier baseTexture() {
 			return baseTexture;
 		}
 
@@ -100,26 +100,26 @@ public record MaterialDef(
 		/** Small sealed type to carry either a tag or a block id. */
 		public sealed interface Target permits Target.TagT, Target.BlockT {
 			static Target tag(String tagId) {
-				return new TagT(ResourceLocation.tryParse(tagId));
+				return new TagT(Identifier.tryParse(tagId));
 			}
 
 			static Target block(String blkId) {
-				return new BlockT(ResourceLocation.tryParse(blkId));
+				return new BlockT(Identifier.tryParse(blkId));
 			}
 
-			ResourceLocation id();
+			Identifier id();
 
 			default boolean isTag() {
 				return this instanceof TagT;
 			}
 
-			record TagT(ResourceLocation id) implements Target {
+			record TagT(Identifier id) implements Target {
 				public TagT {
 					Objects.requireNonNull(id);
 				}
 			}
 
-			record BlockT(ResourceLocation id) implements Target {
+			record BlockT(Identifier id) implements Target {
 				public BlockT {
 					Objects.requireNonNull(id);
 				}

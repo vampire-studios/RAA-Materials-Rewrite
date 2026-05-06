@@ -24,7 +24,7 @@
 
 package net.vampirestudios.raaMaterials;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.awt.*;
 import java.util.List;
@@ -86,11 +86,11 @@ public class Rands {
         return Optional.of(values[randInt(values.length)]);
     }
 
-    public static Optional<ResourceLocation> optionalValues(List<ResourceLocation> values) {
+    public static Optional<Identifier> optionalValues(List<Identifier> values) {
         return Optional.of(values.get(randInt(values.size())));
     }
 
-    public static Optional<ResourceLocation> optionalValues(Random random, List<ResourceLocation> values) {
+    public static Optional<Identifier> optionalValues(Random random, List<Identifier> values) {
         return Optional.of(values.get(random.nextInt(values.size())));
     }
 

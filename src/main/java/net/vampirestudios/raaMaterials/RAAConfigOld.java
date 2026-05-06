@@ -1,3 +1,4 @@
+/*
 package net.vampirestudios.raaMaterials;
 
 import com.google.gson.Gson;
@@ -14,10 +15,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+*/
 /**
  * Main JSON config for RAA Materials.
  * Adds per-kind "formControls" (toggles + explicit add/remove) while preserving your existing fields.
- */
+ *//*
+
 public final class RAAConfigOld {
 	public static ConfigClassHandler<RAAConfigOld> HANDLER = ConfigClassHandler.createBuilder(RAAConfigOld.class)
 			.id(RAAMaterials.id("raa_materials"))
@@ -92,14 +95,18 @@ public final class RAAConfigOld {
 	@SerialEntry
 	public int toolChancePercent = 100; // 0..100
 
-	/* =========================================================================================
+	*/
+/* =========================================================================================
 	   NEW: Per-kind form controls (toggles + explicit add/remove + shape clamp)
 	   Keys = MaterialKind.name() (e.g., "METAL", "SAND", ...)
-	   ========================================================================================= */
+	   ========================================================================================= *//*
+
 	@SerialEntry
 	public Map<String, KindFormControls> formControls = defaultFormControls();
 
-	/** Default per-kind form controls (sane, permissive). */
+	*/
+/** Default per-kind form controls (sane, permissive). *//*
+
 	private static Map<String, KindFormControls> defaultFormControls() {
 		Map<String, KindFormControls> m = new LinkedHashMap<>();
 
@@ -130,12 +137,16 @@ public final class RAAConfigOld {
 		return m;
 	}
 
-	/** Fluent factory with all booleans defaulted to false (explicit opt-in per-kind above). */
+	*/
+/** Fluent factory with all booleans defaulted to false (explicit opt-in per-kind above). *//*
+
 	private static KindFormControls controls() { return new KindFormControls(); }
 
-	/* =========================================================================================
+	*/
+/* =========================================================================================
 	   Helpers
-	   ========================================================================================= */
+	   ========================================================================================= *//*
+
 
 	// helper (in config class)
 	private static YRange band(int a, int b, int c, int d) {
@@ -200,9 +211,11 @@ public final class RAAConfigOld {
 		}
 	}
 
-	/* =========================================================================================
+	*/
+/* =========================================================================================
 	   Existing nested types (unchanged)
-	   ========================================================================================= */
+	   ========================================================================================= *//*
+
 	public record NameGen(boolean useColorPrefixes, boolean useBiomeBias, boolean useReplaceableBias, int hashLen, List<String> banned) {
 		public NameGen() {
 			this(true, true, true, 4, List.of("obsidian", "pumice"));
@@ -229,9 +242,11 @@ public final class RAAConfigOld {
 		}
 	}
 
-	/* =========================================================================================
+	*/
+/* =========================================================================================
 	   NEW: Per-kind form controls bean
-	   ========================================================================================= */
+	   ========================================================================================= *//*
+
 	@SerialEntry
 	public static final class KindFormControls {
 		// Group toggles (nullable to aid migration; treat null as false unless set by defaults)
@@ -249,11 +264,15 @@ public final class RAAConfigOld {
 		public Boolean enableSaltSet;
 		public Boolean enableVolcanic;
 
-		/** Explicit add/remove: list of Form enum ids as strings, e.g., ["SLAB","STAIRS","WALL"] */
+		*/
+/** Explicit add/remove: list of Form enum ids as strings, e.g., ["SLAB","STAIRS","WALL"] *//*
+
 		public List<String> add = List.of();
 		public List<String> remove = List.of();
 
-		/** Clamp number of shape forms (SLAB/STAIRS/WALL). -1 = unlimited. */
+		*/
+/** Clamp number of shape forms (SLAB/STAIRS/WALL). -1 = unlimited. *//*
+
 		public int maxShapeForms = -1;
 
 		// ---- Fluent helpers for building defaults ----
@@ -272,3 +291,4 @@ public final class RAAConfigOld {
 		public KindFormControls enableVolcanic(boolean v)      { this.enableVolcanic = v; return this; }
 	}
 }
+*/

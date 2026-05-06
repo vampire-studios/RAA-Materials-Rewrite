@@ -2,7 +2,7 @@
 package net.vampirestudios.raaMaterials.material;
 
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
@@ -32,8 +32,8 @@ public final class MaterialRegistry {
 		return (idx >= 0 && idx < all.size()) ? Optional.of(all.get(idx)) : Optional.empty();
 	}
 
-	/** Resolve the index of a given material ResourceLocation within this level's dimension set. */
-	public static Optional<Integer> indexOf(ServerLevel level, ResourceLocation id) {
+	/** Resolve the index of a given material Identifier within this level's dimension set. */
+	public static Optional<Integer> indexOf(ServerLevel level, Identifier id) {
 		var set = get(level.dimension());
 		if (set == null) return Optional.empty();
 		var all = set.all();
@@ -59,7 +59,7 @@ public final class MaterialRegistry {
 		return ClientMaterialCache.byIndex(idx); // client cache
 	}
 
-	public static Optional<Integer> indexOf(Level level, ResourceLocation id) {
+	public static Optional<Integer> indexOf(Level level, Identifier id) {
 		if (level instanceof ServerLevel sl) return indexOf(sl, id);
 		return ClientMaterialCache.indexOf(id); // client cache
 	}

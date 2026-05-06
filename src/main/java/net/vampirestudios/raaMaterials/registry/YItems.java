@@ -175,7 +175,12 @@ public final class YItems {
 	}
 
 	private static Item regBlockItem(String registryId, Block block) {
-		return Registry.register(BuiltInRegistries.ITEM, RAAMaterials.id(registryId),
-				new ParametricBlockItem(new Item.Properties().modelId(RAAMaterials.id(registryId)), block, registryId));
+		var id = RAAMaterials.id(registryId);
+		return Registry.register(BuiltInRegistries.ITEM, id, new ParametricBlockItem(
+				new Item.Properties()
+						.setId(ResourceKey.create(Registries.ITEM, RAAMaterials.id(registryId))),
+				block,
+				registryId
+		));
 	}
 }

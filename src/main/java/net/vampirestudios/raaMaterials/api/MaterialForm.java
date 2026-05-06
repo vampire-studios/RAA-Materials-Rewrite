@@ -1,7 +1,7 @@
 // api/MaterialForm.java
 package net.vampirestudios.raaMaterials.api;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.vampirestudios.raaMaterials.material.MaterialDef;
@@ -9,7 +9,7 @@ import net.vampirestudios.raaMaterials.material.MaterialDef;
 import java.util.Optional;
 
 public interface MaterialForm {
-    ResourceLocation id();                 // e.g. yourmod:plate_block
+    Identifier id();                 // e.g. yourmod:plate_block
     boolean supports(MaterialDef def);     // should this form exist for this material?
 
     // Factories (called once during content bootstrap)

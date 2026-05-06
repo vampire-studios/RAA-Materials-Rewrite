@@ -4,7 +4,7 @@ package net.vampirestudios.raaMaterials.material;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +18,7 @@ public record MaterialSet(List<MaterialDef> all) {
 
 	public static MaterialSet DEFAULT = new MaterialSet(List.of());
 
-	public Optional<MaterialDef> byId(ResourceLocation id) {
+	public Optional<MaterialDef> byId(Identifier id) {
 		return all.stream().filter(m -> m.nameInformation().id().equals(id)).findFirst();
 	}
 

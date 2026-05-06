@@ -1,7 +1,7 @@
 // ClientMaterialCache.java
 package net.vampirestudios.raaMaterials.material;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +17,7 @@ public final class ClientMaterialCache {
 		return set.all();
 	}
 
-	public static Optional<MaterialDef> byRL(ResourceLocation rl) {
+	public static Optional<MaterialDef> byRL(Identifier rl) {
 		return set.all().stream().filter(m -> m.nameInformation().id().equals(rl)).findFirst();
 	}
 
@@ -25,7 +25,7 @@ public final class ClientMaterialCache {
 		return set.byIndex(idx);
 	}
 
-	public static Optional<Integer> indexOf(ResourceLocation rl) {
+	public static Optional<Integer> indexOf(Identifier rl) {
 		var all = set.all();
 		for (int i = 0; i < all.size(); i++) {
 			if (all.get(i).nameInformation().id().equals(rl)) {

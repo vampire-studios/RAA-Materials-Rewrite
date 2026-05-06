@@ -2,10 +2,10 @@
 package net.vampirestudios.raaMaterials.content;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.vampirestudios.raaMaterials.material.ClientMaterialCache;
 import net.vampirestudios.raaMaterials.material.MaterialKind;
@@ -20,7 +20,7 @@ public final class MaterialTooltipUtil {
 	private MaterialTooltipUtil() {}
 
 	public static void add(ItemStack stack, Consumer<Component> lines) {
-		ResourceLocation matId = stack.get(net.vampirestudios.raaMaterials.YComponents.MATERIAL);
+		Identifier matId = stack.get(net.vampirestudios.raaMaterials.YComponents.MATERIAL);
 		if (matId == null) return;
 
 		var opt = ClientMaterialCache.byRL(matId);
@@ -40,7 +40,7 @@ public final class MaterialTooltipUtil {
 //							s.minY(), s.maxY())
 //					.withStyle(ChatFormatting.DARK_GRAY));
 
-			if (Screen.hasShiftDown()) {
+			if (Minecraft.getInstance().hasShiftDown()) {
 //				var host = tagsLineKeyed("text.raa_materials.tags.host", s.replaceables());
 //				if (host != null) lines.accept(host.copy().withStyle(ChatFormatting.DARK_GRAY));
 //				var biomes = tagsLineKeyed("text.raa_materials.tags.biomes", s.biomeTag());
@@ -74,7 +74,7 @@ public final class MaterialTooltipUtil {
 	private static String spawnModeKey(SpawnMode m) {
 		return m == null
 				? "text.raa_materials.spawn_mode.unknown"
-				: (STR."text.raa_materials.spawn_mode.\{m.name().toLowerCase(Locale.ROOT)}");
+				: (String.format("text.raa_materials.spawn_mode.%s", m.name().toLowerCase(Locale.ROOT)));
 	}
 
 	private static Component tagsLineKeyed(String labelKey, List<String> tags) {
