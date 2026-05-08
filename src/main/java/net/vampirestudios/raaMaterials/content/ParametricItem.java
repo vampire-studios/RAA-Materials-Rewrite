@@ -36,7 +36,7 @@ public class ParametricItem extends Item {
 
 		String key = LangKeys.keyFor(form, kind, forms);
 
-		String base  = def.map(def1 -> def1.nameInformation().displayName()).orElse("");
+		String base  = def.map(LocalizedMaterialNames::displayName).orElse("");
 		String lower = base.toLowerCase(Locale.ROOT);
 
 		Object[] icuArgs = {

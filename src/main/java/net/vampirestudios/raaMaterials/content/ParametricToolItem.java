@@ -10,6 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.vampirestudios.raaMaterials.RAAMaterials;
 import net.vampirestudios.raaMaterials.YComponents;
 import net.vampirestudios.raaMaterials.material.ClientMaterialCache;
+import net.vampirestudios.raaMaterials.material.LocalizedMaterialNames;
 import net.vampirestudios.raaMaterials.material.MaterialDef;
 
 import java.util.Locale;
@@ -33,7 +34,7 @@ public class ParametricToolItem extends Item {
 		Identifier mat = stack.get(YComponents.MATERIAL);
 		Optional<MaterialDef> def = ClientMaterialCache.byRL(mat);
 		return Component.literal(def
-				.map(d -> name.replace("%s", d.nameInformation().displayName()))
+				.map(d -> name.replace("%s", LocalizedMaterialNames.displayName(d)))
 				.orElse(name.replace("%s ", ""))
 		);
 	}

@@ -40,7 +40,6 @@ public class RAAMaterials implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			var overworld = server.overworld();
 
-			// Generate materials at server start so ores can spawn in fresh chunks.
 			var set = overworld.getAttached(MaterialAttachments.MATERIALS);
 			if (set == null || set.all().isEmpty()) {
 				set = MaterialGenerator.generate(overworld.getSeed());

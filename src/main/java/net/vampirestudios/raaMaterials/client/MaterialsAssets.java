@@ -393,7 +393,7 @@ public final class MaterialsAssets {
 
 		for (int idx = 0; idx < mats.size(); idx++) {
 			var def = mats.get(idx);
-			if (hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), forms)) continue;
+			if (!hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), forms)) continue;
 
 			var perModelId = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath());
 			var tex = picker.pick(idx);
@@ -428,17 +428,20 @@ public final class MaterialsAssets {
 
 		List<JBlockModelEntry> variants = new ArrayList<>();
 		var select = JItemModel.select().property(MAT_COMP);
+		int cases = 0;
 		for (int idx = 0; idx < mats.size(); idx++) {
 			var def = mats.get(idx);
-			if (hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), forms)) continue;
+			if (!hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), forms)) continue;
 
 			var perModelId = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath());
 			var tex = pickBlockTex(def, idx, pickers);
 			addCubeAllTintedBlockModel(rp, perModelId, tex);
 			variants.add(new JBlockModelEntry(idx, JState.model(perModelId)));
 			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(perModelId.toString()).tint(JTint.constant(def.primaryColor()))));
+			cases++;
 		}
 
+		if (cases == 0) return;
 		var v = JState.variant();
 		for (var e : variants) v.put("mat", e.idx, e.model);
 		rp.addBlockState(JState.state(v), sharedBlockId);
@@ -462,7 +465,7 @@ public final class MaterialsAssets {
 
 		for (int idx = 0; idx < mats.size(); idx++) {
 			var def = mats.get(idx);
-			if (hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), form)) continue;
+			if (!hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), form)) continue;
 
 			var perModelId = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath());
 			rp.addModel(JModel.model("minecraft:block/cross")
@@ -473,8 +476,8 @@ public final class MaterialsAssets {
 			cases++;
 		}
 
-		rp.addBlockState(JState.state(v), sharedBlockId);
 		if (cases == 0) return;
+		rp.addBlockState(JState.state(v), sharedBlockId);
 		select.fallback(JModelBasic.of("minecraft:block/amethyst_cluster"));
 		rp.addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
 	}
@@ -485,17 +488,20 @@ public final class MaterialsAssets {
 		var rp = RRPGen.PACK;
 		var mats = ClientMaterialCache.all();
 		var v = JState.variant();
+		int cases = 0;
 
 		for (int idx = 0; idx < mats.size(); idx++) {
 			var def = mats.get(idx);
-			if (hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), form)) continue;
+			if (!hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), form)) continue;
 
 			var perModelId = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath());
 			rp.addModel(JModel.model("minecraft:block/cross")
 					.textures(JModel.textures().var("cross", blockTexture(texture.pick(idx)))), perModelId);
 			addFacingVariants(v, idx, perModelId);
+			cases++;
 		}
 
+		if (cases == 0) return;
 		rp.addBlockState(JState.state(v), sharedBlockId);
 	}
 
@@ -508,7 +514,7 @@ public final class MaterialsAssets {
 
 		for (int idx = 0; idx < mats.size(); idx++) {
 			var def = mats.get(idx);
-			if (hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), Form.ROD_BLOCK)) continue;
+			if (!hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), Form.ROD_BLOCK)) continue;
 
 			var perModelId = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath());
 			rp.addModel(JModel.model("minecraft:block/end_rod")
@@ -519,8 +525,8 @@ public final class MaterialsAssets {
 			cases++;
 		}
 
-		rp.addBlockState(JState.state(v), sharedBlockId);
 		if (cases == 0) return;
+		rp.addBlockState(JState.state(v), sharedBlockId);
 		select.fallback(JModelBasic.of("minecraft:block/end_rod"));
 		rp.addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
 	}
@@ -529,12 +535,12 @@ public final class MaterialsAssets {
 		var rp = RRPGen.PACK;
 		var mats = ClientMaterialCache.all();
 		var select = JItemModel.select().property(MAT_COMP);
-		var multipart = JState.multipart();
+		var state = JState.state();
 		int cases = 0;
 
 		for (int idx = 0; idx < mats.size(); idx++) {
 			var def = mats.get(idx);
-			if (hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), Form.PANE)) continue;
+			if (!hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), Form.PANE)) continue;
 
 			var tex = blockTexture(texture.pick(idx));
 			var post = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath() + "_post");
@@ -554,22 +560,22 @@ public final class MaterialsAssets {
 			rp.addModel(JModel.model("minecraft:block/template_glass_pane_noside_alt")
 					.textures(JModel.textures().var("pane", tex)), noSideAlt);
 
-			multipart.when(Map.of("mat", idx)).addModel(JState.model(post));
-			multipart.when(Map.of("mat", idx, "north", "true")).addModel(JState.model(side));
-			multipart.when(Map.of("mat", idx, "east", "true")).addModel(JState.model(side).y(90));
-			multipart.when(Map.of("mat", idx, "south", "true")).addModel(JState.model(sideAlt));
-			multipart.when(Map.of("mat", idx, "west", "true")).addModel(JState.model(sideAlt).y(90));
-			multipart.when(Map.of("mat", idx, "north", "false")).addModel(JState.model(noSide));
-			multipart.when(Map.of("mat", idx, "east", "false")).addModel(JState.model(noSideAlt));
-			multipart.when(Map.of("mat", idx, "south", "false")).addModel(JState.model(noSideAlt).y(90));
-			multipart.when(Map.of("mat", idx, "west", "false")).addModel(JState.model(noSide).y(270));
+			state.add(JState.multipart(JState.model(post)).when(Map.of("mat", idx)));
+			state.add(JState.multipart(JState.model(side)).when(Map.of("mat", idx, "north", "true")));
+			state.add(JState.multipart(JState.model(side).y(90)).when(Map.of("mat", idx, "east", "true")));
+			state.add(JState.multipart(JState.model(sideAlt)).when(Map.of("mat", idx, "south", "true")));
+			state.add(JState.multipart(JState.model(sideAlt).y(90)).when(Map.of("mat", idx, "west", "true")));
+			state.add(JState.multipart(JState.model(noSide)).when(Map.of("mat", idx, "north", "false")));
+			state.add(JState.multipart(JState.model(noSideAlt)).when(Map.of("mat", idx, "east", "false")));
+			state.add(JState.multipart(JState.model(noSideAlt).y(90)).when(Map.of("mat", idx, "south", "false")));
+			state.add(JState.multipart(JState.model(noSide).y(270)).when(Map.of("mat", idx, "west", "false")));
 			select.addCase(JSelectCase.of(def.nameInformation().id().toString(),
 					JModelBasic.model(post.toString()).tint(JTint.constant(def.primaryColor()))));
 			cases++;
 		}
 
-		rp.addBlockState(JState.state(multipart), sharedBlockId);
 		if (cases == 0) return;
+		rp.addBlockState(state, sharedBlockId);
 		select.fallback(JModelBasic.of("minecraft:block/glass_pane_post"));
 		rp.addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
 	}
@@ -583,13 +589,25 @@ public final class MaterialsAssets {
 		v.put(Map.of("mat", mat, "facing", "east"), JState.model(model).x(90).y(90));
 	}
 
+	private static void addWallParts(JState state, Map<String, ?> base, Identifier post, Identifier side, Identifier sideTall) {
+		state.add(JState.multipart(JState.model(post)).when(base));
+		state.add(JState.multipart(JState.model(side).uvlock().y(0)).when(BlockstateTemplates.plus(base, "north", "low")));
+		state.add(JState.multipart(JState.model(side).uvlock().y(90)).when(BlockstateTemplates.plus(base, "east", "low")));
+		state.add(JState.multipart(JState.model(side).uvlock().y(180)).when(BlockstateTemplates.plus(base, "south", "low")));
+		state.add(JState.multipart(JState.model(side).uvlock().y(270)).when(BlockstateTemplates.plus(base, "west", "low")));
+		state.add(JState.multipart(JState.model(sideTall).uvlock().y(0)).when(BlockstateTemplates.plus(base, "north", "tall")));
+		state.add(JState.multipart(JState.model(sideTall).uvlock().y(90)).when(BlockstateTemplates.plus(base, "east", "tall")));
+		state.add(JState.multipart(JState.model(sideTall).uvlock().y(180)).when(BlockstateTemplates.plus(base, "south", "tall")));
+		state.add(JState.multipart(JState.model(sideTall).uvlock().y(270)).when(BlockstateTemplates.plus(base, "west", "tall")));
+	}
+
 	private static boolean hasAny(List<Form> actual, List<Form> wanted) {
-		for (var f : wanted) if (actual.contains(f)) return false;
-		return true;
+		for (var f : wanted) if (actual.contains(f)) return true;
+		return false;
 	}
 
 	private static boolean hasAny(List<Form> actual, Form wanted) {
-		return !actual.contains(wanted);
+		return actual.contains(wanted);
 	}
 
 	private static void buildSlabFamilyForBlock(Identifier sharedSlabId, Map<MaterialKind, TexPicker> pickers) {
@@ -625,8 +643,8 @@ public final class MaterialsAssets {
 			cases++;
 		}
 
-		rp.addBlockState(JState.state(v), sharedSlabId);
 		if (cases == 0) return;
+		rp.addBlockState(JState.state(v), sharedSlabId);
 		select.fallback(JModelBasic.of("minecraft:block/stone"));
 		rp.addItemModelInfo(new JItemInfo().model(select), sharedSlabId);
 	}
@@ -662,8 +680,8 @@ public final class MaterialsAssets {
 			cases++;
 		}
 
-		rp.addBlockState(JState.state(v), sharedStairsId);
 		if (cases == 0) return;
+		rp.addBlockState(JState.state(v), sharedStairsId);
 		select.fallback(JModelBasic.of("minecraft:block/stone"));
 		rp.addItemModelInfo(new JItemInfo().model(select), sharedStairsId);
 	}
@@ -672,7 +690,7 @@ public final class MaterialsAssets {
 		var rp = RRPGen.PACK;
 		var mats = ClientMaterialCache.all();
 		var select = JItemModel.select().property(MAT_COMP);
-		var multipart = JState.multipart();
+		var state = JState.state();
 		int cases = 0;
 
 		for (int idx = 0; idx < mats.size(); idx++) {
@@ -692,13 +710,13 @@ public final class MaterialsAssets {
 			rp.addModel(JModel.model("minecraft:block/template_wall_side_tall")
 					.textures(JModel.textures().var("wall", blockTexture(tex))), sideT);
 
-			BlockstateTemplates.addWall(multipart, Map.of("mat", idx), JState.model(post), JState.model(side), JState.model(sideT));
+			addWallParts(state, Map.of("mat", idx), post, side, sideT);
 			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(side.toString())));
 			cases++;
 		}
 
-		rp.addBlockState(JState.state(multipart), sharedWallId);
 		if (cases == 0) return;
+		rp.addBlockState(state, sharedWallId);
 		select.fallback(JModelBasic.of("minecraft:block/stone"));
 		rp.addItemModelInfo(new JItemInfo().model(select), sharedWallId);
 	}
@@ -709,6 +727,7 @@ public final class MaterialsAssets {
 		var mats = ClientMaterialCache.all();
 		var select = JItemModel.select().property(MAT_COMP);
 		var v = JState.variant();
+		int cases = 0;
 
 		for (int idx = 0; idx < mats.size(); idx++) {
 			var def = mats.get(idx);
@@ -735,8 +754,10 @@ public final class MaterialsAssets {
 			v.put(Map.of("mat", idx, "type", "double"), JState.model(fullModel));
 
 			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(modelBottom.toString())));
+			cases++;
 		}
 
+		if (cases == 0) return;
 		rp.addBlockState(JState.state(v), sharedSlabId);
 		select.fallback(JModelBasic.of("minecraft:block/stone"));
 		rp.addItemModelInfo(new JItemInfo().model(select), sharedSlabId);
@@ -748,6 +769,7 @@ public final class MaterialsAssets {
 		var mats = ClientMaterialCache.all();
 		var select = JItemModel.select().property(MAT_COMP);
 		var v = JState.variant();
+		int cases = 0;
 
 		for (int idx = 0; idx < mats.size(); idx++) {
 			var def = mats.get(idx);
@@ -776,8 +798,10 @@ public final class MaterialsAssets {
 				}
 			}
 			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(model.toString())));
+			cases++;
 		}
 
+		if (cases == 0) return;
 		rp.addBlockState(JState.state(v), sharedStairsId);
 		select.fallback(JModelBasic.of("minecraft:block/stone"));
 		rp.addItemModelInfo(new JItemInfo().model(select), sharedStairsId);
@@ -792,7 +816,8 @@ public final class MaterialsAssets {
 		var rp = RRPGen.PACK;
 		var mats = ClientMaterialCache.all();
 		var select = JItemModel.select().property(MAT_COMP);
-		var multipart = JState.multipart();
+		var state = JState.state();
+		int cases = 0;
 
 		for (int idx = 0; idx < mats.size(); idx++) {
 			var def = mats.get(idx);
@@ -813,20 +838,14 @@ public final class MaterialsAssets {
 			rp.addModel(JModel.model("minecraft:block/wall_inventory")
 					.textures(JModel.textures().var("wall", blockTexture(tex))), inventory);
 
-			multipart.when(Map.of("mat", idx)).addModel(JState.model(post));
-			multipart.when(Map.of("mat", idx, "north", "low")).addModel(JState.model(side).uvlock().y(0));
-			multipart.when(Map.of("mat", idx, "east", "low")).addModel(JState.model(side).uvlock().y(90));
-			multipart.when(Map.of("mat", idx, "south", "low")).addModel(JState.model(side).uvlock().y(180));
-			multipart.when(Map.of("mat", idx, "west", "low")).addModel(JState.model(side).uvlock().y(270));
-			multipart.when(Map.of("mat", idx, "north", "tall")).addModel(JState.model(sideT).uvlock().y(0));
-			multipart.when(Map.of("mat", idx, "east", "tall")).addModel(JState.model(sideT).uvlock().y(90));
-			multipart.when(Map.of("mat", idx, "south", "tall")).addModel(JState.model(sideT).uvlock().y(180));
-			multipart.when(Map.of("mat", idx, "west", "tall")).addModel(JState.model(sideT).uvlock().y(270));
+			addWallParts(state, Map.of("mat", idx), post, side, sideT);
 
 			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(inventory.toString()).tint(JTint.constant(def.primaryColor()))));
+			cases++;
 		}
 
-		rp.addBlockState(JState.state(multipart), sharedWallId);
+		if (cases == 0) return;
+		rp.addBlockState(state, sharedWallId);
 		select.fallback(JModelBasic.of("minecraft:block/stone"));
 		rp.addItemModelInfo(new JItemInfo().model(select), sharedWallId);
 	}
@@ -850,7 +869,7 @@ public final class MaterialsAssets {
 
 		for (int idx = 0; idx < mats.size(); idx++) {
 			var def = mats.get(idx);
-			if (hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), forms)) continue;
+			if (!hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), forms)) continue;
 
 			var perModelId = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath());
 			addGeneratedItemModel(rp, perModelId, layer0.pick(idx));
@@ -894,7 +913,7 @@ public final class MaterialsAssets {
 
 		for (int idx = 0; idx < mats.size(); idx++) {
 			var def = mats.get(idx);
-			if (hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), form)) continue;
+			if (!hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), form)) continue;
 
 			var perModelId = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath());
 			var model = JModel.model("item/handheld")

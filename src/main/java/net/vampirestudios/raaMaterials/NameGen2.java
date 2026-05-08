@@ -26,9 +26,14 @@ public final class NameGen2 {
         return new MessageFormat(pattern, clientLocale()).format(args);
     }
 
-    private static Locale clientLocale() {
+    public static String clientLanguageCode() {
         String code = Minecraft.getInstance().getLanguageManager().getSelected();
-        if (code == null || code.isEmpty()) return Locale.ROOT;
+        return code == null ? "" : code;
+    }
+
+    private static Locale clientLocale() {
+        String code = clientLanguageCode();
+        if (code.isEmpty()) return Locale.ROOT;
 
         // Code is like "fr_fr", "en_us"
         String[] parts = code.split("_", 2);
