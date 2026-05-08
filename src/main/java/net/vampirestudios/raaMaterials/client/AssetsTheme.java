@@ -174,8 +174,8 @@ public final class AssetsTheme {
 	}
 
 	private TextureDef3 buildTextureDef3(MaterialDef m, Random rnd) {
-		Optional<Identifier> axeHead = Optional.of(numbered("tools/axe/axe_head_", rnd, 11));
-		Optional<Identifier> axeHandle = Optional.of(numbered("tools/axe/axe_stick_", rnd, 8));
+		Optional<Identifier> axeHead = Optional.of(numbered("tools/axe/axe_head_", rnd, 12));
+		Optional<Identifier> axeHandle = Optional.of(numbered("tools/axe/axe_stick_", rnd, 9));
 		Optional<Identifier> swordBlade = Optional.of(numbered("tools/sword/blade_", rnd, 13));
 		Optional<Identifier> swordHandle = Optional.of(numbered("tools/sword/handle_", rnd, 11));
 		Optional<Identifier> shovelHead = Optional.of(numbered("tools/shovel/shovel_head_", rnd, 11));

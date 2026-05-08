@@ -18,6 +18,12 @@ import static net.vampirestudios.arrp.json.models.JModel.model;
 import static net.vampirestudios.arrp.json.models.JModel.textures;
 
 public class ARRPGenerationHelper {
+    private static String blockTexture(Identifier id) {
+        String path = id.getPath();
+        if (path.endsWith(".png")) path = path.substring(0, path.length() - 4);
+        if (!path.startsWith("block/")) path = "block/" + path;
+        return Identifier.fromNamespaceAndPath(id.getNamespace(), path).toString();
+    }
 
     public static void generateBasicBlockState(RuntimeResourcePack clientResourcePackBuilder, Identifier name) {
         clientResourcePackBuilder.addBlockState(JState.state(variant(JState.model(Utils.prependToPath(name, "block/")))), name);
@@ -148,13 +154,13 @@ public class ARRPGenerationHelper {
 
     public static void generateAllBlockModel(RuntimeResourcePack clientResourcePackBuilder, Identifier name, Identifier texture) {
         clientResourcePackBuilder.addModel(model("block/cube_all").textures(textures()
-                .var("all", Utils.prependToPath(texture, "block/").toString())
+                .var("all", blockTexture(texture))
         ), name);
     }
 
     public static void generateAllTintedBlockModel(RuntimeResourcePack clientResourcePackBuilder, Identifier name, Identifier texture) {
         var model = JModel.model("minecraft:block/cube_all")
-                .textures(JModel.textures().var("all", Utils.prependToPath(texture, "block/").toString()))
+                .textures(JModel.textures().var("all", blockTexture(texture)))
                 .element(JModel.element()
                         .bounds(0, 0, 0, 16, 16, 16)
                         .faces(JModel.faces()
@@ -177,14 +183,14 @@ public class ARRPGenerationHelper {
 
     public static void generateCrossBlockModel(RuntimeResourcePack clientResourcePackBuilder, Identifier name, Identifier texture) {
         clientResourcePackBuilder.addModel(model("block/cross").textures(textures()
-                .var("cross", Utils.prependToPath(texture, "block/").toString())
+                .var("cross", blockTexture(texture))
         ), name);
     }
 
     public static void generateColumnBlockModel(RuntimeResourcePack clientResourcePackBuilder, Identifier name, Identifier endTexture, Identifier sideTexture) {
         clientResourcePackBuilder.addModel(model("block/cube_column").textures(textures()
-                .var("end", Utils.prependToPath(endTexture, "block/").toString())
-                .var("side", Utils.prependToPath(sideTexture, "block/").toString())
+                .var("end", blockTexture(endTexture))
+                .var("side", blockTexture(sideTexture))
         ), name);
     }
 
@@ -197,9 +203,9 @@ public class ARRPGenerationHelper {
 
     public static void generateTopBottomBlockModel(RuntimeResourcePack clientResourcePackBuilder, Identifier name, Identifier topTexture, Identifier bottomTexture, Identifier sideTexture) {
         clientResourcePackBuilder.addModel(model("block/cube_top_bottom").textures(textures()
-                .var("top", Utils.prependToPath(topTexture, "block/").toString())
-                .var("bottom", Utils.prependToPath(bottomTexture, "block/").toString())
-                .var("side", Utils.prependToPath(sideTexture, "block/").toString())
+                .var("top", blockTexture(topTexture))
+                .var("bottom", blockTexture(bottomTexture))
+                .var("side", blockTexture(sideTexture))
         ), name);
     }
 

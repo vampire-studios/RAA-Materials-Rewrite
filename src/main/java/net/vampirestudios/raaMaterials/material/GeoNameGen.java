@@ -13,7 +13,7 @@ import java.util.function.BiFunction;
 /**
  * GeoNameGen — geology-leaning material displayName generator (modular).
  * Deterministic by (worldSeed, kind, index).
- *
+ * <p>
  * Assumption: MaterialKind contains METAL, GEM, CRYSTAL, ALLOY, STONE, SOIL, SAND, GRAVEL, CLAY, MUD, SALT, VOLCANIC, OTHER.
  * If yours differs, map your kinds to these buckets in KIND_CFG_INIT below.
  */
@@ -532,7 +532,7 @@ public final class GeoNameGen {
 	*/
 	private static String compose(String prefix, String link, String core, String suffix, MaterialKind kind) {
 		String p = prefix == null ? "" : prefix;
-		String l = (p.isEmpty() ? "" : link == null ? "" : link);
+		String l = (p.isEmpty() ? "" : (link == null ? "" : link));
 		String c = core == null ? "" : core;
 		String s = suffix == null ? "" : suffix;
 

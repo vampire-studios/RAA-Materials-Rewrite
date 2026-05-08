@@ -162,6 +162,20 @@ public final class MaterialsAssets {
 		registerColorProviderForSharedBlock(RAW_BLOCK_SHARED_ID, materials);
 		registerColorProviderForSharedBlock(SHINGLES_SHARED_ID, materials);
 		registerColorProviderForSharedBlock(PLATE_BLOCK_SHARED_ID, materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_crystal_cluster"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_crystal_bud_small"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_crystal_bud_medium"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_crystal_bud_large"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_crystal_bricks"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_crystal_glass"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_crystal_tinted_glass"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_basalt_lamp"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_calcite_lamp"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_crystal_pane"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_rod_block"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_cobbled"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_bricks"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_polished"), materials);
 	}
 
 	private static void registerColorProviderForSharedBlock(Identifier sharedBlockId, List<MaterialDef> materials) {
@@ -229,6 +243,22 @@ public final class MaterialsAssets {
 				(idx) -> texture(def.get(idx)).textures2().crystalGlass().orElseThrow());
 		buildBlockFamily(List.of(Form.TINTED_GLASS), RAAMaterials.id("material_crystal_tinted_glass"), "block/material_crystal_tinted_glass/",
 				(idx) -> texture(def.get(idx)).textures1().tintedGlass().orElseThrow());
+		buildBlockFamily(List.of(Form.BASALT_LAMP), RAAMaterials.id("material_basalt_lamp"), "block/material_basalt_lamp/",
+				(idx) -> texture(def.get(idx)).textures2().lampBasalt().orElse(RAAMaterials.id("crystal/basalt_lamp")));
+		buildBlockFamily(List.of(Form.CALCITE_LAMP), RAAMaterials.id("material_calcite_lamp"), "block/material_calcite_lamp/",
+				(idx) -> texture(def.get(idx)).textures2().lampCalcite().orElse(RAAMaterials.id("crystal/calcite_lamp")));
+		buildCrystalClusterFamily(RAAMaterials.id("material_crystal_cluster"), Form.CLUSTER, "block/material_crystal_cluster/",
+				(idx) -> texture(def.get(idx)).textures1().cluster().orElse(RAAMaterials.id("crystal/crystal_" + oneIndexed(idx, 9))));
+		buildCrystalBudFamily(RAAMaterials.id("material_crystal_bud_small"), Form.BUD_SMALL, "block/material_crystal_bud_small/",
+				(idx) -> texture(def.get(idx)).textures1().budSmall().orElse(RAAMaterials.id("crystal/crystal_" + oneIndexed(idx, 9))));
+		buildCrystalBudFamily(RAAMaterials.id("material_crystal_bud_medium"), Form.BUD_MEDIUM, "block/material_crystal_bud_medium/",
+				(idx) -> texture(def.get(idx)).textures1().budMedium().orElse(RAAMaterials.id("crystal/crystal_" + oneIndexed(idx, 9))));
+		buildCrystalBudFamily(RAAMaterials.id("material_crystal_bud_large"), Form.BUD_LARGE, "block/material_crystal_bud_large/",
+				(idx) -> texture(def.get(idx)).textures1().budLarge().orElse(RAAMaterials.id("crystal/crystal_" + oneIndexed(idx, 9))));
+		buildPaneFamily(RAAMaterials.id("material_crystal_pane"), "block/material_crystal_pane/",
+				(idx) -> texture(def.get(idx)).textures2().crystalGlass().orElse(RAAMaterials.id("crystal/crystal_glass")));
+		buildRodBlockFamily(RAAMaterials.id("material_rod_block"), "block/material_rod_block/",
+				(idx) -> RAAMaterials.id("crystal/crystal_" + oneIndexed(idx, 9)));
 		buildBlockFamily(List.of(Form.COBBLED), RAAMaterials.id("material_cobbled"), "block/material_cobbled/",
 				(idx) -> texture(def.get(idx)).textures3().cobblestone().orElseThrow());
 		buildBlockFamily(List.of(Form.BRICKS), RAAMaterials.id("material_bricks"), "block/material_bricks/",
@@ -332,6 +362,13 @@ public final class MaterialsAssets {
 		return (Math.floorMod(idx, max) + 1);
 	}
 
+	private static String blockTexture(Identifier id) {
+		String path = id.getPath();
+		if (path.endsWith(".png")) path = path.substring(0, path.length() - 4);
+		if (!path.startsWith("block/")) path = "block/" + path;
+		return Identifier.fromNamespaceAndPath(id.getNamespace(), path).toString();
+	}
+
 	/** Resolves a block texture for a material given the kind-to-picker map. */
 	private static Identifier pickBlockTex(MaterialDef def, int idx, Map<MaterialKind, TexPicker> pickers) {
 		return switch (def.kind()) {
@@ -414,6 +451,138 @@ public final class MaterialsAssets {
 		ARRPGenerationHelper.generateAllTintedBlockModel(rp, modelId, texture);
 	}
 
+	private static void buildCrystalClusterFamily(
+			Identifier sharedBlockId, Form form, String perModelPrefix, TexPicker texture
+	) {
+		var rp = RRPGen.PACK;
+		var mats = ClientMaterialCache.all();
+		var select = JItemModel.select().property(MAT_COMP);
+		var v = JState.variant();
+		int cases = 0;
+
+		for (int idx = 0; idx < mats.size(); idx++) {
+			var def = mats.get(idx);
+			if (hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), form)) continue;
+
+			var perModelId = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath());
+			rp.addModel(JModel.model("minecraft:block/cross")
+					.textures(JModel.textures().var("cross", blockTexture(texture.pick(idx)))), perModelId);
+			addFacingVariants(v, idx, perModelId);
+			select.addCase(JSelectCase.of(def.nameInformation().id().toString(),
+					JModelBasic.model(perModelId.toString()).tint(JTint.constant(def.primaryColor()))));
+			cases++;
+		}
+
+		rp.addBlockState(JState.state(v), sharedBlockId);
+		if (cases == 0) return;
+		select.fallback(JModelBasic.of("minecraft:block/amethyst_cluster"));
+		rp.addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
+	}
+
+	private static void buildCrystalBudFamily(
+			Identifier sharedBlockId, Form form, String perModelPrefix, TexPicker texture
+	) {
+		var rp = RRPGen.PACK;
+		var mats = ClientMaterialCache.all();
+		var v = JState.variant();
+
+		for (int idx = 0; idx < mats.size(); idx++) {
+			var def = mats.get(idx);
+			if (hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), form)) continue;
+
+			var perModelId = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath());
+			rp.addModel(JModel.model("minecraft:block/cross")
+					.textures(JModel.textures().var("cross", blockTexture(texture.pick(idx)))), perModelId);
+			addFacingVariants(v, idx, perModelId);
+		}
+
+		rp.addBlockState(JState.state(v), sharedBlockId);
+	}
+
+	private static void buildRodBlockFamily(Identifier sharedBlockId, String perModelPrefix, TexPicker texture) {
+		var rp = RRPGen.PACK;
+		var mats = ClientMaterialCache.all();
+		var select = JItemModel.select().property(MAT_COMP);
+		var v = JState.variant();
+		int cases = 0;
+
+		for (int idx = 0; idx < mats.size(); idx++) {
+			var def = mats.get(idx);
+			if (hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), Form.ROD_BLOCK)) continue;
+
+			var perModelId = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath());
+			rp.addModel(JModel.model("minecraft:block/end_rod")
+					.textures(JModel.textures().var("end_rod", blockTexture(texture.pick(idx)))), perModelId);
+			addFacingVariants(v, idx, perModelId);
+			select.addCase(JSelectCase.of(def.nameInformation().id().toString(),
+					JModelBasic.model(perModelId.toString()).tint(JTint.constant(def.primaryColor()))));
+			cases++;
+		}
+
+		rp.addBlockState(JState.state(v), sharedBlockId);
+		if (cases == 0) return;
+		select.fallback(JModelBasic.of("minecraft:block/end_rod"));
+		rp.addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
+	}
+
+	private static void buildPaneFamily(Identifier sharedBlockId, String perModelPrefix, TexPicker texture) {
+		var rp = RRPGen.PACK;
+		var mats = ClientMaterialCache.all();
+		var select = JItemModel.select().property(MAT_COMP);
+		var multipart = JState.multipart();
+		int cases = 0;
+
+		for (int idx = 0; idx < mats.size(); idx++) {
+			var def = mats.get(idx);
+			if (hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), Form.PANE)) continue;
+
+			var tex = blockTexture(texture.pick(idx));
+			var post = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath() + "_post");
+			var side = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath() + "_side");
+			var sideAlt = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath() + "_side_alt");
+			var noSide = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath() + "_noside");
+			var noSideAlt = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath() + "_noside_alt");
+
+			rp.addModel(JModel.model("minecraft:block/template_glass_pane_post")
+					.textures(JModel.textures().var("pane", tex)), post);
+			rp.addModel(JModel.model("minecraft:block/template_glass_pane_side")
+					.textures(JModel.textures().var("pane", tex)), side);
+			rp.addModel(JModel.model("minecraft:block/template_glass_pane_side_alt")
+					.textures(JModel.textures().var("pane", tex)), sideAlt);
+			rp.addModel(JModel.model("minecraft:block/template_glass_pane_noside")
+					.textures(JModel.textures().var("pane", tex)), noSide);
+			rp.addModel(JModel.model("minecraft:block/template_glass_pane_noside_alt")
+					.textures(JModel.textures().var("pane", tex)), noSideAlt);
+
+			multipart.when(Map.of("mat", idx)).addModel(JState.model(post));
+			multipart.when(Map.of("mat", idx, "north", "true")).addModel(JState.model(side));
+			multipart.when(Map.of("mat", idx, "east", "true")).addModel(JState.model(side).y(90));
+			multipart.when(Map.of("mat", idx, "south", "true")).addModel(JState.model(sideAlt));
+			multipart.when(Map.of("mat", idx, "west", "true")).addModel(JState.model(sideAlt).y(90));
+			multipart.when(Map.of("mat", idx, "north", "false")).addModel(JState.model(noSide));
+			multipart.when(Map.of("mat", idx, "east", "false")).addModel(JState.model(noSideAlt));
+			multipart.when(Map.of("mat", idx, "south", "false")).addModel(JState.model(noSideAlt).y(90));
+			multipart.when(Map.of("mat", idx, "west", "false")).addModel(JState.model(noSide).y(270));
+			select.addCase(JSelectCase.of(def.nameInformation().id().toString(),
+					JModelBasic.model(post.toString()).tint(JTint.constant(def.primaryColor()))));
+			cases++;
+		}
+
+		rp.addBlockState(JState.state(multipart), sharedBlockId);
+		if (cases == 0) return;
+		select.fallback(JModelBasic.of("minecraft:block/glass_pane_post"));
+		rp.addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
+	}
+
+	private static void addFacingVariants(net.vampirestudios.arrp.json.blockstate.JVariant v, int mat, Identifier model) {
+		v.put(Map.of("mat", mat, "facing", "up"), JState.model(model));
+		v.put(Map.of("mat", mat, "facing", "down"), JState.model(model).x(180));
+		v.put(Map.of("mat", mat, "facing", "north"), JState.model(model).x(90));
+		v.put(Map.of("mat", mat, "facing", "south"), JState.model(model).x(90).y(180));
+		v.put(Map.of("mat", mat, "facing", "west"), JState.model(model).x(90).y(270));
+		v.put(Map.of("mat", mat, "facing", "east"), JState.model(model).x(90).y(90));
+	}
+
 	private static boolean hasAny(List<Form> actual, List<Form> wanted) {
 		for (var f : wanted) if (actual.contains(f)) return false;
 		return true;
@@ -442,14 +611,14 @@ public final class MaterialsAssets {
 
 			rp.addModel(JModel.model("minecraft:block/slab")
 					.textures(JModel.textures()
-							.var("bottom", baseTex.toString())
-							.var("top", baseTex.toString())
-							.var("side", baseTex.toString())), modelBottom);
+							.var("bottom", blockTexture(baseTex))
+							.var("top", blockTexture(baseTex))
+							.var("side", blockTexture(baseTex))), modelBottom);
 			rp.addModel(JModel.model("minecraft:block/slab_top")
 					.textures(JModel.textures()
-							.var("bottom", baseTex.toString())
-							.var("top", baseTex.toString())
-							.var("side", baseTex.toString())), modelTop);
+							.var("bottom", blockTexture(baseTex))
+							.var("top", blockTexture(baseTex))
+							.var("side", blockTexture(baseTex))), modelTop);
 
 			BlockstateTemplates.addSlab(v, Map.of("mat", idx), JState.model(modelBottom), JState.model(modelTop), JState.model(fullModel));
 			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(modelBottom.toString())));
@@ -483,7 +652,7 @@ public final class MaterialsAssets {
 			var modelIn = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath() + "_stairs_inner");
 			var modelOut = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath() + "_stairs_outer");
 
-			var texs = JModel.textures().var("bottom", tex.toString()).var("top", tex.toString()).var("side", tex.toString());
+			var texs = JModel.textures().var("bottom", blockTexture(tex)).var("top", blockTexture(tex)).var("side", blockTexture(tex));
 			rp.addModel(JModel.model("minecraft:block/stairs").textures(texs), model);
 			rp.addModel(JModel.model("minecraft:block/inner_stairs").textures(texs), modelIn);
 			rp.addModel(JModel.model("minecraft:block/outer_stairs").textures(texs), modelOut);
@@ -517,11 +686,11 @@ public final class MaterialsAssets {
 			var sideT = RAAMaterials.id("block/material_block/" + def.nameInformation().id().getPath() + "_wall_side_tall");
 
 			rp.addModel(JModel.model("minecraft:block/template_wall_post")
-					.textures(JModel.textures().var("wall", tex.toString())), post);
+					.textures(JModel.textures().var("wall", blockTexture(tex))), post);
 			rp.addModel(JModel.model("minecraft:block/template_wall_side")
-					.textures(JModel.textures().var("wall", tex.toString())), side);
+					.textures(JModel.textures().var("wall", blockTexture(tex))), side);
 			rp.addModel(JModel.model("minecraft:block/template_wall_side_tall")
-					.textures(JModel.textures().var("wall", tex.toString())), sideT);
+					.textures(JModel.textures().var("wall", blockTexture(tex))), sideT);
 
 			BlockstateTemplates.addWall(multipart, Map.of("mat", idx), JState.model(post), JState.model(side), JState.model(sideT));
 			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(side.toString())));
@@ -551,14 +720,14 @@ public final class MaterialsAssets {
 
 			rp.addModel(JModel.model("minecraft:block/slab")
 					.textures(JModel.textures()
-							.var("bottom", tex.toString())
-							.var("top", tex.toString())
-							.var("side", tex.toString())), modelBottom);
+							.var("bottom", blockTexture(tex))
+							.var("top", blockTexture(tex))
+							.var("side", blockTexture(tex))), modelBottom);
 			rp.addModel(JModel.model("minecraft:block/slab_top")
 					.textures(JModel.textures()
-							.var("bottom", tex.toString())
-							.var("top", tex.toString())
-							.var("side", tex.toString())), modelTop);
+							.var("bottom", blockTexture(tex))
+							.var("top", blockTexture(tex))
+							.var("side", blockTexture(tex))), modelTop);
 
 			v.put(Map.of("mat", idx, "type", "bottom"), JState.model(modelBottom));
 			v.put(Map.of("mat", idx, "type", "top"), JState.model(modelTop));
@@ -589,7 +758,7 @@ public final class MaterialsAssets {
 			var modelIn = RAAMaterials.id(perModelPrefixVariant + def.nameInformation().id().getPath() + "_stairs_inner");
 			var modelOut = RAAMaterials.id(perModelPrefixVariant + def.nameInformation().id().getPath() + "_stairs_outer");
 
-			var texs = JModel.textures().var("bottom", tex.toString()).var("top", tex.toString()).var("side", tex.toString());
+			var texs = JModel.textures().var("bottom", blockTexture(tex)).var("top", blockTexture(tex)).var("side", blockTexture(tex));
 			rp.addModel(JModel.model("minecraft:block/stairs").textures(texs), model);
 			rp.addModel(JModel.model("minecraft:block/inner_stairs").textures(texs), modelIn);
 			rp.addModel(JModel.model("minecraft:block/outer_stairs").textures(texs), modelOut);
@@ -636,13 +805,13 @@ public final class MaterialsAssets {
 			var inventory = RAAMaterials.id(perModelPrefixVariant + def.nameInformation().id().getPath() + "_wall_inventory");
 
 			rp.addModel(JModel.model("minecraft:block/template_wall_post")
-					.textures(JModel.textures().var("wall", tex.toString())), post);
+					.textures(JModel.textures().var("wall", blockTexture(tex))), post);
 			rp.addModel(JModel.model("minecraft:block/template_wall_side")
-					.textures(JModel.textures().var("wall", tex.toString())), side);
+					.textures(JModel.textures().var("wall", blockTexture(tex))), side);
 			rp.addModel(JModel.model("minecraft:block/template_wall_side_tall")
-					.textures(JModel.textures().var("wall", tex.toString())), sideT);
+					.textures(JModel.textures().var("wall", blockTexture(tex))), sideT);
 			rp.addModel(JModel.model("minecraft:block/wall_inventory")
-					.textures(JModel.textures().var("wall", tex.toString())), inventory);
+					.textures(JModel.textures().var("wall", blockTexture(tex))), inventory);
 
 			multipart.when(Map.of("mat", idx)).addModel(JState.model(post));
 			multipart.when(Map.of("mat", idx, "north", "low")).addModel(JState.model(side).uvlock().y(0));
