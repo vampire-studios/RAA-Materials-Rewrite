@@ -63,7 +63,8 @@ public record MaterialDef(
 		RED_SANDSTONE("minecraft:block/red_sandstone", Target.block("minecraft:red_sandstone")),
 		CALCITE("minecraft:block/calcite", Target.block("minecraft:calcite")),
 		DRIPSTONE("minecraft:block/dripstone_block", Target.block("minecraft:dripstone_block")),
-		SMOOTH_BASALT("minecraft:block/smooth_basalt", Target.block("minecraft:smooth_basalt"));
+		SMOOTH_BASALT("minecraft:block/smooth_basalt", Target.block("minecraft:smooth_basalt")),
+		OVERWORLD_STONE("minecraft:block/stone", Target.tag("minecraft:base_stone_overworld"));
 
 		private final Identifier baseTexture;
 		private final Target target;

@@ -28,8 +28,7 @@ public final class MaterialGenerator {
 
 			SpawnInfo spawn = OverworldSpawnProfiles.pick(kind, rng);
 
-			// >>> NEW: choose host and force its target into replaceables
-			OreHost host = pickOreHost(rng, spawn.y().minY(), spawn.y().maxY());
+			OreHost host = pickOreHost(kind, rng, spawn.y().minY(), spawn.y().maxY());
 //			spawn = spawn.withReplaceables(java.util.List.of(host.target()));
 
 			// --- NEW: generate a plausible displayName (registry-safe id + display) ---
@@ -78,7 +77,11 @@ public final class MaterialGenerator {
 	}
 
 	/** Picks a reasonable host based on dimension-ish biome keys + depth band. */
-	private static OreHost pickOreHost(Random rng, /*List<Identifier> biomeTags, */int minY, int maxY) {
+	private static OreHost pickOreHost(MaterialKind kind, Random rng, /*List<Identifier> biomeTags, */int minY, int maxY) {
+		if (kind == MaterialKind.STONE || kind == MaterialKind.VOLCANIC || kind == MaterialKind.SALT) {
+			return OreHost.OVERWORLD_STONE;
+		}
+
 		// Dimension buckets
 //		if (isEnd(biomeTags)) {
 //			return OreHost.END_STONE;
