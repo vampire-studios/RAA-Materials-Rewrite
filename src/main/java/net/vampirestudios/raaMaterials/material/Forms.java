@@ -43,8 +43,8 @@ public final class Forms {
 		put("material_bud_medium", Form.BUD_MEDIUM);
 		put("material_bud_large", Form.BUD_LARGE);
 		put("material_crystal_bricks", Form.CRYSTAL_BRICKS);
-		put("material_crystal_glass", Form.GLASS);
-		put("material_crystal_tinted_glass", Form.TINTED_GLASS);
+		put("material_glass", Form.GLASS);
+		put("material_tinted_glass", Form.TINTED_GLASS);
 
 		// ---- Sandstone & stone variants
 		put("material_sandstone", Form.SANDSTONE);

@@ -1,12 +1,8 @@
-// content/ParametricCrystalClusterBlock.java
 package net.vampirestudios.raaMaterials.content;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.BlockItemStateProperties;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelReader;
@@ -18,14 +14,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.vampirestudios.raaMaterials.YComponents;
-import net.vampirestudios.raaMaterials.material.MaterialRegistry;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class ParametricCrystalClusterBlock extends ParametricBlock {
     public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
@@ -67,27 +58,5 @@ public class ParametricCrystalClusterBlock extends ParametricBlock {
     @Override
     protected BlockState updateShape(BlockState s, LevelReader level, ScheduledTickAccess scheduledTickAccess, BlockPos pos, Direction d, BlockPos blockPos2, BlockState blockState2, RandomSource randomSource) {
         return d.getOpposite() == s.getValue(FACING) && !s.canSurvive(level, pos) ? Blocks.AIR.defaultBlockState() : s;
-    }
-
-    @Override
-    protected List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
-        List<ItemStack> drops = super.getDrops(state, params);
-
-        int idx = state.getValue(MAT);
-
-        for (ItemStack stack : drops) {
-            if (stack.getItem() == this.asItem()) {
-                MaterialRegistry.byIndex(params.getLevel(), idx).ifPresent(def ->
-                        stack.set(YComponents.MATERIAL, def.nameInformation().id())
-                );
-
-                stack.set(
-                        DataComponents.BLOCK_STATE,
-                        BlockItemStateProperties.EMPTY.with(MAT, idx)
-                );
-            }
-        }
-
-        return drops;
     }
 }

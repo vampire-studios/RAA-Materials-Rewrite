@@ -39,7 +39,7 @@ public final class MaterialGenerator {
 			int color = randomColorFor(kind, rng);
 
 			HarvestTier tier = pickTierFor(kind, rng);
-			List<Form> forms = getForms(kind);
+			List<Form> forms = getForms(kind, rng);
 
 			SpawnInfo spawn = OverworldSpawnProfiles.pick(kind, rng);
 			OreHost host = pickOreHost(kind, rng, spawn.y().minY(), spawn.y().maxY());
@@ -165,7 +165,7 @@ public final class MaterialGenerator {
 		return OreHost.CALCITE;
 	}
 
-	private static @NotNull List<Form> getForms(MaterialKind kind) {
+	private static @NotNull List<Form> getForms(MaterialKind kind, Random rng) {
 		return switch (kind) {
 			case METAL -> join(
 					List.of(RAW, INGOT, DUST, NUGGET, SHEET, GEAR, ROD, WIRE, COIL, RIVET, BOLT, NAIL, RING),
@@ -198,7 +198,7 @@ public final class MaterialGenerator {
 					BUTTON, PRESSURE_PLATE
 			);
 
-			case SAND -> List.of(BLOCK, SANDSTONE, CUT, CHISELED, SMOOTH, SLAB, STAIRS, WALL);
+			case SAND -> sandForms(rng);
 			case GRAVEL -> List.of(BLOCK, POLISHED, SLAB, STAIRS, WALL);
 			case CLAY -> List.of(BLOCK, BALL, CERAMIC);
 			case MUD -> List.of(BLOCK, DRIED, BRICKS, SLAB, STAIRS, WALL);
@@ -208,6 +208,17 @@ public final class MaterialGenerator {
 			case WOOD -> List.of(BLOCK, PILLAR, BUTTON, PRESSURE_PLATE);
 			case OTHER -> List.of(DUST);
 		};
+	}
+
+	private static @NotNull List<Form> sandForms(Random rng) {
+		var forms = new ArrayList<>(List.of(BLOCK, SANDSTONE, CUT, CHISELED, SMOOTH, SLAB, STAIRS, WALL));
+		if (rng.nextFloat() < 0.45f) {
+			forms.add(GLASS);
+			if (rng.nextFloat() < 0.25f) {
+				forms.add(TINTED_GLASS);
+			}
+		}
+		return List.copyOf(forms);
 	}
 
 	@SafeVarargs

@@ -8,10 +8,11 @@ public final class RRPGen {
     public static final RuntimeResourcePack PACK = RuntimeResourcePack.create("raa_materials:runtime");
     private static boolean initialized;
 
-    public static void init() {
-        if (initialized) return;
-        initialized = true;
-        ARRPGenerationHelper.generateParametricBlockLootTables(PACK);
-        RRPCallback.AFTER_VANILLA.register(a -> a.add(PACK));
-    }
+	public static void init() {
+		if (initialized) return;
+		initialized = true;
+		ARRPGenerationHelper.generateParametricBlockLootTables(PACK);
+		ARRPGenerationHelper.generateParametricRecipes(PACK);
+		RRPCallback.AFTER_VANILLA.register(a -> a.add(PACK));
+	}
 }

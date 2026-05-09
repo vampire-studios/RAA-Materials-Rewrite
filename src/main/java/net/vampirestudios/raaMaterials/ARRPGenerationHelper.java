@@ -24,7 +24,6 @@ import static net.vampirestudios.arrp.json.models.JModel.textures;
 
 public class ARRPGenerationHelper {
     private static final String[] PARAMETRIC_BLOCK_DROPS = {
-            "material_ore",
             "material_block",
             "material_raw_block",
             "material_plate_block",
@@ -48,8 +47,8 @@ public class ARRPGenerationHelper {
             "material_crystal_block",
             "material_crystal_bricks",
             "material_crystal_cluster",
-            "material_crystal_glass",
-            "material_crystal_tinted_glass",
+            "material_glass",
+            "material_tinted_glass",
             "material_basalt_lamp",
             "material_calcite_lamp",
             "material_pillar",
@@ -85,12 +84,45 @@ public class ARRPGenerationHelper {
     }
 
     public static void generateParametricBlockLootTables(RuntimeResourcePack pack) {
+        addOreLootTable(pack);
         for (String blockId : PARAMETRIC_BLOCK_DROPS) {
             addSelfDropLootTable(pack, blockId, false);
         }
         for (String blockId : PARAMETRIC_SLAB_DROPS) {
             addSelfDropLootTable(pack, blockId, true);
         }
+    }
+
+    public static void generateParametricRecipes(RuntimeResourcePack pack) {
+        addSpecialRecipe(pack, "block_from_ingots");
+        addSpecialRecipe(pack, "ingots_from_block");
+        addSpecialRecipe(pack, "ingot_from_nuggets");
+        addSpecialRecipe(pack, "nuggets_from_ingot");
+        addSpecialRecipe(pack, "raw_block_from_raw");
+        addSpecialRecipe(pack, "raw_from_raw_block");
+        addSpecialRecipe(pack, "slab_from_block");
+        addSpecialRecipe(pack, "stairs_from_block");
+        addSpecialRecipe(pack, "wall_from_block");
+        addSpecialRecipe(pack, "sandstone_slab_from_sandstone");
+        addSpecialRecipe(pack, "sandstone_stairs_from_sandstone");
+        addSpecialRecipe(pack, "sandstone_wall_from_sandstone");
+        addSpecialRecipe(pack, "brick_slab_from_bricks");
+        addSpecialRecipe(pack, "brick_stairs_from_bricks");
+        addSpecialRecipe(pack, "brick_wall_from_bricks");
+        addSpecialRecipe(pack, "polished_slab_from_polished");
+        addSpecialRecipe(pack, "polished_stairs_from_polished");
+        addSpecialRecipe(pack, "polished_wall_from_polished");
+        addSpecialRecipe(pack, "smelt_ore_to_ingot");
+        addSpecialRecipe(pack, "blast_ore_to_ingot");
+        addSpecialRecipe(pack, "smelt_raw_to_ingot");
+        addSpecialRecipe(pack, "blast_raw_to_ingot");
+        addSpecialRecipe(pack, "smelt_sand_to_glass");
+    }
+
+    private static void addSpecialRecipe(RuntimeResourcePack pack, String id) {
+        JsonObject recipe = new JsonObject();
+        recipe.addProperty("type", RAAMaterials.id(id).toString());
+        pack.addData(RAAMaterials.id("recipe/" + id + ".json"), recipe.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
 
     private static void addSelfDropLootTable(RuntimeResourcePack pack, String blockId, boolean slab) {
@@ -118,6 +150,58 @@ public class ARRPGenerationHelper {
                 net.vampirestudios.arrp.json.loot.JLootTable.loot("minecraft:block")
                         .pool(pool)
                         .randomSequence(RAAMaterials.id("blocks/" + blockId)));
+    }
+
+    private static void addOreLootTable(RuntimeResourcePack pack) {
+        var ore = RAAMaterials.id("material_ore");
+        var raw = RAAMaterials.id("material_raw");
+
+        var silkTouch = net.vampirestudios.arrp.json.loot.JLootTable.entry()
+                .type("minecraft:item")
+                .name(ore.toString())
+                .condition(silkTouchCondition())
+                .function(copyMatStateFunction(ore));
+
+        var rawDrop = net.vampirestudios.arrp.json.loot.JLootTable.entry()
+                .type("minecraft:item")
+                .name(raw.toString())
+                .condition(net.vampirestudios.arrp.json.loot.JLootTable.predicate("minecraft:survives_explosion"));
+
+        var alternatives = net.vampirestudios.arrp.json.loot.JLootTable.entry()
+                .type("minecraft:alternatives")
+                .child(silkTouch)
+                .child(rawDrop);
+
+        var pool = net.vampirestudios.arrp.json.loot.JLootTable.pool()
+                .rolls(1)
+                .bonus(0)
+                .entry(alternatives);
+
+        pack.addLootTable(RAAMaterials.id("blocks/material_ore"),
+                net.vampirestudios.arrp.json.loot.JLootTable.loot("minecraft:block")
+                        .pool(pool)
+                        .randomSequence(RAAMaterials.id("blocks/material_ore")));
+    }
+
+    private static net.vampirestudios.arrp.json.loot.JCondition silkTouchCondition() {
+        JsonObject levels = new JsonObject();
+        levels.addProperty("min", 1);
+
+        JsonObject enchantment = new JsonObject();
+        enchantment.addProperty("enchantments", "minecraft:silk_touch");
+        enchantment.add("levels", levels);
+
+        JsonArray enchantments = new JsonArray();
+        enchantments.add(enchantment);
+
+        JsonObject predicates = new JsonObject();
+        predicates.add("minecraft:enchantments", enchantments);
+
+        JsonObject predicate = new JsonObject();
+        predicate.add("predicates", predicates);
+
+        return net.vampirestudios.arrp.json.loot.JLootTable.predicate("minecraft:match_tool")
+                .parameter("predicate", predicate);
     }
 
     private static JFunction copyMatStateFunction(Identifier blockId) {

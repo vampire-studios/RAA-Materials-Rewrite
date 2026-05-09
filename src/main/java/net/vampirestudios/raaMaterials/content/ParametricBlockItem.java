@@ -1,4 +1,3 @@
-// ParametricIngotItem.java
 package net.vampirestudios.raaMaterials.content;
 
 import net.minecraft.core.component.DataComponents;

@@ -55,12 +55,11 @@ public class ParametricBlock extends Block {
 
 		int idx = state.getValue(MAT);
 
+		var material = MaterialRegistry.byIndex(params.getLevel(), idx);
 		for (ItemStack stack : drops) {
-			if (stack.getItem() == this.asItem()) {
-				MaterialRegistry.byIndex(params.getLevel(), idx).ifPresent(def ->
-						stack.set(YComponents.MATERIAL, def.nameInformation().id())
-				);
+			material.ifPresent(def -> stack.set(YComponents.MATERIAL, def.nameInformation().id()));
 
+			if (stack.getItem() == this.asItem()) {
 				stack.set(
 						DataComponents.BLOCK_STATE,
 						BlockItemStateProperties.EMPTY.with(MAT, idx)

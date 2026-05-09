@@ -1,4 +1,3 @@
-// src/main/java/net/vampirestudios/raaMaterials/client/AssetsTheme.java
 package net.vampirestudios.raaMaterials.client;
 
 import net.minecraft.resources.Identifier;

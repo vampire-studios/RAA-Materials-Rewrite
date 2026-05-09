@@ -8,6 +8,7 @@ import net.minecraft.resources.Identifier;
 import net.vampirestudios.raaMaterials.material.*;
 import net.vampirestudios.raaMaterials.net.NetworkInit;
 import net.vampirestudios.raaMaterials.net.ServerSend;
+import net.vampirestudios.raaMaterials.recipe.ParametricRecipes;
 import net.vampirestudios.raaMaterials.registry.RAARegistries;
 import net.vampirestudios.raaMaterials.registry.YBlocks;
 import net.vampirestudios.raaMaterials.registry.YItems;
@@ -32,6 +33,7 @@ public class RAAMaterials implements ModInitializer {
 		YComponents.init();
 		YBlocks.init();
 		YItems.init();
+		ParametricRecipes.init();
 		NetworkInit.initCommon();
 		YTabs.init();
 		RAACommands.init();

@@ -66,11 +66,11 @@ public final class YItems {
 	// Crystal items
 	public static Item PARAM_CRYSTAL_BRICKS_ITEM;
 	public static Item PARAM_CLUSTER_ITEM;
-	public static Item PARAM_CRYSTAL_GLASS_ITEM;
-	public static Item PARAM_CRYSTAL_TINTED_GLASS_ITEM;
 	public static Item PARAM_BASALT_LAMP_ITEM;
 	public static Item PARAM_CALCITE_LAMP_ITEM;
 
+	public static Item PARAM_GLASS_ITEM;
+	public static Item PARAM_TINTED_GLASS_ITEM;
 
 	public static void init() {
 		PARAM_INGOT = regItem("material_ingot");
@@ -134,8 +134,6 @@ public final class YItems {
 
 		PARAM_CRYSTAL_BRICKS_ITEM = regBlockItem("material_crystal_bricks", YBlocks.PARAM_CRYSTAL_BRICKS);
 		PARAM_CLUSTER_ITEM = regBlockItem("material_crystal_cluster", YBlocks.PARAM_CLUSTER);
-		PARAM_CRYSTAL_GLASS_ITEM = regBlockItem("material_crystal_glass", YBlocks.PARAM_CRYSTAL_GLASS);
-		PARAM_CRYSTAL_TINTED_GLASS_ITEM = regBlockItem("material_crystal_tinted_glass", YBlocks.PARAM_CRYSTAL_TINTED_GLASS);
 		PARAM_BASALT_LAMP_ITEM = regBlockItem("material_basalt_lamp", YBlocks.PARAM_BASALT_LAMP);
 		PARAM_CALCITE_LAMP_ITEM = regBlockItem("material_calcite_lamp", YBlocks.PARAM_CALCITE_LAMP);
 
@@ -162,6 +160,9 @@ public final class YItems {
 		// ---- NEW crystal-ish block items ----
 		PARAM_CRYSTAL_PANE_ITEM = regBlockItem("material_crystal_pane", YBlocks.PARAM_CRYSTAL_PANE);
 		PARAM_ROD_BLOCK_ITEM = regBlockItem("material_rod_block", YBlocks.PARAM_ROD_BLOCK);
+
+		PARAM_GLASS_ITEM = regBlockItem("material_glass", YBlocks.PARAM_GLASS);
+		PARAM_TINTED_GLASS_ITEM = regBlockItem("material_tinted_glass", YBlocks.PARAM_TINTED_GLASS);
 	}
 
 	private static Item regItem(String registryId) {

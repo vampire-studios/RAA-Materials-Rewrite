@@ -47,8 +47,6 @@ public final class YBlocks {
 	// Crystal-only forms
 	public static Block PARAM_CLUSTER;
 	public static Block PARAM_CRYSTAL_BLOCK;
-	public static Block PARAM_CRYSTAL_GLASS;
-	public static Block PARAM_CRYSTAL_TINTED_GLASS;
 	public static Block PARAM_CRYSTAL_BRICKS;
 	public static Block PARAM_BASALT_LAMP;
 	public static Block PARAM_CALCITE_LAMP;
@@ -64,12 +62,15 @@ public final class YBlocks {
 	public static Block PARAM_MOSSY, PARAM_CRACKED, PARAM_COBBLED;
 	public static Block PARAM_BARS, PARAM_GRATE;
 	public static Block PARAM_BUTTON_STONE, PARAM_BUTTON_METAL, PARAM_BUTTON_WOOD,
-			PARAM_PRESSURE_PLATE_STONE, PARAM_PRESSURE_PLATE_METAL, PARAM_PRESSURE_PLATE_WOOD
-			/*PARAM_DOOR_METAL, PARAM_DOOR_WOOD, PARAM_TRAPDOOR_METAL, PARAM_TRAPDOOR_WOOD*/;
+			PARAM_PRESSURE_PLATE_STONE, PARAM_PRESSURE_PLATE_METAL, PARAM_PRESSURE_PLATE_WOOD,
+			PARAM_DOOR_METAL, PARAM_DOOR_WOOD, PARAM_TRAPDOOR_METAL, PARAM_TRAPDOOR_WOOD;
 
 	// + NEW crystal-ish
 	public static Block PARAM_CRYSTAL_PANE;
 	public static Block PARAM_ROD_BLOCK;
+
+	public static Block PARAM_GLASS;
+	public static Block PARAM_TINTED_GLASS;
 
 	private static Block regBlock(String id, Block item) {
 		return Registry.register(BuiltInRegistries.BLOCK, RAAMaterials.id(id), item);
@@ -241,22 +242,6 @@ public final class YBlocks {
 				.sound(SoundType.AMETHYST_CLUSTER)
 		));
 
-		// Crystal Glass (translucent + tintable)
-		PARAM_CRYSTAL_GLASS = regBlock("material_crystal_glass", new ParametricCrystalGlassBlock(Block.Properties.of()
-				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_crystal_glass")))
-				.strength(0.3f)
-				.noOcclusion()
-				.sound(SoundType.GLASS)
-		));
-
-		// Crystal Tinted Glass (translucent model; full light block handled by render/behavior later if needed)
-		PARAM_CRYSTAL_TINTED_GLASS = regBlock("material_crystal_tinted_glass", new ParametricCrystalTintedGlassBlock(Block.Properties.of()
-				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_crystal_tinted_glass")))
-				.strength(0.3f)
-				.noOcclusion()
-				.sound(SoundType.GLASS)
-		));
-
 		// Basalt Lamp (opaque housing + tinted slits; full lamp)
 		PARAM_BASALT_LAMP = regBlock("material_basalt_lamp", new ParametricCrystalLampBlock(Block.Properties.of()
 				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_basalt_lamp")))
@@ -356,13 +341,20 @@ public final class YBlocks {
 						.strength(0.5F).pushReaction(PushReaction.DESTROY)
 						.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_pressure_plate_metal")))
 		);
-//		PARAM_DOOR = regBlock("material_door", new ParametricDoorBlock(Block.Properties.of()
-//				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_door")))
-//				.strength(5.0f).sound(SoundType.METAL).noOcclusion()));
-//
-//		PARAM_TRAPDOOR = regBlock("material_trapdoor", new ParametricTrapdoorBlock(Block.Properties.of()
-//				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_trapdoor")))
-//				.strength(5.0f).sound(SoundType.METAL).noOcclusion()));
+		PARAM_DOOR_METAL = regBlock("material_door_metal", new ParametricDoorBlock(BlockSetType.IRON, Block.Properties.of()
+				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_door_metal")))
+				.strength(5.0F).sound(SoundType.METAL).pushReaction(PushReaction.DESTROY).noOcclusion()));
+		PARAM_DOOR_WOOD = regBlock("material_door_wood", new ParametricDoorBlock(BlockSetType.OAK, Block.Properties.of()
+				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_door_wood")))
+				.strength(3.0F).instrument(NoteBlockInstrument.BASS).ignitedByLava().sound(SoundType.WOOD).noOcclusion()));
+
+		PARAM_TRAPDOOR_METAL = regBlock("material_trapdoor_metal", new ParametricTrapdoorBlock(BlockSetType.IRON, Block.Properties.of()
+				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_trapdoor_metal")))
+				.strength(5.0f).sound(SoundType.METAL).pushReaction(PushReaction.DESTROY).noOcclusion()));
+
+		PARAM_TRAPDOOR_WOOD = regBlock("material_trapdoor_wood", new ParametricTrapdoorBlock(BlockSetType.OAK, Block.Properties.of()
+				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_trapdoor_wood")))
+				.strength(3.0F).instrument(NoteBlockInstrument.BASS).ignitedByLava().sound(SoundType.WOOD).noOcclusion()));
 
 		// -------- Crystal-specific --------
 		PARAM_CRYSTAL_PANE = regBlock("material_crystal_pane", new ParametricPaneBlock(Block.Properties.of()
@@ -372,6 +364,21 @@ public final class YBlocks {
 		PARAM_ROD_BLOCK = regBlock("material_rod_block", new ParametricRodBlock(Block.Properties.of()
 				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_rod_block")))
 				.strength(1.0f).lightLevel(s -> 14).noOcclusion().sound(SoundType.AMETHYST)));
+
+		PARAM_GLASS = regBlock("material_glass", new ParametricGlassBlock(Block.Properties.of()
+				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_glass")))
+				.strength(0.3f)
+				.noOcclusion()
+				.sound(SoundType.GLASS)
+		));
+
+		PARAM_TINTED_GLASS = regBlock("material_tinted_glass", new ParametricTintedGlassBlock(Block.Properties.of()
+				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_tinted_glass")))
+				.strength(0.3f)
+				.noOcclusion()
+				.sound(SoundType.GLASS)
+		));
+
 	}
 
 	public static BlockBehaviour.Properties buttonProperties(String name) {

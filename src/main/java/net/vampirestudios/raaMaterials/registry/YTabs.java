@@ -296,12 +296,12 @@ public final class YTabs {
 										{Form.BASALT_LAMP, YItems.PARAM_BASALT_LAMP_ITEM},
 //										{Form.LAMP, YItems.PARAM_LAMP_ITEM} // generic lamp if present
 								});
-								if (isCrystalLike(def)) {
+								if (isCrystalLike(def) || hasAll(def, Form.GLASS)) {
 									addBlocksIf(output, def, idx, new Object[][]{
 											{Form.CRYSTAL_BRICKS, YItems.PARAM_CRYSTAL_BRICKS_ITEM},
 											{Form.PANE, YItems.PARAM_CRYSTAL_PANE_ITEM},
-											{Form.GLASS, YItems.PARAM_CRYSTAL_GLASS_ITEM},
-											{Form.TINTED_GLASS, YItems.PARAM_CRYSTAL_TINTED_GLASS_ITEM},
+											{Form.GLASS, YItems.PARAM_GLASS_ITEM},
+											{Form.TINTED_GLASS, YItems.PARAM_TINTED_GLASS_ITEM},
 											{Form.ROD_BLOCK, YItems.PARAM_ROD_BLOCK_ITEM},
 //											{Form.BUDDING, YItems.PARAM_BUDDING_BLOCK_ITEM},
 //											{Form.BUD_SMALL, YItems.PARAM_BUD_SMALL_ITEM},

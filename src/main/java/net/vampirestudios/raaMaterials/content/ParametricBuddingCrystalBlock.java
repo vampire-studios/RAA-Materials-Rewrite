@@ -1,4 +1,3 @@
-// content/ParametricBuddingCrystalBlock.java
 package net.vampirestudios.raaMaterials.content;
 
 import net.minecraft.core.BlockPos;
