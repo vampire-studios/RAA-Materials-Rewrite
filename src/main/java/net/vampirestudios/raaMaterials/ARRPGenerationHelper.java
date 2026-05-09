@@ -1,15 +1,20 @@
 package net.vampirestudios.raaMaterials;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.state.properties.SlabType;
 import net.vampirestudios.arrp.api.RuntimeResourcePack;
 import net.vampirestudios.arrp.json.blockstate.JBlockModel;
 import net.vampirestudios.arrp.json.blockstate.JState;
 import net.vampirestudios.arrp.json.blockstate.JVariant;
 import net.vampirestudios.arrp.json.iteminfo.JItemInfo;
 import net.vampirestudios.arrp.json.iteminfo.model.JModelBasic;
+import net.vampirestudios.arrp.json.loot.JFunction;
 import net.vampirestudios.arrp.json.models.JModel;
 import net.vampirestudios.arrp.json.models.JTextures;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.block.state.properties.SlabType;
+import net.vampirestudios.raaMaterials.content.ParametricBlock;
 
 import java.util.Map;
 
@@ -18,11 +23,124 @@ import static net.vampirestudios.arrp.json.models.JModel.model;
 import static net.vampirestudios.arrp.json.models.JModel.textures;
 
 public class ARRPGenerationHelper {
+    private static final String[] PARAMETRIC_BLOCK_DROPS = {
+            "material_ore",
+            "material_block",
+            "material_raw_block",
+            "material_plate_block",
+            "material_ceramic",
+            "material_shingles",
+            "material_sandstone",
+            "material_cut",
+            "material_smooth",
+            "material_chiseled",
+            "material_bricks",
+            "material_polished",
+            "material_dried",
+            "material_stairs",
+            "material_wall",
+            "material_sandstone_stairs",
+            "material_sandstone_wall",
+            "material_brick_stairs",
+            "material_brick_wall",
+            "material_polished_stairs",
+            "material_polished_wall",
+            "material_crystal_block",
+            "material_crystal_bricks",
+            "material_crystal_cluster",
+            "material_crystal_glass",
+            "material_crystal_tinted_glass",
+            "material_basalt_lamp",
+            "material_calcite_lamp",
+            "material_pillar",
+            "material_tiles",
+            "material_mosaic",
+            "material_mossy",
+            "material_cracked",
+            "material_cobbled",
+            "material_bars",
+            "material_grate",
+            "material_button_metal",
+            "material_button_stone",
+            "material_button_wood",
+            "material_pressure_plate_metal",
+            "material_pressure_plate_stone",
+            "material_pressure_plate_wood",
+            "material_crystal_pane",
+            "material_rod_block"
+    };
+
+    private static final String[] PARAMETRIC_SLAB_DROPS = {
+            "material_slab",
+            "material_sandstone_slab",
+            "material_brick_slab",
+            "material_polished_slab"
+    };
+
     private static String blockTexture(Identifier id) {
         String path = id.getPath();
         if (path.endsWith(".png")) path = path.substring(0, path.length() - 4);
         if (!path.startsWith("block/")) path = "block/" + path;
         return Identifier.fromNamespaceAndPath(id.getNamespace(), path).toString();
+    }
+
+    public static void generateParametricBlockLootTables(RuntimeResourcePack pack) {
+        for (String blockId : PARAMETRIC_BLOCK_DROPS) {
+            addSelfDropLootTable(pack, blockId, false);
+        }
+        for (String blockId : PARAMETRIC_SLAB_DROPS) {
+            addSelfDropLootTable(pack, blockId, true);
+        }
+    }
+
+    private static void addSelfDropLootTable(RuntimeResourcePack pack, String blockId, boolean slab) {
+        var id = RAAMaterials.id(blockId);
+        var entry = net.vampirestudios.arrp.json.loot.JLootTable.entry()
+                .type("minecraft:item")
+                .name(id.toString())
+                .function(copyMatStateFunction(id));
+
+        if (slab) {
+            entry.function(doubleSlabCountFunction(id));
+            entry.function(net.vampirestudios.arrp.json.loot.JLootTable.function("minecraft:explosion_decay"));
+        }
+
+        var pool = net.vampirestudios.arrp.json.loot.JLootTable.pool()
+                .rolls(1)
+                .bonus(0)
+                .entry(entry);
+
+        if (!slab) {
+            pool.condition(net.vampirestudios.arrp.json.loot.JLootTable.predicate("minecraft:survives_explosion"));
+        }
+
+        pack.addLootTable(RAAMaterials.id("blocks/" + blockId),
+                net.vampirestudios.arrp.json.loot.JLootTable.loot("minecraft:block")
+                        .pool(pool)
+                        .randomSequence(RAAMaterials.id("blocks/" + blockId)));
+    }
+
+    private static JFunction copyMatStateFunction(Identifier blockId) {
+        JsonArray properties = new JsonArray();
+        properties.add(ParametricBlock.MAT.getName());
+
+        return net.vampirestudios.arrp.json.loot.JLootTable.function("minecraft:copy_state")
+                .parameter("block", blockId)
+                .parameter("properties", properties);
+    }
+
+    private static JFunction doubleSlabCountFunction(Identifier blockId) {
+        JsonObject properties = new JsonObject();
+        properties.addProperty("type", "double");
+
+        var condition = net.vampirestudios.arrp.json.loot.JLootTable.predicate("minecraft:block_state_property")
+                .parameter("block", blockId)
+                .parameter("properties", properties);
+
+        return net.vampirestudios.arrp.json.loot.JLootTable.function("minecraft:set_count")
+                .parameter("count", 2.0)
+                .parameter("add", false)
+                .condition(condition);
     }
 
     public static void generateBasicBlockState(RuntimeResourcePack clientResourcePackBuilder, Identifier name) {
@@ -164,12 +282,12 @@ public class ARRPGenerationHelper {
                 .element(JModel.element()
                         .bounds(0, 0, 0, 16, 16, 16)
                         .faces(JModel.faces()
-                                .north(JModel.face("all").uv(0, 0, 16, 16).tintIndex(0))
-                                .east(JModel.face("all").uv(0, 0, 16, 16).tintIndex(0))
-                                .south(JModel.face("all").uv(0, 0, 16, 16).tintIndex(0))
-                                .west(JModel.face("all").uv(0, 0, 16, 16).tintIndex(0))
-                                .up(JModel.face("all").uv(0, 0, 16, 16).tintIndex(0))
-                                .down(JModel.face("all").uv(0, 0, 16, 16).tintIndex(0))
+                                .north(JModel.face("all").uv(0, 0, 16, 16).cullface(Direction.NORTH).tintIndex(0))
+                                .east(JModel.face("all").uv(0, 0, 16, 16).cullface(Direction.EAST).tintIndex(0))
+                                .south(JModel.face("all").uv(0, 0, 16, 16).cullface(Direction.SOUTH).tintIndex(0))
+                                .west(JModel.face("all").uv(0, 0, 16, 16).cullface(Direction.WEST).tintIndex(0))
+                                .up(JModel.face("all").uv(0, 0, 16, 16).cullface(Direction.UP).tintIndex(0))
+                                .down(JModel.face("all").uv(0, 0, 16, 16).cullface(Direction.DOWN).tintIndex(0))
                         )
                 );
         clientResourcePackBuilder.addModel(model, name);

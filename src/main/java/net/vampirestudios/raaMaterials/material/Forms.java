@@ -48,7 +48,9 @@ public final class Forms {
 
 		// ---- Sandstone & stone variants
 		put("material_sandstone", Form.SANDSTONE);
+		put("material_cut", Form.CUT);
 		put("material_cut_sandstone", Form.CUT);
+		put("material_smooth", Form.SMOOTH);
 		put("material_smooth_sandstone", Form.SMOOTH);
 		put("material_chiseled", Form.CHISELED);
 		put("material_polished", Form.POLISHED);

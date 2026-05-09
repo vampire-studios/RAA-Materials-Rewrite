@@ -53,19 +53,19 @@ public interface FormTextureResolver {
 
         private Identifier baseFallback(MaterialKind k) {
             return switch (k) {
-                case SAND     -> withDefaultNamespace("sandstone.png");
-                case CLAY     -> withDefaultNamespace("clay.png");
-                case MUD      -> withDefaultNamespace("packed_mud.png");
-                case GRAVEL   -> withDefaultNamespace("gravel.png");
-				case SOIL     -> withDefaultNamespace("dirt.png");
-                case SALT     -> withDefaultNamespace("calcite.png");
-                case VOLCANIC -> withDefaultNamespace("basalt_top.png");
-                case WOOD     -> withDefaultNamespace("oak_planks.png");
-                case CRYSTAL  -> withDefaultNamespace("amethyst_block.png");
-                case GEM      -> withDefaultNamespace("diamond_block.png");
-                case METAL    -> withDefaultNamespace("iron_block.png");
-                case ALLOY    -> withDefaultNamespace("copper_block.png");
-                default       -> withDefaultNamespace("stone.png");
+                case SAND     -> withDefaultNamespace("block/sandstone");
+                case CLAY     -> withDefaultNamespace("block/clay");
+                case MUD      -> withDefaultNamespace("block/packed_mud");
+                case GRAVEL   -> withDefaultNamespace("block/gravel");
+				case SOIL     -> withDefaultNamespace("block/dirt");
+                case SALT     -> withDefaultNamespace("block/calcite");
+                case VOLCANIC -> withDefaultNamespace("block/basalt_top");
+                case WOOD     -> withDefaultNamespace("block/oak_planks");
+                case CRYSTAL  -> withDefaultNamespace("block/amethyst_block");
+                case GEM      -> withDefaultNamespace("block/diamond_block");
+                case METAL    -> withDefaultNamespace("block/iron_block");
+                case ALLOY    -> withDefaultNamespace("block/copper_block");
+                default       -> withDefaultNamespace("block/stone");
             };
         }
     }

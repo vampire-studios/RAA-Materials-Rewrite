@@ -3,16 +3,19 @@ package net.vampirestudios.raaMaterials.content;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.vampirestudios.raaMaterials.material.ClientMaterialCache;
+import net.vampirestudios.raaMaterials.material.MaterialDef;
 import net.vampirestudios.raaMaterials.material.MaterialKind;
 import net.vampirestudios.raaMaterials.worldgen.SpawnMode;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -20,10 +23,7 @@ public final class MaterialTooltipUtil {
 	private MaterialTooltipUtil() {}
 
 	public static void add(ItemStack stack, Consumer<Component> lines) {
-		Identifier matId = stack.get(net.vampirestudios.raaMaterials.YComponents.MATERIAL);
-		if (matId == null) return;
-
-		var opt = ClientMaterialCache.byRL(matId);
+		var opt = materialDefinition(stack);
 		if (opt.isEmpty()) return;
 		var def = opt.get();
 
@@ -50,6 +50,20 @@ public final class MaterialTooltipUtil {
 						.withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
 			}
 		}
+	}
+
+	private static Optional<MaterialDef> materialDefinition(ItemStack stack) {
+		Identifier matId = stack.get(net.vampirestudios.raaMaterials.YComponents.MATERIAL);
+		if (matId != null) {
+			var def = ClientMaterialCache.byRL(matId);
+			if (def.isPresent()) return def;
+		}
+
+		var props = stack.get(DataComponents.BLOCK_STATE);
+		if (props == null || props.get(ParametricBlock.MAT) == null) {
+			return Optional.empty();
+		}
+		return ClientMaterialCache.byIndex(props.get(ParametricBlock.MAT));
 	}
 
 	private static String kindKey(MaterialKind k) {

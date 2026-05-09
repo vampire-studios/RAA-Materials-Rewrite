@@ -10,10 +10,7 @@ public final class LangKeys {
 	}
 
 	private static final Set<Form> BASE_AWARE = Set.of(
-			SLAB, STAIRS, WALL,
-			BUTTON, PRESSURE_PLATE, DOOR, TRAPDOOR, FENCE, FENCE_GATE,
-			PANE, BARS,
-			BRICKS, POLISHED, CHISELED, COBBLED, CRACKED, MOSSY, TILES, MOSAIC, PILLAR
+			SLAB, STAIRS, WALL
 	);
 
 	/** Translation key for a form; use with one arg: the material display name. */

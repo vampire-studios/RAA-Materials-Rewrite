@@ -117,6 +117,4 @@ public class ParametricCrystalBudBlock extends ParametricBlock {
 			return name().toLowerCase(Locale.ROOT);
 		}
 	}
-
-	// Buds have no item; let loot table handle “drop nothing”.
 }

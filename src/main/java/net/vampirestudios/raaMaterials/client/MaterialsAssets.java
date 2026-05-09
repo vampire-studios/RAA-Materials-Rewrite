@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.BlockColorRegistry;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
@@ -25,7 +26,6 @@ import net.vampirestudios.arrp.json.iteminfo.model.JSelectCase;
 import net.vampirestudios.arrp.json.iteminfo.property.JPropertyComponent;
 import net.vampirestudios.arrp.json.iteminfo.tint.JTint;
 import net.vampirestudios.arrp.json.iteminfo.tint.JTintConstant;
-import net.vampirestudios.arrp.json.iteminfo.tint.JTintDye;
 import net.vampirestudios.arrp.json.models.JModel;
 import net.vampirestudios.arrp.json.recipe.*;
 import net.vampirestudios.raaMaterials.ARRPGenerationHelper;
@@ -55,8 +55,8 @@ public final class MaterialsAssets {
 	private static final Identifier PLATE_BLOCK_SHARED_ID = RAAMaterials.id("material_plate_block");
 	// Building variant block IDs (WIP)
 	private static final Identifier SANDSTONE_SHARED_ID = RAAMaterials.id("material_sandstone");
-	private static final Identifier CUT_SANDSTONE_SHARED_ID = RAAMaterials.id("material_cut_sandstone");
-	private static final Identifier SMOOTH_SANDSTONE_SHARED_ID = RAAMaterials.id("material_smooth_sandstone");
+	private static final Identifier CUT_SANDSTONE_SHARED_ID = RAAMaterials.id("material_cut");
+	private static final Identifier SMOOTH_SANDSTONE_SHARED_ID = RAAMaterials.id("material_smooth");
 	private static final Identifier CHISELED_SHARED_ID = RAAMaterials.id("material_chiseled");
 	private static final Identifier BRICKS_SHARED_ID = RAAMaterials.id("material_bricks");
 	private static final Identifier POLISHED_SHARED_ID = RAAMaterials.id("material_polished");
@@ -176,6 +176,17 @@ public final class MaterialsAssets {
 		registerColorProviderForSharedBlock(RAAMaterials.id("material_cobbled"), materials);
 		registerColorProviderForSharedBlock(RAAMaterials.id("material_bricks"), materials);
 		registerColorProviderForSharedBlock(RAAMaterials.id("material_polished"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_sandstone"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_cut"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_smooth"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_chiseled"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_dried"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_ceramic"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_tiles"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_mosaic"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_mossy"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_cracked"), materials);
+		registerColorProviderForSharedBlock(RAAMaterials.id("material_pillar"), materials);
 	}
 
 	private static void registerColorProviderForSharedBlock(Identifier sharedBlockId, List<MaterialDef> materials) {
@@ -187,9 +198,17 @@ public final class MaterialsAssets {
 		BlockColorRegistry.register((state, _, _, tintValues) -> {
 			int matIndex = state.getValue(ParametricBlock.MAT);
 			if (matIndex >= 0 && matIndex < materials.size()) {
-				tintValues.add(materials.get(matIndex).primaryColor());
+				tintValues.add(opaqueColor(materials.get(matIndex).primaryColor()));
 			}
 		}, block);
+	}
+
+	private static int opaqueColor(int color) {
+		return color | 0xFF000000;
+	}
+
+	private static JModelBasic tintedModel(Identifier modelId, MaterialDef def) {
+		return (JModelBasic) JModelBasic.model(modelId.toString()).tint(JTint.constant(opaqueColor(def.primaryColor())));
 	}
 
 	public static void markDirty() {
@@ -219,7 +238,7 @@ public final class MaterialsAssets {
 		}
 
 		// ---- BLOCK FAMILIES (cube-all) ----
-		buildBlockFamily(List.of(Form.ORE), ORE_SHARED_ID, "block/material_ore/",
+		buildOreFamily(ORE_SHARED_ID, "block/material_ore/",
 				(idx) -> texture(def.get(idx)).textures1().oreVein().orElseThrow());
 
 		Map<MaterialKind, TexPicker> blockTextures = Map.of(
@@ -271,18 +290,35 @@ public final class MaterialsAssets {
 				(idx) -> texture(def.get(idx)).textures1().plateBlock().orElseThrow());
 
 		// Building families — WIP (uses building atlas textures; wire up when assets are ready)
-//		buildBlockFamily(List.of(Form.SANDSTONE), SANDSTONE_SHARED_ID, "block/material_sandstone/",
-//				(idx) -> RAAMaterials.id("building/sandstone/sandstone_" + oneIndexed(idx, 10)));
-//		buildBlockFamily(List.of(Form.CUT), CUT_SANDSTONE_SHARED_ID, "block/material_cut_sandstone/",
-//				(idx) -> RAAMaterials.id("building/sandstone/cut_sandstone_" + oneIndexed(idx, 10)));
-//		buildBlockFamily(List.of(Form.SMOOTH), SMOOTH_SANDSTONE_SHARED_ID, "block/material_smooth_sandstone/",
-//				(idx) -> RAAMaterials.id("building/sandstone/smooth_sandstone_" + oneIndexed(idx, 10)));
-//		buildBlockFamily(List.of(Form.CHISELED), CHISELED_SHARED_ID, "block/material_chiseled/",
-//				(idx) -> RAAMaterials.id("building/chiseled/chiseled_" + oneIndexed(idx, 12)));
-//		buildBlockFamily(List.of(Form.DRIED), DRIED_SHARED_ID, "block/material_dried/",
-//				(idx) -> RAAMaterials.id("building/dried/dried_" + oneIndexed(idx, 8)));
-//		buildBlockFamily(List.of(Form.CERAMIC), CERAMIC_SHARED_ID, "block/material_ceramic/",
-//				(idx) -> RAAMaterials.id("building/ceramic/ceramic_" + oneIndexed(idx, 8)));
+		buildBlockFamily(List.of(Form.SANDSTONE), SANDSTONE_SHARED_ID, "block/material_sandstone/",
+				(idx) -> texture(def.get(idx)).textures1().sandstoneSide()
+						.orElse(RAAMaterials.id("storage_blocks/sand_" + oneIndexed(idx, 3))));
+		buildBlockFamily(List.of(Form.CUT), CUT_SANDSTONE_SHARED_ID, "block/material_cut/",
+				(idx) -> texture(def.get(idx)).textures1().cutSandstoneSide()
+						.orElse(RAAMaterials.id("storage_blocks/sand_" + oneIndexed(idx, 3))));
+		buildBlockFamily(List.of(Form.SMOOTH), SMOOTH_SANDSTONE_SHARED_ID, "block/material_smooth/",
+				(idx) -> texture(def.get(idx)).textures1().sandstoneTop()
+						.orElse(RAAMaterials.id("storage_blocks/sand_" + oneIndexed(idx, 3))));
+		buildBlockFamily(List.of(Form.CHISELED), CHISELED_SHARED_ID, "block/material_chiseled/",
+				(idx) -> texture(def.get(idx)).textures3().chiseled()
+						.orElse(RAAMaterials.id("stone/stone_chiseled_" + oneIndexed(idx, 4))));
+		buildBlockFamily(List.of(Form.DRIED), DRIED_SHARED_ID, "block/material_dried/",
+				(idx) -> RAAMaterials.id("stone/stone_bricks_" + oneIndexed(idx, 24)));
+		buildBlockFamily(List.of(Form.CERAMIC), CERAMIC_SHARED_ID, "block/material_ceramic/",
+				(idx) -> RAAMaterials.id("stone/stone_tiles_" + oneIndexed(idx, 8)));
+		buildBlockFamily(List.of(Form.TILES), RAAMaterials.id("material_tiles"), "block/material_tiles/",
+				(idx) -> RAAMaterials.id("stone/stone_tiles_" + oneIndexed(idx, 8)));
+		buildBlockFamily(List.of(Form.MOSAIC), RAAMaterials.id("material_mosaic"), "block/material_mosaic/",
+				(idx) -> RAAMaterials.id("stone/stone_frame_" + oneIndexed(idx, 13)));
+		buildBlockFamily(List.of(Form.MOSSY), RAAMaterials.id("material_mossy"), "block/material_mossy/",
+				(idx) -> texture(def.get(idx)).textures3().bricks()
+						.orElse(RAAMaterials.id("stone/stone_bricks_" + oneIndexed(idx, 24))));
+		buildBlockFamily(List.of(Form.CRACKED), RAAMaterials.id("material_cracked"), "block/material_cracked/",
+				(idx) -> texture(def.get(idx)).textures3().cobblestone()
+						.orElse(RAAMaterials.id("stone/stone_cobbled_" + oneIndexed(idx, 7))));
+		buildPillarFamily(RAAMaterials.id("material_pillar"), "block/material_pillar/",
+				(idx) -> RAAMaterials.id("stone/stone_frame_" + oneIndexed(idx, 13)),
+				(idx) -> RAAMaterials.id("stone/stone_tiles_" + oneIndexed(idx, 8)));
 
 		// ---- SHAPES (use BLOCK textures) ----
 		buildSlabFamilyForBlock(SLAB_SHARED_ID, blockTextures);
@@ -376,7 +412,7 @@ public final class MaterialsAssets {
 			case GEM -> pickers.get(MaterialKind.GEM).pick(idx);
 			case CRYSTAL -> pickers.get(MaterialKind.CRYSTAL).pick(idx);
 			case STONE, CLAY, GRAVEL, SOIL, MUD, SALT, VOLCANIC -> pickers.get(MaterialKind.STONE).pick(idx);
-			case SAND -> RAAMaterials.id("building/sandstone/sandstone_" + oneIndexed(idx, 10));
+			case SAND -> pickers.get(MaterialKind.SAND).pick(idx);
 			case WOOD -> Identifier.withDefaultNamespace("block/oak_planks");
 		};
 	}
@@ -399,7 +435,8 @@ public final class MaterialsAssets {
 			var tex = picker.pick(idx);
 			addCubeAllTintedBlockModel(rp, perModelId, tex);
 			variants.add(new JBlockModelEntry(idx, JState.model(perModelId)));
-			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(perModelId.toString())));
+			select.addCase(JSelectCase.of(def.nameInformation().id().toString(),
+					tintedModel(perModelId, def)));
 			cases++;
 		}
 
@@ -437,7 +474,7 @@ public final class MaterialsAssets {
 			var tex = pickBlockTex(def, idx, pickers);
 			addCubeAllTintedBlockModel(rp, perModelId, tex);
 			variants.add(new JBlockModelEntry(idx, JState.model(perModelId)));
-			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(perModelId.toString()).tint(JTint.constant(def.primaryColor()))));
+			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(perModelId, def)));
 			cases++;
 		}
 
@@ -452,6 +489,93 @@ public final class MaterialsAssets {
 
 	private static void addCubeAllTintedBlockModel(RuntimeResourcePack rp, Identifier modelId, Identifier texture) {
 		ARRPGenerationHelper.generateAllTintedBlockModel(rp, modelId, texture);
+	}
+
+	private static void buildOreFamily(Identifier sharedBlockId, String perModelPrefix, TexPicker oreTexture) {
+		var rp = RRPGen.PACK;
+		var mats = ClientMaterialCache.all();
+
+		List<JBlockModelEntry> variants = new ArrayList<>();
+		var select = JItemModel.select().property(MAT_COMP);
+		int cases = 0;
+
+		for (int idx = 0; idx < mats.size(); idx++) {
+			var def = mats.get(idx);
+			if (!hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), Form.ORE)) continue;
+
+			var perModelId = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath());
+			addOreBlockModel(rp, perModelId, def.host().baseTexture(), oreTexture.pick(idx));
+			variants.add(new JBlockModelEntry(idx, JState.model(perModelId)));
+			select.addCase(JSelectCase.of(def.nameInformation().id().toString(),
+					tintedModel(perModelId, def)));
+			cases++;
+		}
+
+		if (cases == 0) return;
+		var v = JState.variant();
+		for (var e : variants) v.put("mat", e.idx, e.model);
+		rp.addBlockState(JState.state(v), sharedBlockId);
+
+		select.fallback(JModelBasic.of("minecraft:block/stone"));
+		rp.addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
+	}
+
+	private static void addOreBlockModel(RuntimeResourcePack rp, Identifier modelId, Identifier baseTexture, Identifier overlayTexture) {
+		var base = blockTexture(baseTexture);
+		var overlay = blockTexture(overlayTexture);
+		var model = JModel.model("minecraft:block/block")
+				.textures(JModel.textures()
+						.var("particle", base)
+						.var("base", base)
+						.var("overlay", overlay))
+				.element(JModel.element()
+						.bounds(0, 0, 0, 16, 16, 16)
+						.faces(JModel.faces()
+								.north(JModel.face("base").uv(0, 0, 16, 16).cullface(Direction.NORTH))
+								.east(JModel.face("base").uv(0, 0, 16, 16).cullface(Direction.EAST))
+								.south(JModel.face("base").uv(0, 0, 16, 16).cullface(Direction.SOUTH))
+								.west(JModel.face("base").uv(0, 0, 16, 16).cullface(Direction.WEST))
+								.up(JModel.face("base").uv(0, 0, 16, 16).cullface(Direction.UP))
+								.down(JModel.face("base").uv(0, 0, 16, 16).cullface(Direction.DOWN))))
+				.element(JModel.element()
+						.bounds(-0.01f, -0.01f, -0.01f, 16.01f, 16.01f, 16.01f)
+						.faces(JModel.faces()
+								.north(JModel.face("overlay").uv(0, 0, 16, 16).cullface(Direction.NORTH).tintIndex(0))
+								.east(JModel.face("overlay").uv(0, 0, 16, 16).cullface(Direction.EAST).tintIndex(0))
+								.south(JModel.face("overlay").uv(0, 0, 16, 16).cullface(Direction.SOUTH).tintIndex(0))
+								.west(JModel.face("overlay").uv(0, 0, 16, 16).cullface(Direction.WEST).tintIndex(0))
+								.up(JModel.face("overlay").uv(0, 0, 16, 16).cullface(Direction.UP).tintIndex(0))
+								.down(JModel.face("overlay").uv(0, 0, 16, 16).cullface(Direction.DOWN).tintIndex(0))));
+		rp.addModel(model, modelId);
+	}
+
+	private static void buildPillarFamily(
+			Identifier sharedBlockId, String perModelPrefix, TexPicker endTexture, TexPicker sideTexture
+	) {
+		var rp = RRPGen.PACK;
+		var mats = ClientMaterialCache.all();
+		var select = JItemModel.select().property(MAT_COMP);
+		var v = JState.variant();
+		int cases = 0;
+
+		for (int idx = 0; idx < mats.size(); idx++) {
+			var def = mats.get(idx);
+			if (!hasAny(FormsRuntime.activeForms(Minecraft.getInstance().level, def), Form.PILLAR)) continue;
+
+			var perModelId = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath());
+			ARRPGenerationHelper.generateColumnBlockModel(rp, perModelId, endTexture.pick(idx), sideTexture.pick(idx));
+			v.put(Map.of("mat", idx, "axis", "y"), JState.model(perModelId));
+			v.put(Map.of("mat", idx, "axis", "x"), JState.model(perModelId).x(90).y(90));
+			v.put(Map.of("mat", idx, "axis", "z"), JState.model(perModelId).x(90));
+			select.addCase(JSelectCase.of(def.nameInformation().id().toString(),
+					tintedModel(perModelId, def)));
+			cases++;
+		}
+
+		if (cases == 0) return;
+		rp.addBlockState(JState.state(v), sharedBlockId);
+		select.fallback(JModelBasic.of("minecraft:block/stone"));
+		rp.addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
 	}
 
 	private static void buildCrystalClusterFamily(
@@ -472,7 +596,7 @@ public final class MaterialsAssets {
 					.textures(JModel.textures().var("cross", blockTexture(texture.pick(idx)))), perModelId);
 			addFacingVariants(v, idx, perModelId);
 			select.addCase(JSelectCase.of(def.nameInformation().id().toString(),
-					JModelBasic.model(perModelId.toString()).tint(JTint.constant(def.primaryColor()))));
+					tintedModel(perModelId, def)));
 			cases++;
 		}
 
@@ -521,7 +645,7 @@ public final class MaterialsAssets {
 					.textures(JModel.textures().var("end_rod", blockTexture(texture.pick(idx)))), perModelId);
 			addFacingVariants(v, idx, perModelId);
 			select.addCase(JSelectCase.of(def.nameInformation().id().toString(),
-					JModelBasic.model(perModelId.toString()).tint(JTint.constant(def.primaryColor()))));
+					tintedModel(perModelId, def)));
 			cases++;
 		}
 
@@ -570,7 +694,7 @@ public final class MaterialsAssets {
 			state.add(JState.multipart(JState.model(noSideAlt).y(90)).when(Map.of("mat", idx, "south", "false")));
 			state.add(JState.multipart(JState.model(noSide).y(270)).when(Map.of("mat", idx, "west", "false")));
 			select.addCase(JSelectCase.of(def.nameInformation().id().toString(),
-					JModelBasic.model(post.toString()).tint(JTint.constant(def.primaryColor()))));
+					tintedModel(post, def)));
 			cases++;
 		}
 
@@ -840,7 +964,7 @@ public final class MaterialsAssets {
 
 			addWallParts(state, Map.of("mat", idx), post, side, sideT);
 
-			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(inventory.toString()).tint(JTint.constant(def.primaryColor()))));
+			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(inventory, def)));
 			cases++;
 		}
 
@@ -874,7 +998,7 @@ public final class MaterialsAssets {
 			var perModelId = RAAMaterials.id(perModelPrefix + def.nameInformation().id().getPath());
 			addGeneratedItemModel(rp, perModelId, layer0.pick(idx));
 			select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(perModelId.toString())
-					.tint(new JTintConstant(def.primaryColor()))));
+					.tint(new JTintConstant(opaqueColor(def.primaryColor())))));
 			cases++;
 		}
 
@@ -926,7 +1050,7 @@ public final class MaterialsAssets {
 			select.addCase(
 					JSelectCase.of(
 							def.nameInformation().id().toString(),
-							JModelBasic.model(perModelId.toString()).tint(new JTintDye(0xFF00FF))
+							JModelBasic.model(perModelId.toString()).tint(new JTintConstant(opaqueColor(def.primaryColor())))
 					)
 			);
 			cases++;

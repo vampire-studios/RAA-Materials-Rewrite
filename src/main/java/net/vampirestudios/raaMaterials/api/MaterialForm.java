@@ -1,4 +1,3 @@
-// api/MaterialForm.java
 package net.vampirestudios.raaMaterials.api;
 
 import net.minecraft.resources.Identifier;
@@ -12,7 +11,6 @@ public interface MaterialForm {
     Identifier id();                 // e.g. yourmod:plate_block
     boolean supports(MaterialDef def);     // should this form exist for this material?
 
-    // Factories (called once during content bootstrap)
     Optional<Block>   createBlock();       // empty if “item-only” form
     Optional<Item>    createItem();        // empty if “block-only” form
 

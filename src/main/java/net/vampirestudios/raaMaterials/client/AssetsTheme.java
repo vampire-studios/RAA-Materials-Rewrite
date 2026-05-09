@@ -24,17 +24,17 @@ public final class AssetsTheme {
 	}
 
 	private void initializeFallbacks() {
-		fallbacks.put(Slot.SANDSTONE_TOP, withDefaultNamespace("sandstone_top.png"));
-		fallbacks.put(Slot.SANDSTONE_SIDE, withDefaultNamespace("sandstone.png"));
-		fallbacks.put(Slot.SANDSTONE_BOTTOM, withDefaultNamespace("sandstone_bottom.png"));
-		fallbacks.put(Slot.SANDSTONE_CUT, withDefaultNamespace("cut_sandstone.png"));
-		fallbacks.put(Slot.SANDSTONE_CHISELED, withDefaultNamespace("chiseled_sandstone.png"));
-		fallbacks.put(Slot.CRYSTAL_BUD_S, withDefaultNamespace("small_amethyst_bud.png"));
-		fallbacks.put(Slot.CRYSTAL_BUD_M, withDefaultNamespace("medium_amethyst_bud.png"));
-		fallbacks.put(Slot.CRYSTAL_BUD_L, withDefaultNamespace("large_amethyst_bud.png"));
-		fallbacks.put(Slot.TINTED_CRYSTAL_GLASS, id("crystal/tinted_glass_1.png"));
-		fallbacks.put(Slot.CLAY_ITEM, withDefaultNamespace("clay.png"));
-		fallbacks.put(Slot.GEAR_ITEM, id("gears/gear_1.png"));
+		fallbacks.put(Slot.SANDSTONE_TOP, withDefaultNamespace("block/sandstone_top"));
+		fallbacks.put(Slot.SANDSTONE_SIDE, withDefaultNamespace("block/sandstone"));
+		fallbacks.put(Slot.SANDSTONE_BOTTOM, withDefaultNamespace("block/sandstone_bottom"));
+		fallbacks.put(Slot.SANDSTONE_CUT, withDefaultNamespace("block/cut_sandstone"));
+		fallbacks.put(Slot.SANDSTONE_CHISELED, withDefaultNamespace("block/chiseled_sandstone"));
+		fallbacks.put(Slot.CRYSTAL_BUD_S, withDefaultNamespace("block/small_amethyst_bud"));
+		fallbacks.put(Slot.CRYSTAL_BUD_M, withDefaultNamespace("block/medium_amethyst_bud"));
+		fallbacks.put(Slot.CRYSTAL_BUD_L, withDefaultNamespace("block/large_amethyst_bud"));
+		fallbacks.put(Slot.TINTED_CRYSTAL_GLASS, id("crystal/tinted_glass_1"));
+		fallbacks.put(Slot.CLAY_ITEM, withDefaultNamespace("item/clay_ball"));
+		fallbacks.put(Slot.GEAR_ITEM, id("gears/gear_1"));
 	}
 
 	// ---------- Builder ----------
@@ -84,7 +84,7 @@ public final class AssetsTheme {
 	}
 
 	private static Identifier numbered(String base, Random rnd, int max) {
-		return id(base + (rnd.nextInt(max) + 1) + ".png");
+		return id(base + (rnd.nextInt(max) + 1));
 	}
 
 	// ---------- Texture definition builders ----------
@@ -113,8 +113,8 @@ public final class AssetsTheme {
 		};
 
 		// Metal decor
-		Optional<Identifier> plateBlock = Optional.of(id("metal/metal_plate.png"));
-		Optional<Identifier> shingles = Optional.of(id("metal/metal_shingles.png"));
+		Optional<Identifier> plateBlock = Optional.of(id("metal/metal_plate"));
+		Optional<Identifier> shingles = Optional.of(id("metal/metal_shingles"));
 
 		// Sandstone family (vanilla parity)
 		Optional<Identifier> sandstoneTop = Optional.of(withDefaultNamespace("block/sandstone_top"));
@@ -129,7 +129,7 @@ public final class AssetsTheme {
 
 		// Budding & buds (crystal-like)
 		Optional<Identifier> budding = (k == MaterialKind.CRYSTAL) ?
-				Optional.of(id("crystal/budding_crystal_block_1.png")) : Optional.empty();
+				Optional.of(id("crystal/budding_crystal_block_1")) : Optional.empty();
 		Optional<Identifier> budSmall = Optional.of(withDefaultNamespace("block/small_amethyst_bud"));
 		Optional<Identifier> budMedium = Optional.of(withDefaultNamespace("block/medium_amethyst_bud"));
 		Optional<Identifier> budLarge = Optional.of(withDefaultNamespace("block/large_amethyst_bud"));
@@ -137,7 +137,7 @@ public final class AssetsTheme {
 		// Cluster + tinted glass overlay
 		Optional<Identifier> cluster = (k == MaterialKind.CRYSTAL) ?
 				Optional.of(numbered("crystal/crystal_", rnd, 9)) : Optional.empty();
-		Optional<Identifier> tintedGlass = Optional.of(id("crystal/tinted_glass_1.png"));
+		Optional<Identifier> tintedGlass = Optional.of(id("crystal/tinted_glass_1"));
 
 		return new TextureDef1(
 				oreVein, storageBlock, rawBlock, plateBlock, shingles,
@@ -147,17 +147,17 @@ public final class AssetsTheme {
 	}
 
 	private TextureDef2 buildTextureDef2(MaterialDef m, Random rnd) {
-		Optional<Identifier> crystalGlass = Optional.of(id("crystal/crystal_glass.png"));
-		Optional<Identifier> crystalBricks = Optional.of(id("crystal/crystal_bricks.png"));
-		Optional<Identifier> lampOverlay1 = Optional.of(id("crystal/lamp_overlay1.png"));
-		Optional<Identifier> lampOverlay2 = Optional.of(id("crystal/lamp_overlay2.png"));
+		Optional<Identifier> crystalGlass = Optional.of(id("crystal/crystal_glass"));
+		Optional<Identifier> crystalBricks = Optional.of(id("crystal/crystal_bricks"));
+		Optional<Identifier> lampOverlay1 = Optional.of(id("crystal/lamp_overlay1"));
+		Optional<Identifier> lampOverlay2 = Optional.of(id("crystal/lamp_overlay2"));
 
 		Optional<Identifier> raw = Optional.of(numbered("raw/raw_", rnd, 18));
 		Optional<Identifier> ingot = Optional.of(numbered("ingots/ingot_", rnd, 29));
 		Optional<Identifier> dust = Optional.of(numbered("dusts/dust_", rnd, 5));
 		Optional<Identifier> nugget = Optional.of(numbered("nuggets/nugget_", rnd, 10));
 		Optional<Identifier> plate = Optional.of(numbered("plates/plate_", rnd, 3));
-		Optional<Identifier> gear = Optional.of(id("gears/gear_1.png"));
+		Optional<Identifier> gear = Optional.of(id("gears/gear_1"));
 		Optional<Identifier> gem = Optional.of(numbered("gems/gem_", rnd, 33));
 		Optional<Identifier> shard = Optional.of(numbered("crystal_items/shard_", rnd, 7));
 		Optional<Identifier> clayBall = Optional.of(withDefaultNamespace("item/clay_ball"));
@@ -212,48 +212,48 @@ public final class AssetsTheme {
 	public static AssetsTheme defaultTheme() {
 		return AssetsTheme.theme()
 				// Role sheets (global)
-				.fallback(Slot.PLATE_SHEET, id("metal/metal_plate.png"))
-				.fallback(Slot.SHINGLES_SHEET, id("metal/metal_shingles.png"))
-				.fallback(Slot.TINTED_CRYSTAL_GLASS, id("crystal/tinted_glass_1.png"))
+				.fallback(Slot.PLATE_SHEET, id("metal/metal_plate"))
+				.fallback(Slot.SHINGLES_SHEET, id("metal/metal_shingles"))
+				.fallback(Slot.TINTED_CRYSTAL_GLASS, id("crystal/tinted_glass_1"))
 
 				// Material kind storage blocks
-				.kind(MaterialKind.METAL, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("iron_block.png")))
-				.kind(MaterialKind.ALLOY, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("copper_block.png")))
-				.kind(MaterialKind.GEM, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("diamond_block.png")))
-				.kind(MaterialKind.CRYSTAL, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("amethyst_block.png")))
-				.kind(MaterialKind.STONE, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("stone.png")))
-				.kind(MaterialKind.SAND, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("sandstone.png")))
-				.kind(MaterialKind.GRAVEL, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("gravel.png")))
-				.kind(MaterialKind.CLAY, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("clay.png")))
-				.kind(MaterialKind.MUD, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("packed_mud.png")))
-				.kind(MaterialKind.SOIL, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("dirt.png")))
-				.kind(MaterialKind.SALT, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("calcite.png")))
-				.kind(MaterialKind.VOLCANIC, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("basalt_top.png")))
-				.kind(MaterialKind.WOOD, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("oak_planks.png")))
+				.kind(MaterialKind.METAL, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/iron_block")))
+				.kind(MaterialKind.ALLOY, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/copper_block")))
+				.kind(MaterialKind.GEM, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/diamond_block")))
+				.kind(MaterialKind.CRYSTAL, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/amethyst_block")))
+				.kind(MaterialKind.STONE, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/stone")))
+				.kind(MaterialKind.SAND, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/sandstone")))
+				.kind(MaterialKind.GRAVEL, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/gravel")))
+				.kind(MaterialKind.CLAY, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/clay")))
+				.kind(MaterialKind.MUD, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/packed_mud")))
+				.kind(MaterialKind.SOIL, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/dirt")))
+				.kind(MaterialKind.SALT, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/calcite")))
+				.kind(MaterialKind.VOLCANIC, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/basalt_top")))
+				.kind(MaterialKind.WOOD, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/oak_planks")))
 
 				// Sandstone set
-				.fallback(Slot.SANDSTONE_TOP, withDefaultNamespace("sandstone_top.png"))
-				.fallback(Slot.SANDSTONE_SIDE, withDefaultNamespace("sandstone.png"))
-				.fallback(Slot.SANDSTONE_BOTTOM, withDefaultNamespace("sandstone_bottom.png"))
-				.fallback(Slot.SANDSTONE_CUT, withDefaultNamespace("cut_sandstone.png"))
-				.fallback(Slot.SANDSTONE_CHISELED, withDefaultNamespace("chiseled_sandstone.png"))
+				.fallback(Slot.SANDSTONE_TOP, withDefaultNamespace("block/sandstone_top"))
+				.fallback(Slot.SANDSTONE_SIDE, withDefaultNamespace("block/sandstone"))
+				.fallback(Slot.SANDSTONE_BOTTOM, withDefaultNamespace("block/sandstone_bottom"))
+				.fallback(Slot.SANDSTONE_CUT, withDefaultNamespace("block/cut_sandstone"))
+				.fallback(Slot.SANDSTONE_CHISELED, withDefaultNamespace("block/chiseled_sandstone"))
 
 				// Crystal buds
-				.fallback(Slot.CRYSTAL_BUD_S, withDefaultNamespace("small_amethyst_bud.png"))
-				.fallback(Slot.CRYSTAL_BUD_M, withDefaultNamespace("medium_amethyst_bud.png"))
-				.fallback(Slot.CRYSTAL_BUD_L, withDefaultNamespace("large_amethyst_bud.png"))
+				.fallback(Slot.CRYSTAL_BUD_S, withDefaultNamespace("block/small_amethyst_bud"))
+				.fallback(Slot.CRYSTAL_BUD_M, withDefaultNamespace("block/medium_amethyst_bud"))
+				.fallback(Slot.CRYSTAL_BUD_L, withDefaultNamespace("block/large_amethyst_bud"))
 
 				// Per-form defaults
-				.set(Slot.BRICKS, withDefaultNamespace("stone_bricks.png"))
-				.set(Slot.POLISHED, withDefaultNamespace("smooth_stone.png"))
-				.set(Slot.TILES, withDefaultNamespace("quartz_block_top.png"))
-				.set(Slot.MOSAIC, withDefaultNamespace("bamboo_mosaic.png"))
-				.set(Slot.PILLAR_SIDE, withDefaultNamespace("quartz_block_side.png"))
-				.set(Slot.PILLAR_TOP, withDefaultNamespace("quartz_block_top.png"))
+				.set(Slot.BRICKS, withDefaultNamespace("block/stone_bricks"))
+				.set(Slot.POLISHED, withDefaultNamespace("block/smooth_stone"))
+				.set(Slot.TILES, withDefaultNamespace("block/quartz_block_top"))
+				.set(Slot.MOSAIC, withDefaultNamespace("block/bamboo_mosaic"))
+				.set(Slot.PILLAR_SIDE, withDefaultNamespace("block/quartz_block_side"))
+				.set(Slot.PILLAR_TOP, withDefaultNamespace("block/quartz_block_top"))
 
 				// Item icons
-				.fallback(Slot.CLAY_ITEM, withDefaultNamespace("clay.png"))
-				.set(Slot.GEAR_ITEM, id("gears/gear_1.png"))
+				.fallback(Slot.CLAY_ITEM, withDefaultNamespace("item/clay_ball"))
+				.set(Slot.GEAR_ITEM, id("gears/gear_1"))
 
 				.build();
 	}

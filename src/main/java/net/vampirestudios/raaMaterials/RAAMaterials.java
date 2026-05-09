@@ -35,6 +35,7 @@ public class RAAMaterials implements ModInitializer {
 		NetworkInit.initCommon();
 		YTabs.init();
 		RAACommands.init();
+		RRPGen.init();
 		WorldgenInit.init();
 
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {

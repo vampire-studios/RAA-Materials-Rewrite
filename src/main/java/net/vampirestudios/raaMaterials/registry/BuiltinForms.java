@@ -1,4 +1,3 @@
-// registry/BuiltinForms.java
 package net.vampirestudios.raaMaterials.registry;
 
 import net.minecraft.resources.Identifier;

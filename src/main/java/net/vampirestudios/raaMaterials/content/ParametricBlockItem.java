@@ -19,6 +19,7 @@ import net.vampirestudios.raaMaterials.YComponents;
 import net.vampirestudios.raaMaterials.material.*;
 
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class ParametricBlockItem extends BlockItem {
@@ -34,8 +35,7 @@ public class ParametricBlockItem extends BlockItem {
 
 	@Override
 	public Component getName(ItemStack stack) {
-		var mat = stack.get(YComponents.MATERIAL);
-		var def = ClientMaterialCache.byRL(mat);
+		var def = materialDefinition(stack);
 
 		var kind  = def.map(MaterialDef::kind).orElse(MaterialKind.OTHER);
 		var forms = def.map(MaterialDef::forms).orElse(java.util.List.of());
@@ -57,6 +57,20 @@ public class ParametricBlockItem extends BlockItem {
 		return Component.literal(cooked);
 	}
 
+	private static Optional<MaterialDef> materialDefinition(ItemStack stack) {
+		var mat = stack.get(YComponents.MATERIAL);
+		if (mat != null) {
+			var def = ClientMaterialCache.byRL(mat);
+			if (def.isPresent()) return def;
+		}
+
+		var props = stack.get(DataComponents.BLOCK_STATE);
+		if (props == null || props.get(ParametricBlock.MAT) == null) {
+			return Optional.empty();
+		}
+		return ClientMaterialCache.byIndex(props.get(ParametricBlock.MAT));
+	}
+
 	@Override
 	protected BlockState getPlacementState(BlockPlaceContext ctx) {
 		BlockState s = super.getPlacementState(ctx);
@@ -67,14 +81,15 @@ public class ParametricBlockItem extends BlockItem {
 		// 1) Prefer explicit BLOCK_STATE component (e.g., creative tab showed specific state)
 		var props = stack.get(DataComponents.BLOCK_STATE);
 		if (props != null && s.hasProperty(ParametricBlock.MAT) && props.get(ParametricBlock.MAT) != null) {
-			return s.setValue(ParametricBlock.MAT, props.get(ParametricBlock.MAT));
+			int idx = props.get(ParametricBlock.MAT);
+			return s.setValue(ParametricBlock.MAT, ParametricBlock.clampMaterialIndex(idx));
 		}
 
 		// 2) Else derive MAT index from YComponents.MATERIAL (ResourceLocation)
 		var rl = stack.get(YComponents.MATERIAL);
 		if (rl != null && s.hasProperty(ParametricBlock.MAT) && ctx.getLevel() instanceof ServerLevel serverLevel) {
 			int idx = MaterialRegistry.indexOf(serverLevel, rl).orElse(0);
-			return s.setValue(ParametricBlock.MAT, Math.max(0, Math.min(4095, idx)));
+			return s.setValue(ParametricBlock.MAT, ParametricBlock.clampMaterialIndex(idx));
 		}
 
 		return s;

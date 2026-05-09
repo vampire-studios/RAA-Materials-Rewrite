@@ -42,7 +42,7 @@ public final class YTabs {
 		if (def.forms().contains(form)) {
 			ItemStack stack = new ItemStack(item);
 			stack.set(YComponents.MATERIAL, def.nameInformation().id());
-			stack.set(DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(ParametricBlock.MAT, idx));
+			stack.set(DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(ParametricBlock.MAT, ParametricBlock.clampMaterialIndex(idx)));
 			output.accept(stack);
 		}
 	}

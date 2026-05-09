@@ -1,4 +1,3 @@
-// api/FormRegistry.java
 package net.vampirestudios.raaMaterials.api;
 
 import net.minecraft.resources.Identifier;
