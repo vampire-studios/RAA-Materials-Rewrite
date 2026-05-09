@@ -1,18 +1,14 @@
 package net.vampirestudios.raaMaterials.content;
 
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.BlockItemStateProperties;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.storage.loot.LootParams;
-import net.vampirestudios.raaMaterials.YComponents;
-import net.vampirestudios.raaMaterials.material.MaterialRegistry;
 
 import java.util.List;
 
@@ -36,23 +32,6 @@ public class ParametricTrapdoorBlock extends TrapDoorBlock {
 
     @Override
     protected List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
-        List<ItemStack> drops = super.getDrops(state, params);
-
-        int idx = state.getValue(MAT);
-
-        for (ItemStack stack : drops) {
-            if (stack.getItem() == this.asItem()) {
-                MaterialRegistry.byIndex(params.getLevel(), idx).ifPresent(def ->
-                        stack.set(YComponents.MATERIAL, def.nameInformation().id())
-                );
-
-                stack.set(
-                        DataComponents.BLOCK_STATE,
-                        BlockItemStateProperties.EMPTY.with(MAT, idx)
-                );
-            }
-        }
-
-        return drops;
+        return ParametricDropHelper.stampSelfDrops(this, state, params, super.getDrops(state, params));
     }
 }

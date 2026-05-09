@@ -70,6 +70,13 @@ public final class MaterialAssetBuilders {
             RAAMaterials.id("material_tinted_glass"),
             RAAMaterials.id("material_basalt_lamp"),
             RAAMaterials.id("material_calcite_lamp"),
+            RAAMaterials.id("material_lamp"),
+            RAAMaterials.id("material_chain"),
+            RAAMaterials.id("material_lantern"),
+            RAAMaterials.id("material_door"),
+            RAAMaterials.id("material_trapdoor"),
+            RAAMaterials.id("material_fence"),
+            RAAMaterials.id("material_fence_gate"),
             RAAMaterials.id("material_crystal_pane"),
             RAAMaterials.id("material_rod_block"),
             RAAMaterials.id("material_cobbled"),
@@ -284,6 +291,21 @@ public final class MaterialAssetBuilders {
                 idx -> textures(ctx.materials().get(idx)).textures2().lampCalcite()
                         .orElse(RAAMaterials.id("crystal/calcite_lamp"))
         ));
+
+        buildBlockFamily(ctx, new BlockFamilySpec(
+                List.of(Form.LAMP),
+                RAAMaterials.id("material_lamp"),
+                "block/material_lamp/",
+                idx -> textures(ctx.materials().get(idx)).textures2().lampCalcite()
+                        .orElse(pickBlockTexture(ctx.materials().get(idx), idx))
+        ));
+
+        buildDoorFamily(ctx, RAAMaterials.id("material_door"), "block/material_door/");
+        buildTrapdoorFamily(ctx, RAAMaterials.id("material_trapdoor"), "block/material_trapdoor/");
+        buildFenceFamily(ctx, RAAMaterials.id("material_fence"), "block/material_fence/");
+        buildFenceGateFamily(ctx, RAAMaterials.id("material_fence_gate"), "block/material_fence_gate/");
+        buildChainFamily(ctx, RAAMaterials.id("material_chain"), "block/material_chain/");
+        buildLanternFamily(ctx, RAAMaterials.id("material_lantern"), "block/material_lantern/");
 
         buildCrystalClusterFamily(
                 ctx,
@@ -810,6 +832,182 @@ public final class MaterialAssetBuilders {
         ctx.pack().addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
     }
 
+    private static void buildDoorFamily(MaterialAssetContext ctx, Identifier sharedBlockId, String modelPrefix) {
+        var select = JItemModel.select().property(MAT_COMP);
+        var variant = JState.variant();
+        int cases = 0;
+
+        ctx.forEachMaterialWith(Form.DOOR, (idx, def) -> {
+            var tex = pickBlockTexture(def, idx);
+            var path = def.nameInformation().id().getPath();
+            var bottomLeft = RAAMaterials.id(modelPrefix + path + "_bottom_left");
+            var bottomLeftOpen = RAAMaterials.id(modelPrefix + path + "_bottom_left_open");
+            var bottomRight = RAAMaterials.id(modelPrefix + path + "_bottom_right");
+            var bottomRightOpen = RAAMaterials.id(modelPrefix + path + "_bottom_right_open");
+            var topLeft = RAAMaterials.id(modelPrefix + path + "_top_left");
+            var topLeftOpen = RAAMaterials.id(modelPrefix + path + "_top_left_open");
+            var topRight = RAAMaterials.id(modelPrefix + path + "_top_right");
+            var topRightOpen = RAAMaterials.id(modelPrefix + path + "_top_right_open");
+
+            addDoorModels(ctx.pack(), bottomLeft, bottomLeftOpen, bottomRight, bottomRightOpen, topLeft, topLeftOpen, topRight, topRightOpen, tex);
+            addDoorVariants(variant, idx, bottomLeft, bottomLeftOpen, bottomRight, bottomRightOpen, topLeft, topLeftOpen, topRight, topRightOpen);
+            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(bottomLeft, def)));
+        });
+
+        for (MaterialDef def : ctx.materials()) {
+            if (ctx.has(def, Form.DOOR)) cases++;
+        }
+
+        if (cases == 0) return;
+
+        ctx.pack().addBlockState(JState.state(variant), sharedBlockId);
+        select.fallback(JModelBasic.of("minecraft:block/oak_door_bottom_left"));
+        ctx.pack().addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
+    }
+
+    private static void buildTrapdoorFamily(MaterialAssetContext ctx, Identifier sharedBlockId, String modelPrefix) {
+        var select = JItemModel.select().property(MAT_COMP);
+        var variant = JState.variant();
+        int cases = 0;
+
+        ctx.forEachMaterialWith(Form.TRAPDOOR, (idx, def) -> {
+            var tex = pickBlockTexture(def, idx);
+            var path = def.nameInformation().id().getPath();
+            var bottom = RAAMaterials.id(modelPrefix + path + "_bottom");
+            var top = RAAMaterials.id(modelPrefix + path + "_top");
+            var open = RAAMaterials.id(modelPrefix + path + "_open");
+
+            addTrapdoorModels(ctx.pack(), bottom, top, open, tex);
+            addTrapdoorVariants(variant, idx, bottom, top, open);
+            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(bottom, def)));
+        });
+
+        for (MaterialDef def : ctx.materials()) {
+            if (ctx.has(def, Form.TRAPDOOR)) cases++;
+        }
+
+        if (cases == 0) return;
+
+        ctx.pack().addBlockState(JState.state(variant), sharedBlockId);
+        select.fallback(JModelBasic.of("minecraft:block/oak_trapdoor_bottom"));
+        ctx.pack().addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
+    }
+
+    private static void buildFenceFamily(MaterialAssetContext ctx, Identifier sharedBlockId, String modelPrefix) {
+        var select = JItemModel.select().property(MAT_COMP);
+        var state = JState.state();
+        int cases = 0;
+
+        ctx.forEachMaterialWith(Form.FENCE, (idx, def) -> {
+            var tex = pickBlockTexture(def, idx);
+            var path = def.nameInformation().id().getPath();
+            var post = RAAMaterials.id(modelPrefix + path + "_post");
+            var side = RAAMaterials.id(modelPrefix + path + "_side");
+            var inventory = RAAMaterials.id(modelPrefix + path + "_inventory");
+
+            addFenceModels(ctx.pack(), post, side, inventory, tex);
+            addFenceParts(state, Map.of("mat", idx), post, side);
+            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(inventory, def)));
+        });
+
+        for (MaterialDef def : ctx.materials()) {
+            if (ctx.has(def, Form.FENCE)) cases++;
+        }
+
+        if (cases == 0) return;
+
+        ctx.pack().addBlockState(state, sharedBlockId);
+        select.fallback(JModelBasic.of("minecraft:block/oak_fence_inventory"));
+        ctx.pack().addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
+    }
+
+    private static void buildFenceGateFamily(MaterialAssetContext ctx, Identifier sharedBlockId, String modelPrefix) {
+        var select = JItemModel.select().property(MAT_COMP);
+        var variant = JState.variant();
+        int cases = 0;
+
+        ctx.forEachMaterialWith(Form.FENCE_GATE, (idx, def) -> {
+            var tex = pickBlockTexture(def, idx);
+            var path = def.nameInformation().id().getPath();
+            var gate = RAAMaterials.id(modelPrefix + path);
+            var gateOpen = RAAMaterials.id(modelPrefix + path + "_open");
+            var gateWall = RAAMaterials.id(modelPrefix + path + "_wall");
+            var gateWallOpen = RAAMaterials.id(modelPrefix + path + "_wall_open");
+
+            addFenceGateModels(ctx.pack(), gate, gateOpen, gateWall, gateWallOpen, tex);
+            addFenceGateVariants(variant, idx, gate, gateOpen, gateWall, gateWallOpen);
+            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(gate, def)));
+        });
+
+        for (MaterialDef def : ctx.materials()) {
+            if (ctx.has(def, Form.FENCE_GATE)) cases++;
+        }
+
+        if (cases == 0) return;
+
+        ctx.pack().addBlockState(JState.state(variant), sharedBlockId);
+        select.fallback(JModelBasic.of("minecraft:block/oak_fence_gate"));
+        ctx.pack().addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
+    }
+
+    private static void buildChainFamily(MaterialAssetContext ctx, Identifier sharedBlockId, String modelPrefix) {
+        var select = JItemModel.select().property(MAT_COMP);
+        var variant = JState.variant();
+        int cases = 0;
+
+        ctx.forEachMaterialWith(Form.CHAIN, (idx, def) -> {
+            var modelId = RAAMaterials.id(modelPrefix + def.nameInformation().id().getPath());
+            ctx.pack().addModel(JModel.model("minecraft:block/template_chain")
+                    .textures(JModel.textures().var("texture", blockTexture(pickBlockTexture(def, idx)))), modelId);
+
+            variant.put(Map.of("mat", idx, "axis", "y"), JState.model(modelId));
+            variant.put(Map.of("mat", idx, "axis", "x"), JState.model(modelId).x(90).y(90));
+            variant.put(Map.of("mat", idx, "axis", "z"), JState.model(modelId).x(90));
+            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(modelId, def)));
+        });
+
+        for (MaterialDef def : ctx.materials()) {
+            if (ctx.has(def, Form.CHAIN)) cases++;
+        }
+
+        if (cases == 0) return;
+
+        ctx.pack().addBlockState(JState.state(variant), sharedBlockId);
+        select.fallback(JModelBasic.of("minecraft:block/iron_chain"));
+        ctx.pack().addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
+    }
+
+    private static void buildLanternFamily(MaterialAssetContext ctx, Identifier sharedBlockId, String modelPrefix) {
+        var select = JItemModel.select().property(MAT_COMP);
+        var variant = JState.variant();
+        int cases = 0;
+
+        ctx.forEachMaterialWith(Form.LANTERN, (idx, def) -> {
+            var tex = blockTexture(pickBlockTexture(def, idx));
+            var base = RAAMaterials.id(modelPrefix + def.nameInformation().id().getPath());
+            var hanging = RAAMaterials.id(modelPrefix + def.nameInformation().id().getPath() + "_hanging");
+
+            ctx.pack().addModel(JModel.model("minecraft:block/template_lantern")
+                    .textures(JModel.textures().var("lantern", tex)), base);
+            ctx.pack().addModel(JModel.model("minecraft:block/template_hanging_lantern")
+                    .textures(JModel.textures().var("lantern", tex)), hanging);
+
+            variant.put(Map.of("mat", idx, "hanging", "false"), JState.model(base));
+            variant.put(Map.of("mat", idx, "hanging", "true"), JState.model(hanging));
+            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(base, def)));
+        });
+
+        for (MaterialDef def : ctx.materials()) {
+            if (ctx.has(def, Form.LANTERN)) cases++;
+        }
+
+        if (cases == 0) return;
+
+        ctx.pack().addBlockState(JState.state(variant), sharedBlockId);
+        select.fallback(JModelBasic.of("minecraft:block/lantern"));
+        ctx.pack().addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
+    }
+
     private static void buildPaneFamily(
             MaterialAssetContext ctx,
             Identifier sharedBlockId,
@@ -941,6 +1139,43 @@ public final class MaterialAssetBuilders {
                 .textures(JModel.textures().var("wall", tex)), sideTall);
     }
 
+    private static void addDoorModels(RuntimeResourcePack rp, Identifier bottomLeft, Identifier bottomLeftOpen, Identifier bottomRight, Identifier bottomRightOpen,
+                                      Identifier topLeft, Identifier topLeftOpen, Identifier topRight, Identifier topRightOpen, Identifier texture) {
+        var tex = blockTexture(texture);
+        var textures = JModel.textures().var("bottom", tex).var("top", tex);
+
+        rp.addModel(JModel.model("minecraft:block/door_bottom_left").textures(textures), bottomLeft);
+        rp.addModel(JModel.model("minecraft:block/door_bottom_left_open").textures(textures), bottomLeftOpen);
+        rp.addModel(JModel.model("minecraft:block/door_bottom_right").textures(textures), bottomRight);
+        rp.addModel(JModel.model("minecraft:block/door_bottom_right_open").textures(textures), bottomRightOpen);
+        rp.addModel(JModel.model("minecraft:block/door_top_left").textures(textures), topLeft);
+        rp.addModel(JModel.model("minecraft:block/door_top_left_open").textures(textures), topLeftOpen);
+        rp.addModel(JModel.model("minecraft:block/door_top_right").textures(textures), topRight);
+        rp.addModel(JModel.model("minecraft:block/door_top_right_open").textures(textures), topRightOpen);
+    }
+
+    private static void addTrapdoorModels(RuntimeResourcePack rp, Identifier bottom, Identifier top, Identifier open, Identifier texture) {
+        var textures = JModel.textures().var("texture", blockTexture(texture));
+        rp.addModel(JModel.model("minecraft:block/template_trapdoor_bottom").textures(textures), bottom);
+        rp.addModel(JModel.model("minecraft:block/template_trapdoor_top").textures(textures), top);
+        rp.addModel(JModel.model("minecraft:block/template_trapdoor_open").textures(textures), open);
+    }
+
+    private static void addFenceModels(RuntimeResourcePack rp, Identifier post, Identifier side, Identifier inventory, Identifier texture) {
+        var textures = JModel.textures().var("texture", blockTexture(texture));
+        rp.addModel(JModel.model("minecraft:block/fence_post").textures(textures), post);
+        rp.addModel(JModel.model("minecraft:block/fence_side").textures(textures), side);
+        rp.addModel(JModel.model("minecraft:block/fence_inventory").textures(textures), inventory);
+    }
+
+    private static void addFenceGateModels(RuntimeResourcePack rp, Identifier gate, Identifier gateOpen, Identifier gateWall, Identifier gateWallOpen, Identifier texture) {
+        var textures = JModel.textures().var("texture", blockTexture(texture));
+        rp.addModel(JModel.model("minecraft:block/template_fence_gate").textures(textures), gate);
+        rp.addModel(JModel.model("minecraft:block/template_fence_gate_open").textures(textures), gateOpen);
+        rp.addModel(JModel.model("minecraft:block/template_fence_gate_wall").textures(textures), gateWall);
+        rp.addModel(JModel.model("minecraft:block/template_fence_gate_wall_open").textures(textures), gateWallOpen);
+    }
+
     private static void addGeneratedItemModel(RuntimeResourcePack rp, Identifier modelId, Identifier layer0) {
         rp.addModel(JModel.model("minecraft:item/generated")
                 .textures(JModel.textures().var("layer0", itemTexture(layer0))), modelId);
@@ -956,6 +1191,78 @@ public final class MaterialAssetBuilders {
         state.add(JState.multipart(JState.model(sideTall).uvlock().y(90)).when(BlockstateTemplates.plus(base, "east", "tall")));
         state.add(JState.multipart(JState.model(sideTall).uvlock().y(180)).when(BlockstateTemplates.plus(base, "south", "tall")));
         state.add(JState.multipart(JState.model(sideTall).uvlock().y(270)).when(BlockstateTemplates.plus(base, "west", "tall")));
+    }
+
+    private static void addFenceParts(JState state, Map<String, ?> base, Identifier post, Identifier side) {
+        state.add(JState.multipart(JState.model(post)).when(base));
+        state.add(JState.multipart(JState.model(side).uvlock()).when(BlockstateTemplates.plus(base, "north", "true")));
+        state.add(JState.multipart(JState.model(side).uvlock().y(90)).when(BlockstateTemplates.plus(base, "east", "true")));
+        state.add(JState.multipart(JState.model(side).uvlock().y(180)).when(BlockstateTemplates.plus(base, "south", "true")));
+        state.add(JState.multipart(JState.model(side).uvlock().y(270)).when(BlockstateTemplates.plus(base, "west", "true")));
+    }
+
+    private static void addFenceGateVariants(net.vampirestudios.arrp.json.blockstate.JVariant variant, int mat,
+                                             Identifier gate, Identifier gateOpen, Identifier gateWall, Identifier gateWallOpen) {
+        for (String facing : List.of("south", "west", "north", "east")) {
+            int y = switch (facing) {
+                case "west" -> 90;
+                case "north" -> 180;
+                case "east" -> 270;
+                default -> 0;
+            };
+
+            putFenceGate(variant, mat, facing, false, false, JState.model(gate).uvlock().y(y));
+            putFenceGate(variant, mat, facing, false, true, JState.model(gateOpen).uvlock().y(y));
+            putFenceGate(variant, mat, facing, true, false, JState.model(gateWall).uvlock().y(y));
+            putFenceGate(variant, mat, facing, true, true, JState.model(gateWallOpen).uvlock().y(y));
+        }
+    }
+
+    private static void putFenceGate(net.vampirestudios.arrp.json.blockstate.JVariant variant, int mat, String facing, boolean inWall, boolean open, JBlockModel model) {
+        variant.put(Map.of("mat", mat, "facing", facing, "in_wall", Boolean.toString(inWall), "open", Boolean.toString(open)), model);
+    }
+
+    private static void addTrapdoorVariants(net.vampirestudios.arrp.json.blockstate.JVariant variant, int mat, Identifier bottom, Identifier top, Identifier openModel) {
+        for (String facing : List.of("north", "east", "south", "west")) {
+            int y = switch (facing) {
+                case "east" -> 90;
+                case "south" -> 180;
+                case "west" -> 270;
+                default -> 0;
+            };
+
+            variant.put(Map.of("mat", mat, "facing", facing, "half", "bottom", "open", "false"), JState.model(bottom));
+            variant.put(Map.of("mat", mat, "facing", facing, "half", "top", "open", "false"), JState.model(top));
+            variant.put(Map.of("mat", mat, "facing", facing, "half", "bottom", "open", "true"), JState.model(openModel).y(y));
+            variant.put(Map.of("mat", mat, "facing", facing, "half", "top", "open", "true"), JState.model(openModel).y(y));
+        }
+    }
+
+    private static void addDoorVariants(net.vampirestudios.arrp.json.blockstate.JVariant variant, int mat,
+                                        Identifier bottomLeft, Identifier bottomLeftOpen, Identifier bottomRight, Identifier bottomRightOpen,
+                                        Identifier topLeft, Identifier topLeftOpen, Identifier topRight, Identifier topRightOpen) {
+        putDoorFacing(variant, mat, "east", 0, 90, 0, 270, bottomLeft, bottomLeftOpen, bottomRight, bottomRightOpen, topLeft, topLeftOpen, topRight, topRightOpen);
+        putDoorFacing(variant, mat, "south", 90, 180, 90, 0, bottomLeft, bottomLeftOpen, bottomRight, bottomRightOpen, topLeft, topLeftOpen, topRight, topRightOpen);
+        putDoorFacing(variant, mat, "west", 180, 270, 180, 90, bottomLeft, bottomLeftOpen, bottomRight, bottomRightOpen, topLeft, topLeftOpen, topRight, topRightOpen);
+        putDoorFacing(variant, mat, "north", 270, 0, 270, 180, bottomLeft, bottomLeftOpen, bottomRight, bottomRightOpen, topLeft, topLeftOpen, topRight, topRightOpen);
+    }
+
+    private static void putDoorFacing(net.vampirestudios.arrp.json.blockstate.JVariant variant, int mat, String facing,
+                                      int closedY, int leftOpenY, int rightClosedY, int rightOpenY,
+                                      Identifier bottomLeft, Identifier bottomLeftOpen, Identifier bottomRight, Identifier bottomRightOpen,
+                                      Identifier topLeft, Identifier topLeftOpen, Identifier topRight, Identifier topRightOpen) {
+        putDoor(variant, mat, facing, "lower", "left", "false", JState.model(bottomLeft).y(closedY));
+        putDoor(variant, mat, facing, "lower", "left", "true", JState.model(bottomLeftOpen).y(leftOpenY));
+        putDoor(variant, mat, facing, "lower", "right", "false", JState.model(bottomRight).y(rightClosedY));
+        putDoor(variant, mat, facing, "lower", "right", "true", JState.model(bottomRightOpen).y(rightOpenY));
+        putDoor(variant, mat, facing, "upper", "left", "false", JState.model(topLeft).y(closedY));
+        putDoor(variant, mat, facing, "upper", "left", "true", JState.model(topLeftOpen).y(leftOpenY));
+        putDoor(variant, mat, facing, "upper", "right", "false", JState.model(topRight).y(rightClosedY));
+        putDoor(variant, mat, facing, "upper", "right", "true", JState.model(topRightOpen).y(rightOpenY));
+    }
+
+    private static void putDoor(net.vampirestudios.arrp.json.blockstate.JVariant variant, int mat, String facing, String half, String hinge, String open, JBlockModel model) {
+        variant.put(Map.of("mat", mat, "facing", facing, "half", half, "hinge", hinge, "open", open), model);
     }
 
     private static void addFacingVariants(net.vampirestudios.arrp.json.blockstate.JVariant variant, int mat, Identifier model) {

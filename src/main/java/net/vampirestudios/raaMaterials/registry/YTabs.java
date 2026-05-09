@@ -225,17 +225,10 @@ public final class YTabs {
 								});
 
 								// NEW: Fences (by family)
-//								if (isWoodLike(def)) {
-//									addBlocksIf(output, def, idx, new Object[][]{
-//											{Form.FENCE, YItems.PARAM_FENCE_WOOD_ITEM},
-//											{Form.FENCE_GATE, YItems.PARAM_FENCE_GATE_WOOD_ITEM}
-//									});
-//								} else if (isMetalLike(def)) {
-//									addBlocksIf(output, def, idx, new Object[][]{
-//											{Form.FENCE, YItems.PARAM_FENCE_METAL_ITEM},
-//											{Form.FENCE_GATE, YItems.PARAM_FENCE_GATE_METAL_ITEM}
-//									});
-//								}
+								addBlocksIf(output, def, idx, new Object[][]{
+										{Form.FENCE, YItems.PARAM_FENCE_ITEM},
+										{Form.FENCE_GATE, YItems.PARAM_FENCE_GATE_ITEM}
+								});
 //
 //								// Signs (wood-like)
 //								if (isWoodLike(def)) {
@@ -294,7 +287,7 @@ public final class YTabs {
 								addBlocksIf(output, def, idx, new Object[][]{
 										{Form.CALCITE_LAMP, YItems.PARAM_CALCITE_LAMP_ITEM},
 										{Form.BASALT_LAMP, YItems.PARAM_BASALT_LAMP_ITEM},
-//										{Form.LAMP, YItems.PARAM_LAMP_ITEM} // generic lamp if present
+										{Form.LAMP, YItems.PARAM_LAMP_ITEM}
 								});
 								if (isCrystalLike(def) || hasAll(def, Form.GLASS)) {
 									addBlocksIf(output, def, idx, new Object[][]{
@@ -312,11 +305,10 @@ public final class YTabs {
 								}
 
 								// General decor (non-crystal): chain / lantern / torch (if the material defines them)
-//								addBlocksIf(output, def, idx, new Object[][]{
-//										{Form.CHAIN, YItems.PARAM_CHAIN_ITEM},
-//										{Form.LANTERN, YItems.PARAM_LANTERN_ITEM},
-//										{Form.TORCH, YItems.PARAM_TORCH_ITEM}
-//								});
+								addBlocksIf(output, def, idx, new Object[][]{
+										{Form.CHAIN, YItems.PARAM_CHAIN_ITEM},
+										{Form.LANTERN, YItems.PARAM_LANTERN_ITEM}
+								});
 							}
 						}).build()
 		);

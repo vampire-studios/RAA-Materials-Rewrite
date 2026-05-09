@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.vampirestudios.raaMaterials.RAAMaterials;
@@ -63,7 +64,8 @@ public final class YBlocks {
 	public static Block PARAM_BARS, PARAM_GRATE;
 	public static Block PARAM_BUTTON_STONE, PARAM_BUTTON_METAL, PARAM_BUTTON_WOOD,
 			PARAM_PRESSURE_PLATE_STONE, PARAM_PRESSURE_PLATE_METAL, PARAM_PRESSURE_PLATE_WOOD,
-			PARAM_DOOR_METAL, PARAM_DOOR_WOOD, PARAM_TRAPDOOR_METAL, PARAM_TRAPDOOR_WOOD;
+			PARAM_DOOR, PARAM_TRAPDOOR, PARAM_DOOR_METAL, PARAM_DOOR_WOOD, PARAM_TRAPDOOR_METAL, PARAM_TRAPDOOR_WOOD,
+			PARAM_FENCE, PARAM_FENCE_GATE, PARAM_CHAIN, PARAM_LANTERN, PARAM_LAMP;
 
 	// + NEW crystal-ish
 	public static Block PARAM_CRYSTAL_PANE;
@@ -341,6 +343,27 @@ public final class YBlocks {
 						.strength(0.5F).pushReaction(PushReaction.DESTROY)
 						.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_pressure_plate_metal")))
 		);
+		PARAM_DOOR = regBlock("material_door", new ParametricDoorBlock(BlockSetType.OAK, Block.Properties.of()
+				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_door")))
+				.strength(3.0F).instrument(NoteBlockInstrument.BASS).sound(SoundType.WOOD).noOcclusion()));
+		PARAM_TRAPDOOR = regBlock("material_trapdoor", new ParametricTrapdoorBlock(BlockSetType.OAK, Block.Properties.of()
+				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_trapdoor")))
+				.strength(3.0F).instrument(NoteBlockInstrument.BASS).sound(SoundType.WOOD).noOcclusion()));
+		PARAM_FENCE = regBlock("material_fence", new ParametricFenceBlock(Block.Properties.of()
+				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_fence")))
+				.strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
+		PARAM_FENCE_GATE = regBlock("material_fence_gate", new ParametricFenceGateBlock(WoodType.OAK, Block.Properties.of()
+				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_fence_gate")))
+				.strength(3.0F).sound(SoundType.WOOD).noOcclusion()));
+		PARAM_CHAIN = regBlock("material_chain", new ParametricChainBlock(Block.Properties.of()
+				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_chain")))
+				.strength(5.0F).sound(SoundType.CHAIN).noOcclusion()));
+		PARAM_LANTERN = regBlock("material_lantern", new ParametricLanternBlock(Block.Properties.of()
+				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_lantern")))
+				.strength(3.5F).lightLevel(s -> 15).sound(SoundType.LANTERN).noOcclusion()));
+		PARAM_LAMP = regBlock("material_lamp", new ParametricCrystalLampBlock(Block.Properties.of()
+				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_lamp")))
+				.strength(2.0F).lightLevel(s -> 15).sound(SoundType.GLASS)));
 		PARAM_DOOR_METAL = regBlock("material_door_metal", new ParametricDoorBlock(BlockSetType.IRON, Block.Properties.of()
 				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_door_metal")))
 				.strength(5.0F).sound(SoundType.METAL).pushReaction(PushReaction.DESTROY).noOcclusion()));

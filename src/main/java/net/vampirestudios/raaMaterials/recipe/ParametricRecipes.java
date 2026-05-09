@@ -27,6 +27,13 @@ public final class ParametricRecipes {
 	public static RecipeSerializer<ParametricCraftingRecipe> POLISHED_SLAB_FROM_POLISHED;
 	public static RecipeSerializer<ParametricCraftingRecipe> POLISHED_STAIRS_FROM_POLISHED;
 	public static RecipeSerializer<ParametricCraftingRecipe> POLISHED_WALL_FROM_POLISHED;
+	public static RecipeSerializer<ParametricCraftingRecipe> DOOR_FROM_BLOCK;
+	public static RecipeSerializer<ParametricCraftingRecipe> TRAPDOOR_FROM_BLOCK;
+	public static RecipeSerializer<ParametricCraftingRecipe> FENCE_FROM_BLOCK;
+	public static RecipeSerializer<ParametricCraftingRecipe> FENCE_GATE_FROM_BLOCK;
+	public static RecipeSerializer<ParametricCraftingRecipe> CHAIN_FROM_ROD;
+	public static RecipeSerializer<ParametricCraftingRecipe> LAMP_FROM_BLOCK;
+	public static RecipeSerializer<ParametricCraftingRecipe> LANTERN_FROM_LAMP;
 
 	public static RecipeSerializer<ParametricCookingRecipe> SMELT_ORE_TO_INGOT;
 	public static RecipeSerializer<ParametricCookingRecipe> BLAST_ORE_TO_INGOT;
@@ -53,6 +60,13 @@ public final class ParametricRecipes {
 		POLISHED_SLAB_FROM_POLISHED = registerCrafting(ParametricCraftingRecipe.Kind.POLISHED_SLAB_FROM_POLISHED);
 		POLISHED_STAIRS_FROM_POLISHED = registerCrafting(ParametricCraftingRecipe.Kind.POLISHED_STAIRS_FROM_POLISHED);
 		POLISHED_WALL_FROM_POLISHED = registerCrafting(ParametricCraftingRecipe.Kind.POLISHED_WALL_FROM_POLISHED);
+		DOOR_FROM_BLOCK = registerCrafting(ParametricCraftingRecipe.Kind.DOOR_FROM_BLOCK);
+		TRAPDOOR_FROM_BLOCK = registerCrafting(ParametricCraftingRecipe.Kind.TRAPDOOR_FROM_BLOCK);
+		FENCE_FROM_BLOCK = registerCrafting(ParametricCraftingRecipe.Kind.FENCE_FROM_BLOCK);
+		FENCE_GATE_FROM_BLOCK = registerCrafting(ParametricCraftingRecipe.Kind.FENCE_GATE_FROM_BLOCK);
+		CHAIN_FROM_ROD = registerCrafting(ParametricCraftingRecipe.Kind.CHAIN_FROM_ROD);
+		LAMP_FROM_BLOCK = registerCrafting(ParametricCraftingRecipe.Kind.LAMP_FROM_BLOCK);
+		LANTERN_FROM_LAMP = registerCrafting(ParametricCraftingRecipe.Kind.LANTERN_FROM_LAMP);
 
 		SMELT_ORE_TO_INGOT = registerCooking(ParametricCookingRecipe.Kind.SMELT_ORE_TO_INGOT);
 		BLAST_ORE_TO_INGOT = registerCooking(ParametricCookingRecipe.Kind.BLAST_ORE_TO_INGOT);

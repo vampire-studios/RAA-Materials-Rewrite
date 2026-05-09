@@ -61,6 +61,13 @@ public final class ParametricCraftingRecipe extends CustomRecipe {
 			case POLISHED_SLAB_FROM_POLISHED -> ParametricRecipes.POLISHED_SLAB_FROM_POLISHED;
 			case POLISHED_STAIRS_FROM_POLISHED -> ParametricRecipes.POLISHED_STAIRS_FROM_POLISHED;
 			case POLISHED_WALL_FROM_POLISHED -> ParametricRecipes.POLISHED_WALL_FROM_POLISHED;
+			case DOOR_FROM_BLOCK -> ParametricRecipes.DOOR_FROM_BLOCK;
+			case TRAPDOOR_FROM_BLOCK -> ParametricRecipes.TRAPDOOR_FROM_BLOCK;
+			case FENCE_FROM_BLOCK -> ParametricRecipes.FENCE_FROM_BLOCK;
+			case FENCE_GATE_FROM_BLOCK -> ParametricRecipes.FENCE_GATE_FROM_BLOCK;
+			case CHAIN_FROM_ROD -> ParametricRecipes.CHAIN_FROM_ROD;
+			case LAMP_FROM_BLOCK -> ParametricRecipes.LAMP_FROM_BLOCK;
+			case LANTERN_FROM_LAMP -> ParametricRecipes.LANTERN_FROM_LAMP;
 		};
 	}
 
@@ -76,6 +83,16 @@ public final class ParametricCraftingRecipe extends CustomRecipe {
 					stairs(input, kind.input);
 			case WALL_FROM_BLOCK, SANDSTONE_WALL_FROM_SANDSTONE, BRICK_WALL_FROM_BRICKS, POLISHED_WALL_FROM_POLISHED ->
 					blockRows(input, kind.input, 2, 3);
+			case DOOR_FROM_BLOCK ->
+					blockRows(input, kind.input, 3, 2);
+			case TRAPDOOR_FROM_BLOCK, FENCE_FROM_BLOCK ->
+					blockRows(input, kind.input, 2, 3);
+			case FENCE_GATE_FROM_BLOCK ->
+					blockRows(input, kind.input, 2, 2);
+			case CHAIN_FROM_ROD ->
+					blockColumn(input, kind.input, 3);
+			case LAMP_FROM_BLOCK, LANTERN_FROM_LAMP ->
+					ParametricRecipeUtil.allSameItemAndMaterial(input, kind.input, 1);
 		};
 	}
 
@@ -97,6 +114,12 @@ public final class ParametricCraftingRecipe extends CustomRecipe {
 		if (box.width() != 3 || box.height() != 3) return false;
 
 		return matchesStair(input, box, false) || matchesStair(input, box, true);
+	}
+
+	private static boolean blockColumn(CraftingInput input, Item item, int height) {
+		if (!ParametricRecipeUtil.allSameItemAndMaterial(input, item, height)) return false;
+		var box = bounds(input);
+		return box.width() == 1 && box.height() == height;
 	}
 
 	private static boolean matchesStair(CraftingInput input, Bounds box, boolean mirrored) {
@@ -152,7 +175,14 @@ public final class ParametricCraftingRecipe extends CustomRecipe {
 		BRICK_WALL_FROM_BRICKS("brick_wall_from_bricks", Form.BRICKS, Form.WALL, YItems.PARAM_BRICKS_BLOCK_ITEM, YItems.PARAM_BRICK_WALL_ITEM, 6),
 		POLISHED_SLAB_FROM_POLISHED("polished_slab_from_polished", Form.POLISHED, Form.SLAB, YItems.PARAM_POLISHED_BLOCK_ITEM, YItems.PARAM_POLISHED_SLAB_ITEM, 6),
 		POLISHED_STAIRS_FROM_POLISHED("polished_stairs_from_polished", Form.POLISHED, Form.STAIRS, YItems.PARAM_POLISHED_BLOCK_ITEM, YItems.PARAM_POLISHED_STAIRS_ITEM, 4),
-		POLISHED_WALL_FROM_POLISHED("polished_wall_from_polished", Form.POLISHED, Form.WALL, YItems.PARAM_POLISHED_BLOCK_ITEM, YItems.PARAM_POLISHED_WALL_ITEM, 6);
+		POLISHED_WALL_FROM_POLISHED("polished_wall_from_polished", Form.POLISHED, Form.WALL, YItems.PARAM_POLISHED_BLOCK_ITEM, YItems.PARAM_POLISHED_WALL_ITEM, 6),
+		DOOR_FROM_BLOCK("door_from_block", Form.BLOCK, Form.DOOR, YItems.PARAM_BLOCK_ITEM, YItems.PARAM_DOOR_ITEM, 3),
+		TRAPDOOR_FROM_BLOCK("trapdoor_from_block", Form.BLOCK, Form.TRAPDOOR, YItems.PARAM_BLOCK_ITEM, YItems.PARAM_TRAPDOOR_ITEM, 2),
+		FENCE_FROM_BLOCK("fence_from_block", Form.BLOCK, Form.FENCE, YItems.PARAM_BLOCK_ITEM, YItems.PARAM_FENCE_ITEM, 3),
+		FENCE_GATE_FROM_BLOCK("fence_gate_from_block", Form.BLOCK, Form.FENCE_GATE, YItems.PARAM_BLOCK_ITEM, YItems.PARAM_FENCE_GATE_ITEM, 1),
+		CHAIN_FROM_ROD("chain_from_rod", Form.ROD, Form.CHAIN, YItems.PARAM_ROD, YItems.PARAM_CHAIN_ITEM, 3),
+		LAMP_FROM_BLOCK("lamp_from_block", Form.BLOCK, Form.LAMP, YItems.PARAM_BLOCK_ITEM, YItems.PARAM_LAMP_ITEM, 1),
+		LANTERN_FROM_LAMP("lantern_from_lamp", Form.LAMP, Form.LANTERN, YItems.PARAM_LAMP_ITEM, YItems.PARAM_LANTERN_ITEM, 1);
 
 		private final String id;
 		private final Form inputForm;
