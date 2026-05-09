@@ -205,7 +205,7 @@ public final class MaterialGenerator {
 			case SOIL -> List.of(BLOCK, PACKED_SOIL);
 			case SALT -> List.of(BLOCK, DUST);
 			case VOLCANIC -> List.of(BLOCK, COBBLED, POLISHED, BRICKS, PILLAR, MOSSY, BUTTON, PRESSURE_PLATE);
-			case WOOD -> List.of(BLOCK, PILLAR, BUTTON, PRESSURE_PLATE);
+			case WOOD -> List.of(BLOCK, PILLAR, BUTTON, PRESSURE_PLATE, FENCE, FENCE_GATE, DOOR, TRAPDOOR);
 			case OTHER -> List.of(DUST);
 		};
 	}

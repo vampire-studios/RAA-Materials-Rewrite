@@ -2,8 +2,10 @@ package net.vampirestudios.raaMaterials.content;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.BlockItemStateProperties;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -32,6 +34,11 @@ public class ParametricBlock extends Block {
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> b) {
 		b.add(MAT);
+	}
+
+	@Override
+	protected float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
+		return ParametricBlockStats.destroyProgress(this, state, player, level, pos);
 	}
 
 	@Override
