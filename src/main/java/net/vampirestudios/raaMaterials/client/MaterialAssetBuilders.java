@@ -11,6 +11,7 @@ import net.vampirestudios.arrp.json.iteminfo.model.JItemModel;
 import net.vampirestudios.arrp.json.iteminfo.model.JModelBasic;
 import net.vampirestudios.arrp.json.iteminfo.model.JSelectCase;
 import net.vampirestudios.arrp.json.iteminfo.property.JPropertyComponent;
+import net.vampirestudios.arrp.json.iteminfo.property.JPropertyDisplayContext;
 import net.vampirestudios.arrp.json.iteminfo.tint.JTint;
 import net.vampirestudios.arrp.json.iteminfo.tint.JTintConstant;
 import net.vampirestudios.arrp.json.models.JModel;
@@ -54,6 +55,7 @@ public final class MaterialAssetBuilders {
     public static final Identifier SWORD_SHARED_ID = RAAMaterials.id("material_sword");
     public static final Identifier PICKAXE_SHARED_ID = RAAMaterials.id("material_pickaxe");
     public static final Identifier AXE_SHARED_ID = RAAMaterials.id("material_axe");
+    public static final Identifier SPEAR_SHARED_ID = RAAMaterials.id("material_spear");
 
     public static final List<Identifier> COLORED_BLOCKS = List.of(
             ORE_SHARED_ID,
@@ -465,6 +467,10 @@ public final class MaterialAssetBuilders {
         buildLayeredItemFamily(ctx, Form.AXE, AXE_SHARED_ID, "item/material_axe/",
                 idx -> textures(ctx.materials().get(idx)).textures3().toolAxeHead().orElseThrow(),
                 idx -> textures(ctx.materials().get(idx)).textures3().toolAxeStick().orElseThrow());
+
+        buildSpearItemFamily(ctx, SPEAR_SHARED_ID, "item/material_spear/",
+                idx -> textures(ctx.materials().get(idx)).textures3().toolSwordBlade().orElseThrow(),
+                idx -> textures(ctx.materials().get(idx)).textures3().toolSwordHandle().orElseThrow());
     }
 
     private static void buildBlockFamily(MaterialAssetContext ctx, BlockFamilySpec spec) {
@@ -577,8 +583,8 @@ public final class MaterialAssetBuilders {
 
             var model = JModel.model("minecraft:item/handheld")
                     .textures(JModel.textures()
-                            .var("layer0", stripPng(layer0.pick(idx).toString()))
-                            .var("layer1", stripPng(layer1.pick(idx).toString()))
+                            .var("layer0", itemTexture(layer0.pick(idx)))
+                            .var("layer1", itemTexture(layer1.pick(idx)))
                     );
 
             ctx.pack().addModel(model, modelId);
@@ -597,12 +603,80 @@ public final class MaterialAssetBuilders {
         }
 
         if (cases == 0) {
-            addFallbackItemModel(ctx.pack(), itemId);
+            ctx.pack().addItemModelInfo(new JItemInfo().model(JModelBasic.of(fallbackToolModel(form))), itemId);
             return;
         }
 
-        select.fallback(JModelBasic.of("minecraft:item/stone_axe"));
+        select.fallback(JModelBasic.of(fallbackToolModel(form)));
         ctx.pack().addItemModelInfo(new JItemInfo().model(select), itemId);
+    }
+
+    private static void buildSpearItemFamily(
+            MaterialAssetContext ctx,
+            Identifier itemId,
+            String modelPrefix,
+            MaterialTexturePickers.TexPicker layer0,
+            MaterialTexturePickers.TexPicker layer1
+    ) {
+        var guiSelect = JItemModel.select().property(MAT_COMP);
+        var inHandSelect = JItemModel.select().property(MAT_COMP);
+        int cases = 0;
+
+        ctx.forEachMaterialWith(Form.SPEAR, (idx, def) -> {
+            var modelId = RAAMaterials.id(modelPrefix + def.nameInformation().id().getPath());
+            var inHandModelId = RAAMaterials.id(modelPrefix + def.nameInformation().id().getPath() + "_in_hand");
+
+            var guiModel = JModel.model("minecraft:item/generated")
+                    .textures(JModel.textures()
+                            .var("layer0", itemTexture(layer0.pick(idx)))
+                            .var("layer1", itemTexture(layer1.pick(idx)))
+                    );
+            var inHandModel = JModel.model("minecraft:item/spear_in_hand")
+                    .textures(JModel.textures()
+                            .var("layer0", itemTexture(layer0.pick(idx)))
+                            .var("layer1", itemTexture(layer1.pick(idx)))
+                    );
+
+            ctx.pack().addModel(guiModel, modelId);
+            ctx.pack().addModel(inHandModel, inHandModelId);
+
+            var tint = new JTintConstant(MaterialsAssets.opaqueColor(def.primaryColor()));
+            guiSelect.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(modelId.toString()).tint(tint)));
+            inHandSelect.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(inHandModelId.toString()).tint(tint)));
+        });
+
+        for (MaterialDef def : ctx.materials()) {
+            if (ctx.has(def, Form.SPEAR)) {
+                cases++;
+            }
+        }
+
+        if (cases == 0) {
+            ctx.pack().addItemModelInfo(new JItemInfo().model(JModelBasic.of("minecraft:item/stone_spear")), itemId);
+            return;
+        }
+
+        guiSelect.fallback(JModelBasic.of("minecraft:item/stone_spear"));
+        inHandSelect.fallback(JModelBasic.of("minecraft:item/stone_spear_in_hand"));
+
+        var displaySelect = JItemModel.select()
+                .property(JPropertyDisplayContext.displayContext())
+                .addCase(JSelectCase.of(List.of("gui", "ground", "fixed", "on_shelf"), guiSelect))
+                .fallback(inHandSelect);
+
+        ctx.pack().addItemModelInfo(new JItemInfo().model(displaySelect), itemId);
+    }
+
+    private static String fallbackToolModel(Form form) {
+        return switch (form) {
+            case PICKAXE -> "minecraft:item/stone_pickaxe";
+            case AXE -> "minecraft:item/stone_axe";
+            case SHOVEL -> "minecraft:item/stone_shovel";
+            case HOE -> "minecraft:item/stone_hoe";
+            case SWORD -> "minecraft:item/stone_sword";
+            case SPEAR -> "minecraft:item/stone_spear";
+            default -> "minecraft:item/stone_pickaxe";
+        };
     }
 
     private static void buildSlabFamilyForBlock(MaterialAssetContext ctx, Identifier sharedSlabId) {

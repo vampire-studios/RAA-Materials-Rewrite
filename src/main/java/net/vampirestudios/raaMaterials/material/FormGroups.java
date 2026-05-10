@@ -3,7 +3,7 @@ package net.vampirestudios.raaMaterials.material;
 import java.util.List;
 
 public final class FormGroups {
-    public static final List<Form> TOOLS = List.of(Form.PICKAXE, Form.AXE, Form.SWORD, Form.SHOVEL, Form.HOE);
+    public static final List<Form> TOOLS = List.of(Form.PICKAXE, Form.AXE, Form.SWORD, Form.SHOVEL, Form.HOE, Form.SPEAR);
 
     public static final List<Form> ORE_CHAIN = List.of(Form.ORE, Form.RAW, Form.DUST, Form.NUGGET, Form.INGOT);
     public static final List<Form> METAL_DECOR = List.of(Form.BLOCK, Form.RAW_BLOCK, Form.PLATE_BLOCK, Form.SHINGLES, Form.SHEET, Form.GEAR);

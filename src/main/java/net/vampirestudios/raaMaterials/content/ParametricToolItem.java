@@ -1,41 +1,39 @@
-// ParametricIngotItem.java
 package net.vampirestudios.raaMaterials.content;
 
-import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.Item;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.ItemStack;
-import net.vampirestudios.raaMaterials.RAAMaterials;
-import net.vampirestudios.raaMaterials.YComponents;
-import net.vampirestudios.raaMaterials.material.ClientMaterialCache;
-import net.vampirestudios.raaMaterials.material.LocalizedMaterialNames;
+import net.vampirestudios.raaMaterials.material.Form;
 import net.vampirestudios.raaMaterials.material.MaterialDef;
 
-import java.util.Locale;
-import java.util.Optional;
+public class ParametricToolItem extends ParametricItem {
+	private final Form form;
 
-public class ParametricToolItem extends Item {
-	private final String name;
-
-	public ParametricToolItem(Properties props, String id, String name) {
-		super(props.setId(ResourceKey.create(Registries.ITEM, RAAMaterials.id(id.replace("%s ", "").toLowerCase(Locale.ROOT)))));
-		this.name = name;
+	public ParametricToolItem(Properties props, Form form) {
+		super(props);
+		this.form = form;
 	}
 
-	public ParametricToolItem(String id, String name) {
-		super(new Properties().setId(ResourceKey.create(Registries.ITEM, RAAMaterials.id(id.replace("%s ", "").toLowerCase(Locale.ROOT)))));
-		this.name = name;
+	public Form form() {
+		return form;
 	}
 
-	@Override
-	public Component getName(ItemStack stack) {
-		Identifier mat = stack.get(YComponents.MATERIAL);
-		Optional<MaterialDef> def = ClientMaterialCache.byRL(mat);
-		return Component.literal(def
-				.map(d -> name.replace("%s", LocalizedMaterialNames.displayName(d)))
-				.orElse(name.replace("%s ", ""))
-		);
+	public static void applyComponents(ItemStack stack, MaterialDef def, Form form) {
+		def.toolSpec().ifPresent(spec -> {
+			ToolComponentUtil.applyCommon(stack, spec);
+			switch (form) {
+				case PICKAXE -> ToolComponentUtil.applyMiningTool(stack, spec, 1.0f, -2.8f, BlockTags.MINEABLE_WITH_PICKAXE);
+				case AXE -> ToolComponentUtil.applyMiningTool(stack, spec, 6.0f, -3.2f, BlockTags.MINEABLE_WITH_AXE);
+				case SHOVEL -> ToolComponentUtil.applyMiningTool(stack, spec, 1.5f, -3.0f, BlockTags.MINEABLE_WITH_SHOVEL);
+				case HOE -> ToolComponentUtil.applyMiningTool(stack, spec, 0.0f, -3.0f, BlockTags.MINEABLE_WITH_HOE);
+				case SWORD -> ToolComponentUtil.applySword(stack, spec, 3.0f, -2.4f);
+				case SPEAR -> ToolComponentUtil.applySpear(stack, spec);
+				default -> {
+				}
+			}
+		});
+	}
+
+	public void applyComponents(ItemStack stack, MaterialDef def) {
+		applyComponents(stack, def, form);
 	}
 }

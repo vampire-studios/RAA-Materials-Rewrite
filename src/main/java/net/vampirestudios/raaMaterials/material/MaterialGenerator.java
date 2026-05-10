@@ -201,7 +201,7 @@ public final class MaterialGenerator {
 	}
 
 	private static final List<Form> STANDARD_EQUIPMENT_SET = List.of(
-			PICKAXE, AXE, SWORD, SHOVEL, HOE
+			PICKAXE, AXE, SWORD, SHOVEL, HOE, SPEAR
 	);
 
 	private static final List<Form> ARMOR_SET = List.of(

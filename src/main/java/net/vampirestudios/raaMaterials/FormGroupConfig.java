@@ -33,7 +33,7 @@ public final class FormGroupConfig {
 
 	public static Map<FormGroup, List<Form>> defaults() {
 		var map = new EnumMap<FormGroup, List<Form>>(FormGroup.class);
-		map.put(FormGroup.TOOLS, List.of(PICKAXE, AXE, SWORD, SHOVEL, HOE));
+		map.put(FormGroup.TOOLS, List.of(PICKAXE, AXE, SWORD, SHOVEL, HOE, SPEAR));
 		map.put(FormGroup.ORE_CHAIN, List.of(ORE, RAW, RAW_BLOCK));
 		map.put(FormGroup.METAL_DECOR, List.of(PLATE_BLOCK, SHINGLES, PILLAR, TILES, MOSAIC));
 		map.put(FormGroup.STONE_DECOR, List.of(BRICKS, PILLAR, TILES, MOSAIC, MOSSY, CRACKED, COBBLED, CHISELED, POLISHED, SLAB, STAIRS, WALL, CUT, SMOOTH));

@@ -23,7 +23,7 @@ import java.util.List;
 public final class ToolComponentUtil {
     private ToolComponentUtil(){}
 
-    public static void applyPickaxe(ItemStack out, ToolMaterialSpec spec, float baseAttack, float baseSpeed, TagKey<Block> mineTag) {
+    public static void applyMiningTool(ItemStack out, ToolMaterialSpec spec, float baseAttack, float baseSpeed, TagKey<Block> mineTag) {
         var blocks = BuiltInRegistries.acquireBootstrapRegistrationLookup(BuiltInRegistries.BLOCK);
         var incorrectTag = TagKey.create(BuiltInRegistries.BLOCK.key(), spec.incorrectBlocksForDropsTag());
 
@@ -44,6 +44,20 @@ public final class ToolComponentUtil {
                         EquipmentSlotGroup.MAINHAND)
                 .add(Attributes.ATTACK_SPEED,
                         new AttributeModifier(Item.BASE_ATTACK_SPEED_ID, baseSpeed,
+                                AttributeModifier.Operation.ADD_VALUE),
+                        EquipmentSlotGroup.MAINHAND)
+                .build());
+    }
+
+    public static void applySpear(ItemStack out, ToolMaterialSpec spec) {
+        out.set(DataComponents.WEAPON, new Weapon(1));
+        out.set(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.builder()
+                .add(Attributes.ATTACK_DAMAGE,
+                        new AttributeModifier(Item.BASE_ATTACK_DAMAGE_ID, 4.0f + spec.attackDamageBonus(),
+                                AttributeModifier.Operation.ADD_VALUE),
+                        EquipmentSlotGroup.MAINHAND)
+                .add(Attributes.ATTACK_SPEED,
+                        new AttributeModifier(Item.BASE_ATTACK_SPEED_ID, -2.9f,
                                 AttributeModifier.Operation.ADD_VALUE),
                         EquipmentSlotGroup.MAINHAND)
                 .build());
@@ -74,6 +88,7 @@ public final class ToolComponentUtil {
 
     public static void applyCommon(ItemStack out, ToolMaterialSpec spec) {
         out.set(DataComponents.MAX_DAMAGE, spec.durability());
+        out.set(DataComponents.DAMAGE, 0);
         out.set(DataComponents.ENCHANTABLE, new Enchantable(spec.enchantmentValue()));
 
         // Allow these items to be used as repair inputs (ingredient-only).

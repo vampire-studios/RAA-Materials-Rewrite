@@ -6,10 +6,13 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.level.block.Block;
 import net.vampirestudios.raaMaterials.RAAMaterials;
 import net.vampirestudios.raaMaterials.content.ParametricBlockItem;
 import net.vampirestudios.raaMaterials.content.ParametricItem;
+import net.vampirestudios.raaMaterials.content.ParametricToolItem;
+import net.vampirestudios.raaMaterials.material.Form;
 
 public final class YItems {
 	public static Item PARAM_INGOT;
@@ -30,6 +33,7 @@ public final class YItems {
 	public static Item PARAM_SHOVEL;
 	public static Item PARAM_SWORD;
 	public static Item PARAM_HOE;
+	public static Item PARAM_SPEAR;
 
 	public static Item PARAM_ORE_ITEM;
 	public static Item PARAM_BLOCK_ITEM;
@@ -94,11 +98,12 @@ public final class YItems {
 		PARAM_NAIL = regItem("material_nail");
 		PARAM_RING = regItem("material_ring");
 
-		PARAM_PICKAXE = regItem("material_pickaxe");
-		PARAM_AXE = regItem("material_axe");
-		PARAM_SHOVEL = regItem("material_shovel");
-		PARAM_SWORD = regItem("material_sword");
-		PARAM_HOE = regItem("material_hoe");
+		PARAM_PICKAXE = regToolItem("material_pickaxe", Form.PICKAXE);
+		PARAM_AXE = regToolItem("material_axe", Form.AXE);
+		PARAM_SHOVEL = regToolItem("material_shovel", Form.SHOVEL);
+		PARAM_SWORD = regToolItem("material_sword", Form.SWORD);
+		PARAM_HOE = regToolItem("material_hoe", Form.HOE);
+		PARAM_SPEAR = regToolItem("material_spear", Form.SPEAR);
 
 		PARAM_ORE_ITEM = regBlockItem("material_ore", YBlocks.PARAM_ORE);
 		PARAM_BLOCK_ITEM = regBlockItem("material_block", YBlocks.PARAM_BLOCK);
@@ -183,6 +188,25 @@ public final class YItems {
 		var id = RAAMaterials.id(registryId);
 		return Registry.register(BuiltInRegistries.ITEM, id,
 				new ParametricItem(properties.setId(ResourceKey.create(Registries.ITEM, id))));
+	}
+
+	private static Item regToolItem(String registryId, Form form) {
+		var id = RAAMaterials.id(registryId);
+		return Registry.register(BuiltInRegistries.ITEM, id,
+				new ParametricToolItem(toolProperties(form).setId(ResourceKey.create(Registries.ITEM, id)), form));
+	}
+
+	private static Item.Properties toolProperties(Form form) {
+		var properties = new Item.Properties();
+		return switch (form) {
+			case PICKAXE -> properties.pickaxe(ToolMaterial.IRON, 1.0f, -2.8f);
+			case AXE -> properties.axe(ToolMaterial.IRON, 6.0f, -3.2f);
+			case SHOVEL -> properties.shovel(ToolMaterial.IRON, 1.5f, -3.0f);
+			case HOE -> properties.hoe(ToolMaterial.IRON, 0.0f, -3.0f);
+			case SWORD -> properties.sword(ToolMaterial.IRON, 3.0f, -2.4f);
+			case SPEAR -> properties.spear(ToolMaterial.IRON, 0.95f, 0.95f, 0.6f, 2.5f, 11.0f, 6.75f, 5.1f, 11.25f, 4.6f);
+			default -> properties;
+		};
 	}
 
 	private static Item regBlockItem(String registryId, Block block) {

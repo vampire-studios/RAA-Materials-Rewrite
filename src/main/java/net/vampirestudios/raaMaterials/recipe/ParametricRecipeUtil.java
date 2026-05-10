@@ -6,6 +6,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.level.Level;
 import net.vampirestudios.raaMaterials.YComponents;
+import net.vampirestudios.raaMaterials.content.ParametricToolItem;
 import net.vampirestudios.raaMaterials.material.Form;
 import net.vampirestudios.raaMaterials.material.MaterialKind;
 import net.vampirestudios.raaMaterials.material.MaterialRegistry;
@@ -43,6 +44,9 @@ final class ParametricRecipeUtil {
 	static ItemStack stack(Item item, Identifier material, int count) {
 		var out = new ItemStack(item, count);
 		out.set(YComponents.MATERIAL, material);
+		if (item instanceof ParametricToolItem toolItem) {
+			MaterialRegistry.byId(material).ifPresent(def -> toolItem.applyComponents(out, def));
+		}
 		return out;
 	}
 

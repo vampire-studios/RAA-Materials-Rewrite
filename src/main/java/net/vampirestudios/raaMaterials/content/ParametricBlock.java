@@ -19,7 +19,7 @@ import net.vampirestudios.raaMaterials.material.MaterialRegistry;
 import java.util.List;
 
 public class ParametricBlock extends Block {
-	public static final int MAX_MATERIAL_STATE = 150;
+	public static final int MAX_MATERIAL_STATE = 255;
 	public static final IntegerProperty MAT = IntegerProperty.create("mat", 0, MAX_MATERIAL_STATE);
 
 	public static int clampMaterialIndex(int idx) {

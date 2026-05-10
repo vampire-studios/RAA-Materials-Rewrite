@@ -13,6 +13,7 @@ import net.minecraft.world.item.component.BlockItemStateProperties;
 import net.vampirestudios.raaMaterials.RAAMaterials;
 import net.vampirestudios.raaMaterials.YComponents;
 import net.vampirestudios.raaMaterials.content.ParametricBlock;
+import net.vampirestudios.raaMaterials.content.ParametricToolItem;
 import net.vampirestudios.raaMaterials.material.ClientMaterialCache;
 import net.vampirestudios.raaMaterials.material.Form;
 import net.vampirestudios.raaMaterials.material.MaterialDef;
@@ -35,6 +36,9 @@ public final class YTabs {
 	private static void add(CreativeModeTab.Output out, MaterialDef def, Item item) {
 		ItemStack s = new ItemStack(item);
 		s.set(YComponents.MATERIAL, def.nameInformation().id());
+		if (item instanceof ParametricToolItem toolItem) {
+			toolItem.applyComponents(s, def);
+		}
 		out.accept(s);
 	}
 
@@ -333,6 +337,7 @@ public final class YTabs {
 								addIf(output, def, Form.SWORD, YItems.PARAM_SWORD);
 								addIf(output, def, Form.SHOVEL, YItems.PARAM_SHOVEL);
 								addIf(output, def, Form.HOE, YItems.PARAM_HOE);
+								addIf(output, def, Form.SPEAR, YItems.PARAM_SPEAR);
 							}
 						})
 						.build()
@@ -350,6 +355,7 @@ public final class YTabs {
 							for (MaterialDef def : mats) {
 								addIf(output, def, Form.AXE, YItems.PARAM_AXE);
 								addIf(output, def, Form.SWORD, YItems.PARAM_SWORD);
+								addIf(output, def, Form.SPEAR, YItems.PARAM_SPEAR);
 							}
 						})
 						.build()
