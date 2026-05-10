@@ -12,7 +12,7 @@ import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.vampirestudios.raaMaterials.NameGen2;
+import net.vampirestudios.raaMaterials.ICUFormatter;
 import net.vampirestudios.raaMaterials.RAAMaterials;
 import net.vampirestudios.raaMaterials.YComponents;
 import net.vampirestudios.raaMaterials.material.*;
@@ -52,7 +52,7 @@ public class ParametricBlockItem extends BlockItem {
 				lower.isEmpty() ? "" : String.format("%s", lower.charAt(lower.length() - 1))
 		};
 
-		String cooked = NameGen2.format(key, icuArgs);
+		String cooked = ICUFormatter.format(key, icuArgs);
 		return Component.literal(cooked);
 	}
 

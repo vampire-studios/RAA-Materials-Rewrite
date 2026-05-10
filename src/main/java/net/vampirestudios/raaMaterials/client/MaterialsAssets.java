@@ -84,6 +84,8 @@ public final class MaterialsAssets {
 		MaterialAssetBuilders.addFallbackModels(ctx);
 		exportDevAssets(ctx);
 
+		MaterialAssetBuilders.validateTextures(ctx);
+
 		MaterialAssetBuilders.buildOreFamilies(ctx);
 		MaterialAssetBuilders.buildBlockFamilies(ctx);
 		MaterialAssetBuilders.buildSpecialBlockFamilies(ctx);

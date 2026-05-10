@@ -113,11 +113,33 @@ public final class GeoNameGen {
 			"potass", "Potasso"
 	);
 
+	private static final PrefixEntry[] DESCRIPTOR = p(
+			"ancient", "Ancient",
+			"deep",    "Deep",
+			"buried",  "Buried",
+			"forge",   "Forge",
+			"dawn",    "Dawn",
+			"dusk",    "Dusk",
+			"storm",   "Storm",
+			"ember",   "Ember",
+			"frost",   "Frost",
+			"sky",     "Sky",
+			"void",    "Void",
+			"prime",   "Prime",
+			"elder",   "Elder",
+			"shadow",  "Shadow",
+			"blaze",   "Blaze",
+			"tide",    "Tide",
+			"crest",   "Crest",
+			"hollow",  "Hollow"
+	);
+
 	private static final CoreEntry[] METAL_CORES = c(
 			f("vyr", "Vyr"), f("orik", "Orik"), f("kael", "Kael"), f("durn", "Durn"),
 			f("tharn", "Tharn"), f("veltr", "Veltr"), f("nyr", "Nyr"), f("korv", "Korv"),
 			f("aurel", "Aurel"), f("myr", "Myr"), f("brask", "Brask"), f("zarn", "Zarn"),
 			f("ulth", "Ulth"), f("kryx", "Kryx"), f("mord", "Mord"), f("varn", "Varn"),
+			f("cald", "Cald"), f("vorn", "Vorn"), f("mirk", "Mirk"), f("teld", "Teld"), f("garm", "Garm"),
 
 			r("chalc", "Chalcopyrite"), r("sulf", "Sulfide"), r("magnet", "Magnetite"),
 			r("hemat", "Hematite"), r("cupr", "Cuprite"), r("ferr", "Ferrite"),
@@ -132,6 +154,7 @@ public final class GeoNameGen {
 			f("lun", "Lun"), f("elun", "Elun"), f("vael", "Vael"), f("ir", "Ir"),
 			f("cyr", "Cyr"), f("zel", "Zel"), f("lyr", "Lyr"), f("ser", "Ser"),
 			f("aura", "Aura"), f("vasha", "Vasha"), f("mir", "Mir"), f("sova", "Sova"),
+			f("oran", "Oran"), f("tael", "Tael"), f("kira", "Kira"), f("zela", "Zela"), f("nuv", "Nuv"),
 
 			r("garnet", "Garnet"), r("beryl", "Beryl"), r("topaz", "Topaz"),
 			r("jade", "Jadeite"), r("opal", "Opal"), r("agate", "Agate"),
@@ -145,6 +168,7 @@ public final class GeoNameGen {
 			f("sel", "Sel"), f("aeth", "Aeth"), f("glac", "Glac"), f("oril", "Oril"),
 			f("prism", "Prism"), f("thal", "Thal"), f("nyra", "Nyra"), f("eil", "Eil"),
 			f("solen", "Solen"), f("laz", "Laz"), f("vaur", "Vaur"), f("candra", "Candra"),
+			f("zeph", "Zeph"), f("rael", "Rael"), f("miru", "Miru"), f("sora", "Sora"), f("aelm", "Aelm"),
 
 			r("quartz", "Quartz"), r("feldspar", "Feldspar"), r("calc", "Calcite"),
 			r("dolom", "Dolomite"), r("halit", "Halite"), r("fluor", "Fluorite"),
@@ -164,7 +188,9 @@ public final class GeoNameGen {
 			r("barite", "Barite"), r("gypsum", "Gypsum"), r("fluorite", "Fluorite"),
 			r("apatite", "Apatite"), r("olivine", "Olivine"), r("pyrite", "Pyrite"),
 			r("galena", "Galena"), r("cinnabar", "Cinnabar"), r("orpiment", "Orpiment"),
-			r("realgar", "Realgar"), r("serpentin", "Serpentinite")
+			r("realgar", "Realgar"), r("serpentin", "Serpentinite"),
+			r("marble", "Marble"), r("slate", "Slate"), r("schist", "Schist"),
+			r("gneiss", "Gneiss"), r("hornfels", "Hornfels"), r("phyllite", "Phyllite")
 	);
 
 	private static final CoreEntry[] SALT_CORES = c(
@@ -198,7 +224,14 @@ public final class GeoNameGen {
 			CoreEntry.alloy("vyr", "Vyr"),
 			CoreEntry.alloy("kael", "Kael"),
 			CoreEntry.alloy("orik", "Orik"),
-			CoreEntry.alloy("durn", "Durn")
+			CoreEntry.alloy("durn", "Durn"),
+			CoreEntry.alloy("tharn", "Tharn"),
+			CoreEntry.alloy("mord", "Mord"),
+			CoreEntry.alloy("zarn", "Zarn"),
+			CoreEntry.alloy("ulth", "Ulth"),
+			CoreEntry.alloy("nyr", "Nyr"),
+			CoreEntry.alloy("brask", "Brask"),
+			CoreEntry.alloy("cald", "Cald")
 	);
 
 	private static final CoreEntry[] SOIL_CORES = c(
@@ -285,29 +318,34 @@ public final class GeoNameGen {
 			CoreEntry.wood("ironw", "Ironwood")
 	);
 
-	private static final String[] FANTASY_METAL_SUFFIXES = {"ium", "ite", "or", "en", "yx", "ar", "on", "yl"};
-	private static final String[] FANTASY_GEM_SUFFIXES = {"ite", "ine", "elle", "ara", "oryn", "el", "on", "alia"};
-	private static final String[] FANTASY_CRYSTAL_SUFFIXES = {"ite", "ine", "cryst", "shard", "spar", "lume", "el"};
-	private static final String[] FANTASY_STONE_SUFFIXES = {"ite", "stone", "rock", "ar", "on", "olith", "en"};
-	private static final String[] FANTASY_SALT_SUFFIXES = {"salt", "ite", "ine", "cryst", "brine", "on"};
-	private static final String[] FANTASY_VOLCANIC_SUFFIXES = {"ite", "glass", "tuff", "ash", "scoria", "tephra", "stone"};
+	private static final String[] FANTASY_METAL_SUFFIXES = {"ium", "ite", "or", "en", "yx", "ar", "on", "yl", "al", "ux", "eld", "urn"};
+	private static final String[] FANTASY_GEM_SUFFIXES = {"ite", "ine", "elle", "ara", "oryn", "el", "on", "alia", "al", "yx", "eira", "iel"};
+	private static final String[] FANTASY_CRYSTAL_SUFFIXES = {"ite", "ine", "cryst", "shard", "spar", "lume", "el", "al", "spike", "point"};
+	private static final String[] FANTASY_STONE_SUFFIXES = {"ite", "stone", "rock", "ar", "on", "olith", "en", "marble", "slate", "schist", "shale", "flint", "gneiss"};
+	private static final String[] FANTASY_SALT_SUFFIXES = {"salt", "ite", "ine", "cryst", "brine", "on", "halite", "evaporite"};
+	private static final String[] FANTASY_VOLCANIC_SUFFIXES = {"ite", "glass", "tuff", "ash", "scoria", "tephra", "stone", "lava", "cinder"};
 
-	private static final String[] ALLOY_SUFFIXES = {"Alloy", "Steel", "Bronze", "Metal"};
-	private static final String[] WOOD_SUFFIXES = {"Wood", "Bark", "Heartwood", "Timber", "Plank"};
+	private static final String[] ALLOY_SUFFIXES = {"Alloy", "Steel", "Bronze", "Metal", "Amalgam", "Composite", "Weave", "Cast", "Blend"};
+	private static final String[] WOOD_SUFFIXES = {"Wood", "Bark", "Heartwood", "Timber", "Plank", "Lumber", "Grain"};
 
 	private static final String[] SCI_FI_STEMS = {
 			"vex", "neutro", "ion", "quant", "xeno", "cryon", "plasma", "radon",
-			"tachy", "nex", "zeron", "flux", "positr", "aether"
+			"tachy", "nex", "zeron", "flux", "positr", "aether",
+			"nano", "proto", "hyper", "ultra", "meta", "chrono", "photon", "helix",
+			"axiom", "synth", "vertex", "cipher", "helix", "sonar"
 	};
 
 	private static final String[] STUPID_STEMS = {
 			"bean", "goob", "wobble", "bonk", "squish", "mlem", "bloop", "yoink",
-			"nug", "chonko", "glorp", "snorf"
+			"nug", "chonko", "glorp", "snorf",
+			"plop", "zorp", "splat", "bork", "doot", "gloop", "florp", "shlorp"
 	};
 
 	private static final String[] FICTION_STEMS = {
 			"eldr", "void", "moon", "star", "dragon", "wyrm", "shadow", "sun",
-			"myth", "rune", "fae", "dread", "ember", "frost"
+			"myth", "rune", "fae", "dread", "ember", "frost",
+			"arcane", "astral", "chaos", "primal", "spectral", "nexus",
+			"hollow", "titan", "wyrd", "riven", "sable", "azure"
 	};
 
 	private static final String[] MICRO = {
@@ -390,13 +428,17 @@ public final class GeoNameGen {
 		};
 
 		String suffix = switch (kind) {
-			case METAL, ALLOY -> pick(rng, "ium", "alloy", "steel", "metal");
-			case GEM, CRYSTAL -> pick(rng, "ite", "ine", "cryst", "shard");
-			case STONE -> pick(rng, "stone", "rock", "ite");
-			default -> pick(rng, "ite", "ium", "stone");
+			case METAL   -> pick(rng, FANTASY_METAL_SUFFIXES);
+			case ALLOY   -> pick(rng, "alloy", "steel", "bronze", "metal", "amalgam", "composite");
+			case GEM     -> pick(rng, FANTASY_GEM_SUFFIXES);
+			case CRYSTAL -> pick(rng, FANTASY_CRYSTAL_SUFFIXES);
+			case STONE, OTHER -> pick(rng, FANTASY_STONE_SUFFIXES);
+			case SALT    -> pick(rng, FANTASY_SALT_SUFFIXES);
+			case VOLCANIC -> pick(rng, FANTASY_VOLCANIC_SUFFIXES);
+			default      -> pick(rng, "ite", "ium", "stone");
 		};
 
-		return titleWords(stem + suffix);
+		return smoothJoin(stem, suffix);
 	}
 
 	private static NameStyle pickStyle(Random rng) {
@@ -560,6 +602,16 @@ public final class GeoNameGen {
 		return smoothJoin(core.display(), suffix);
 	}
 
+	// Suffixes that are standalone words and should be space-joined rather than concatenated.
+	private static final Set<String> STANDALONE_SUFFIXES = Set.of(
+			"marble", "slate", "schist", "shale", "flint", "gneiss", "stone", "rock",
+			"glass", "tuff", "ash", "scoria", "tephra", "lava", "cinder",
+			"salt", "brine", "halite", "evaporite",
+			"alloy", "steel", "bronze", "metal", "amalgam", "composite", "weave", "cast", "blend",
+			"wood", "bark", "timber", "plank", "lumber", "grain",
+			"spike", "point", "shard", "cryst", "spar"
+	);
+
 	private static String smoothJoin(String base, String suffix) {
 		if (base == null || base.isEmpty()) return suffix;
 		if (suffix == null || suffix.isEmpty()) return base;
@@ -568,6 +620,10 @@ public final class GeoNameGen {
 		String s = suffix.toLowerCase(Locale.ROOT);
 
 		if (b.endsWith(s)) return titleWords(b);
+
+		if (STANDALONE_SUFFIXES.contains(s)) {
+			return titleWords(b + " " + s);
+		}
 
 		char last = b.charAt(b.length() - 1);
 		char first = s.charAt(0);
@@ -627,6 +683,7 @@ public final class GeoNameGen {
 				case GEM, CRYSTAL, STONE, VOLCANIC -> 1;
 				default -> 1;
 			});
+			add(pool, DESCRIPTOR, 2);
 		}
 
 		addDepthBias(pool, kind, spawn.y().minY(), spawn.y().maxY());
@@ -841,11 +898,24 @@ public final class GeoNameGen {
 
 	public static void main() {
 		long seed = new SecureRandom().nextLong();
-		MaterialSet set = MaterialGenerator.generate(seed);
+		Random rng = new Random(seed);
 
-		for (int i = 0; i < set.all().size(); i++) {
-			var mat = set.all().get(i);
-			System.out.println("Type: " + mat.kind().getSerializedName() + " " + generate(seed, i, mat));
+		// A generic mid-depth spawn used only to drive prefix depth bias in debug output.
+		SpawnInfo debugSpawn = new SpawnInfo(
+				8, 1.0f, 3, 8, SpawnInfo.VeinShape.ORE_BLOB,
+				new SpawnInfo.YDistribution(-32, 64, 16, 32),
+				new SpawnInfo.NoiseGate(0.01f, -0.5f),
+				new SpawnInfo.NoiseGate(0.05f, -0.3f),
+				false, false, false
+		);
+
+		// Debug mode: generate one name per kind to verify every type produces valid output.
+		Set<String> used = new HashSet<>();
+		int index = 0;
+		for (MaterialKind kind : MaterialKind.values()) {
+			int color = rng.nextInt(0x1000000);
+			NameInformation name = generateUnique(seed, index++, kind, color, debugSpawn, used);
+			System.out.println(kind.getSerializedName() + " -> " + name.displayName() + "  [" + name.id() + "]");
 		}
 	}
 }

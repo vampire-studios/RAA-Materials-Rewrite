@@ -1,4 +1,3 @@
-// MaterialKind.java
 package net.vampirestudios.raaMaterials.material;
 
 import com.mojang.serialization.Codec;
@@ -34,14 +33,5 @@ public enum MaterialKind implements StringRepresentable {
 	@Override
 	public String getSerializedName() {
 		return name().toLowerCase(Locale.ROOT);
-	}
-
-	public static MaterialKind byString(String value) {
-		if (value == null) return null;
-		try {
-			return MaterialKind.valueOf(value.toUpperCase(Locale.ROOT));
-		} catch (IllegalArgumentException e) {
-			return null; // or throw, depending on what you want
-		}
 	}
 }

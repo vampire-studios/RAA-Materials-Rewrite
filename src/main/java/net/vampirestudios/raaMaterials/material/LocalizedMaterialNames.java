@@ -1,6 +1,6 @@
 package net.vampirestudios.raaMaterials.material;
 
-import net.vampirestudios.raaMaterials.NameGen2;
+import net.vampirestudios.raaMaterials.ICUFormatter;
 
 import java.util.Locale;
 
@@ -9,7 +9,7 @@ public final class LocalizedMaterialNames {
 	}
 
 	public static String displayName(MaterialDef def) {
-		return displayName(def, NameGen2.clientLanguageCode());
+		return displayName(def, ICUFormatter.clientLanguageCode());
 	}
 
 	static String displayName(MaterialDef def, String languageCode) {
@@ -28,43 +28,55 @@ public final class LocalizedMaterialNames {
 	private static String french(String base, MaterialKind kind) {
 		return switch (kind) {
 			case SAND -> replaceTerminal(base,
-					"sandstone", "gr\u00e8s",
-					"arenite", "ar\u00e9nite",
+					"sandstone", "grès",
+					"arenite", "arénite",
 					"psammite", "psammite",
 					"sand", "sable");
 			case GRAVEL -> replaceTerminal(base,
-					"conglomerate", "conglom\u00e9rat",
-					"breccia", "br\u00e8che",
+					"conglomerate", "conglomérat",
+					"breccia", "brèche",
 					"gravel", "gravier");
 			case CLAY -> replaceTerminal(base,
 					"argillite", "argilite",
 					"kaolinite", "kaolinite",
-					"mudstone", "p\u00e9lite",
+					"mudstone", "pélite",
 					"shale", "schiste",
 					"clay", "argile");
 			case MUD -> replaceTerminal(base,
-					"mudstone", "p\u00e9lite",
+					"mudstone", "pélite",
 					"lutite", "lutite",
-					"pelite", "p\u00e9lite",
+					"pelite", "pélite",
 					"mud", "boue");
 			case SOIL -> replaceTerminal(base,
 					"soil", "sol",
 					"dirt", "terre",
 					"humus", "humus");
 			case SALT -> replaceTerminal(base,
-					"evaporite", "\u00e9vaporite",
+					"evaporite", "évaporite",
+					"halite", "halite",
 					"salt", "sel");
+			case STONE -> replaceTerminal(base,
+					"marble",   "marbre",
+					"slate",    "ardoise",
+					"schist",   "schiste",
+					"shale",    "schiste",
+					"flint",    "silex",
+					"gneiss",   "gneiss",
+					"hornfels", "cornéenne",
+					"phyllite", "phyllite");
 			case VOLCANIC -> replaceTerminal(base,
-					"tephra", "t\u00e9phra",
+					"tephra", "téphra",
 					"scoria", "scorie",
 					"pumice", "ponce",
 					"glass", "verre",
-					"tuff", "tuf");
+					"tuff", "tuf",
+					"lava", "lave",
+					"cinder", "cendre");
 			case WOOD -> replaceTerminal(base,
 					"heartwood", "duramen",
 					"timber", "bois",
 					"plank", "planche",
-					"bark", "\u00e9corce",
+					"bark", "écorce",
 					"wood", "bois");
 			default -> base;
 		};
@@ -96,15 +108,27 @@ public final class LocalizedMaterialNames {
 					"soil", "jord",
 					"dirt", "jord",
 					"humus", "humus");
+			case STONE -> replaceTerminal(base,
+					"marble",   "marmor",
+					"slate",    "skifer",
+					"schist",   "skifer",
+					"shale",    "skifer",
+					"flint",    "flint",
+					"gneiss",   "gneis",
+					"hornfels", "hornfels",
+					"phyllite", "fylitt");
 			case SALT -> replaceTerminal(base,
 					"evaporite", "evaporitt",
-					"salt", "salt");
+					"halite",    "halit",
+					"salt",      "salt");
 			case VOLCANIC -> replaceTerminal(base,
 					"tephra", "tefra",
 					"scoria", "slagg",
 					"pumice", "pimpstein",
-					"glass", "glass",
-					"tuff", "tuff");
+					"glass",  "glass",
+					"tuff",   "tuff",
+					"lava",   "lava",
+					"cinder", "slagg");
 			case WOOD -> replaceTerminal(base,
 					"heartwood", "kjerneved",
 					"timber", "trevirke",

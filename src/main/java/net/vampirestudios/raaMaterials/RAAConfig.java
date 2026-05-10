@@ -20,15 +20,16 @@ import static java.util.Map.entry;
 import static net.vampirestudios.raaMaterials.material.MaterialKind.*;
 
 public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, Integer> kindWeights,
-                        net.vampirestudios.raaMaterials.RAAConfig.TierWeights tiers,
+                        TierWeights tiers,
                         Map<MaterialKind, ModeWeights> spawnMode, BlockStats blockStats,
-                        Map<MaterialKind, DepthBand> depthWeights, Map<String, YRange> shallowRange,
-                        Map<String, YRange> midRange, Map<String, YRange> deepRange,
+                        Map<MaterialKind, DepthBand> depthWeights,
+                        DepthYRanges depthRanges,
                         Map<String, List<String>> replaceables,
-                        net.vampirestudios.raaMaterials.RAAConfig.NameGen nameGen,
+                        NameGen nameGen,
                         Map<MaterialKind, KindPolicy> formControls, int toolChancePercent,
                         Map<MaterialKind, SpawnProfile> spawnProfiles,
-                        MaterialGenerator.Profile defaultProfile) {
+                        MaterialGenerator.Profile defaultProfile,
+                        Map<MaterialKind, ColorRanges> colorRanges) {
     // ----- Records / Beans -----
     public record TierWeights(int stone, int iron, int diamond, int netherite) {
         public static final Codec<TierWeights> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -74,6 +75,15 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
                 Codec.INT.fieldOf("peakMin").forGetter(YRange::peakMin),
                 Codec.INT.fieldOf("peakMax").forGetter(YRange::peakMax)
         ).apply(i, YRange::new));
+    }
+
+    public record DepthYRanges(Map<String, YRange> shallow, Map<String, YRange> mid, Map<String, YRange> deep) {
+        private static final Codec<Map<String, YRange>> MAP = Codec.unboundedMap(Codec.STRING, YRange.CODEC);
+        public static final Codec<DepthYRanges> CODEC = RecordCodecBuilder.create(i -> i.group(
+                MAP.fieldOf("shallowRange").forGetter(DepthYRanges::shallow),
+                MAP.fieldOf("midRange").forGetter(DepthYRanges::mid),
+                MAP.fieldOf("deepRange").forGetter(DepthYRanges::deep)
+        ).apply(i, DepthYRanges::new));
     }
 
     public record NameGen(boolean useColorPrefixes, boolean useBiomeBias, boolean useReplaceableBias,
@@ -160,7 +170,14 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
 
     }
 
+    // Convenience accessors so call sites don't need to know about DepthYRanges.
+    public Map<String, YRange> shallowRange() { return depthRanges.shallow(); }
+    public Map<String, YRange> midRange()     { return depthRanges.mid(); }
+    public Map<String, YRange> deepRange()    { return depthRanges.deep(); }
+
     // ----- CODECs for maps -----
+    private static final Codec<Map<MaterialKind, ColorRanges>> COLOR_RANGES_CODEC =
+            Codec.unboundedMap(MaterialKind.CODEC, ColorRanges.CODEC);
     private static final Codec<Map<MaterialKind, Integer>> KIND_WEIGHTS_CODEC =
             Codec.unboundedMap(MaterialKind.CODEC, Codec.INT).flatXmap(RAAConfig::validateWeights, RAAConfig::validateWeights);
     private static final Codec<Map<MaterialKind, ModeWeights>> MODE_MAP_CODEC =
@@ -173,6 +190,22 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
             Codec.unboundedMap(MaterialKind.CODEC, KindPolicy.CODEC);
     private static final Codec<Map<MaterialKind, SpawnProfile>> SPAWN_PROFILE_MAP_CODEC =
             Codec.unboundedMap(MaterialKind.CODEC, SpawnProfile.CODEC);
+
+    /**
+     * OKLCh lightness and chroma bounds for a material kind's color generation.
+     * {@code lMin/lMax} control brightness (0=black, 1=white).
+     * {@code cMin/cMax} control saturation (0=grey, ~0.3=vivid).
+     * Hue selection remains kind-specific in code; these ranges scale on top.
+     */
+    public record ColorRanges(float lMin, float lMax, float cMin, float cMax) {
+        private static final Codec<Float> FRAC = Codec.floatRange(0f, 1f);
+        public static final Codec<ColorRanges> CODEC = RecordCodecBuilder.create(i -> i.group(
+                FRAC.fieldOf("lMin").forGetter(ColorRanges::lMin),
+                FRAC.fieldOf("lMax").forGetter(ColorRanges::lMax),
+                FRAC.fieldOf("cMin").forGetter(ColorRanges::cMin),
+                FRAC.fieldOf("cMax").forGetter(ColorRanges::cMax)
+        ).apply(i, ColorRanges::new));
+    }
 
     public record BlockStats(Map<MaterialKind, Float> hardnessMul, Map<MaterialKind, Float> blastMul, Map<MaterialKind, Float> effMul) {
         public static final Codec<BlockStats> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -194,9 +227,7 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
             BlockStats.CODEC.fieldOf("blockStats").forGetter(RAAConfig::blockStats),
 
             DEPTH_CODEC.fieldOf("depthWeights").forGetter(c -> c.depthWeights),
-            Codec.unboundedMap(Codec.STRING, YRange.CODEC).fieldOf("shallowRange").forGetter(c -> c.shallowRange),
-            Codec.unboundedMap(Codec.STRING, YRange.CODEC).fieldOf("midRange").forGetter(c -> c.midRange),
-            Codec.unboundedMap(Codec.STRING, YRange.CODEC).fieldOf("deepRange").forGetter(c -> c.deepRange),
+            DepthYRanges.CODEC.fieldOf("depthRanges").forGetter(RAAConfig::depthRanges),
 
             Codec.unboundedMap(Codec.STRING, Codec.STRING.listOf()).fieldOf("replaceables").forGetter(c -> c.replaceables),
             NameGen.CODEC.fieldOf("nameGen").forGetter(c -> c.nameGen),
@@ -205,7 +236,8 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
 
             Codec.INT.fieldOf("toolChancePercent").forGetter(c -> c.toolChancePercent),
             SPAWN_PROFILE_MAP_CODEC.optionalFieldOf("spawnProfiles", defaultSpawnProfiles()).forGetter(c -> c.spawnProfiles),
-            MaterialGenerator.Profile.CODEC.fieldOf("defaultProfile").forGetter(RAAConfig::defaultProfile)
+            MaterialGenerator.Profile.CODEC.fieldOf("defaultProfile").forGetter(RAAConfig::defaultProfile),
+            COLOR_RANGES_CODEC.optionalFieldOf("colorRanges", defaultColorRanges()).forGetter(RAAConfig::colorRanges)
     ).apply(i, RAAConfig::new));
 
     // ----- Defaults (ported from your old config; volcanic rarer) -----
@@ -229,9 +261,11 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
                         METAL, new DepthBand(20, 40, 40),
                         GEM, new DepthBand(35, 45, 20)
                 ),
-                Map.of("DEFAULT", new YRange(16, 128, 48, 88)),
-                Map.of("DEFAULT", new YRange(-16, 64, 8, 32)),
-                Map.of("DEFAULT", new YRange(-59, 16, -32, -12)),
+                new DepthYRanges(
+                        Map.of("DEFAULT", new YRange(16, 128, 48, 88)),
+                        Map.of("DEFAULT", new YRange(-16, 64, 8, 32)),
+                        Map.of("DEFAULT", new YRange(-59, 16, -32, -12))
+                ),
                 Map.of(
                         "DEEPSLATE", List.of("#minecraft:deepslate_ore_replaceables"),
                         "STONE", List.of("#minecraft:stone_ore_replaceables")
@@ -240,8 +274,29 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
                 defaultPolicies(),
                 100,
                 defaultSpawnProfiles(),
-                MaterialGenerator.Profile.FANTASY_HEAVY
+                MaterialGenerator.Profile.FANTASY_HEAVY,
+                defaultColorRanges()
         );
+    }
+
+    public static Map<MaterialKind, ColorRanges> defaultColorRanges() {
+        var map = new EnumMap<MaterialKind, ColorRanges>(MaterialKind.class);
+        //                               lMin  lMax  cMin  cMax
+        map.put(METAL,    new ColorRanges(0.40f, 0.72f, 0.03f, 0.14f));
+        map.put(ALLOY,    new ColorRanges(0.40f, 0.72f, 0.03f, 0.14f));
+        map.put(GEM,      new ColorRanges(0.45f, 0.75f, 0.16f, 0.32f));
+        map.put(MaterialKind.CRYSTAL,  new ColorRanges(0.60f, 0.85f, 0.08f, 0.22f));
+        map.put(MaterialKind.STONE,    new ColorRanges(0.30f, 0.55f, 0.01f, 0.07f));
+        map.put(MaterialKind.SAND,     new ColorRanges(0.62f, 0.82f, 0.08f, 0.18f));
+        map.put(MaterialKind.GRAVEL,   new ColorRanges(0.35f, 0.55f, 0.00f, 0.04f));
+        map.put(MaterialKind.CLAY,     new ColorRanges(0.25f, 0.50f, 0.04f, 0.12f));
+        map.put(MaterialKind.MUD,      new ColorRanges(0.25f, 0.50f, 0.04f, 0.12f));
+        map.put(MaterialKind.SOIL,     new ColorRanges(0.25f, 0.50f, 0.04f, 0.12f));
+        map.put(MaterialKind.SALT,     new ColorRanges(0.78f, 0.95f, 0.00f, 0.07f));
+        map.put(MaterialKind.VOLCANIC, new ColorRanges(0.15f, 0.45f, 0.06f, 0.22f));
+        map.put(MaterialKind.WOOD,     new ColorRanges(0.35f, 0.60f, 0.06f, 0.14f));
+        map.put(MaterialKind.OTHER,    new ColorRanges(0.45f, 0.80f, 0.12f, 0.30f));
+        return Collections.unmodifiableMap(map);
     }
 
     public static Map<MaterialKind, SpawnProfile> defaultSpawnProfiles() {
@@ -379,37 +434,38 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
                      Map<MaterialKind, ModeWeights> spawnMode,
                      BlockStats blockStats,
                      Map<MaterialKind, DepthBand> depthWeights,
-                     Map<String, YRange> shallowRange,
-                     Map<String, YRange> midRange,
-                     Map<String, YRange> deepRange,
+                     DepthYRanges depthRanges,
                      Map<String, List<String>> replaceables,
                      NameGen nameGen,
                      Map<MaterialKind, KindPolicy> formControls,
                      int toolChancePercent,
                      Map<MaterialKind, SpawnProfile> spawnProfiles,
-                     MaterialGenerator.Profile defaultProfile) {
+                     MaterialGenerator.Profile defaultProfile,
+                     Map<MaterialKind, ColorRanges> colorRanges) {
 
         this.materialsMin = materialsMin;
         this.materialsMax = materialsMax;
-        this.tiers = tiers;
         this.kindWeights = wrapEnumMap(kindWeights);
+        this.tiers = tiers;
         this.spawnMode = wrapEnumMap(spawnMode);
         this.blockStats = blockStats;
         this.depthWeights = wrapEnumMap(depthWeights);
-        this.formControls = wrapEnumMap(formControls);
-        this.shallowRange = shallowRange;
-        this.midRange = midRange;
-        this.deepRange = deepRange;
+        this.depthRanges = depthRanges;
         this.replaceables = replaceables;
         this.nameGen = nameGen;
+        this.formControls = wrapEnumMap(formControls);
         this.toolChancePercent = toolChancePercent;
         this.spawnProfiles = wrapEnumMap(spawnProfiles);
         this.defaultProfile = defaultProfile;
+        this.colorRanges = wrapEnumMap(colorRanges);
     }
 
+    @SuppressWarnings("unchecked")
     private static <K extends Enum<K>, V> Map<K, V> wrapEnumMap(Map<K, V> input) {
-        EnumMap<K, V> em = new EnumMap<>((Class<K>) MaterialKind.class);
-        if (input != null) em.putAll(input);
+        if (input == null || input.isEmpty()) return Collections.emptyMap();
+        Class<K> enumClass = (Class<K>) input.keySet().iterator().next().getClass();
+        EnumMap<K, V> em = new EnumMap<>(enumClass);
+        em.putAll(input);
         return Collections.unmodifiableMap(em);
     }
 

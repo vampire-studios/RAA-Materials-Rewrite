@@ -6,7 +6,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
-import net.vampirestudios.raaMaterials.NameGen2;
+import net.vampirestudios.raaMaterials.ICUFormatter;
 import net.vampirestudios.raaMaterials.YComponents;
 import net.vampirestudios.raaMaterials.material.*;
 
@@ -46,7 +46,7 @@ public class ParametricItem extends Item {
 				lower.isEmpty() ? "" : String.format("%s", lower.charAt(lower.length() - 1))
 		};
 
-		String cooked = NameGen2.format(key, icuArgs);
+		String cooked = ICUFormatter.format(key, icuArgs);
 		return Component.literal(cooked);
 	}
 }

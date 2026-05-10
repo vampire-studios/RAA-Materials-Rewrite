@@ -18,8 +18,8 @@ public final class FormsRuntime {
 
     /** Check a single form quickly. */
     public static boolean has(Level level, MaterialDef def, Form f) {
-        return def.forms().contains(f) ||
-               level.getAttachedOrCreate(MaterialAttachments.LEGENDARIES).byForm().get(f) != null &&
-               level.getAttachedOrCreate(MaterialAttachments.LEGENDARIES).byForm().get(f).equals(def.nameInformation().id());
+        if (def.forms().contains(f)) return true;
+        var assignedTo = level.getAttachedOrCreate(MaterialAttachments.LEGENDARIES).byForm().get(f);
+        return assignedTo != null && assignedTo.equals(def.nameInformation().id());
     }
 }

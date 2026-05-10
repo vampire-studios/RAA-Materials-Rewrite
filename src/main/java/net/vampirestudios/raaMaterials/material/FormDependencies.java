@@ -2,6 +2,7 @@ package net.vampirestudios.raaMaterials.material;
 
 import net.vampirestudios.raaMaterials.RAAMaterials;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,16 +31,27 @@ public final class FormDependencies {
 			Map.entry(Form.CLUSTER,        List.of(Form.BUDDING))
 	);
 
-	public static void validate(MaterialDef.NameInformation name, List<Form> forms) {
-		for (var entry : REQUIRES.entrySet()) {
-			var form = entry.getKey();
-			if (!forms.contains(form)) continue;
-			for (var dep : entry.getValue()) {
-				if (!forms.contains(dep)) {
-					RAAMaterials.LOGGER.warn("[RAA] Material '{}' has {} but is missing required {}",
-							name.id(), form, dep);
+	/**
+	 * Returns a copy of {@code forms} with any missing dependencies automatically added.
+	 * Logs at DEBUG level for each auto-added form so it stays quiet in normal play.
+	 */
+	public static List<Form> resolve(MaterialDef.NameInformation name, List<Form> forms) {
+		var result = new ArrayList<>(forms);
+		boolean changed = true;
+		while (changed) {
+			changed = false;
+			for (var entry : REQUIRES.entrySet()) {
+				if (!result.contains(entry.getKey())) continue;
+				for (var dep : entry.getValue()) {
+					if (!result.contains(dep)) {
+						RAAMaterials.LOGGER.debug("[RAA] Material '{}' auto-added {} (required by {})",
+								name.id(), dep, entry.getKey());
+						result.add(dep);
+						changed = true;
+					}
 				}
 			}
 		}
+		return result;
 	}
 }

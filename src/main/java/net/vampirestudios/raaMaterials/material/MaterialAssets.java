@@ -8,14 +8,14 @@ import java.util.Optional;
 public final class MaterialAssets {
     private MaterialAssets() {}
 
+    private static final AssetsTheme DEFAULT_THEME = AssetsTheme.defaultTheme();
+
     public static MaterialAssetsDef generate(MaterialDef material) {
-        AssetsTheme generator = AssetsTheme.defaultTheme();
-        return generator.resolve(material);
+        return DEFAULT_THEME.resolve(material);
     }
 
     /** Get texture for a specific form */
     public static Optional<Identifier> texture(Form form, MaterialDef material) {
-        AssetsTheme generator = AssetsTheme.defaultTheme();
-        return generator.formTexture(material.kind(), form, material.assetSeed());
+        return DEFAULT_THEME.formTexture(material.kind(), form, material.assetSeed());
     }
 }

@@ -72,7 +72,7 @@ public final class AssetsTheme {
 	}
 
 	// ---------- Texture definition builders ----------
-	private TextureDef1 buildTextureDef1(MaterialDef m, Random rnd) {
+	private BlockTextureSet buildBlockTextureSet(MaterialDef m, Random rnd) {
 		var k = m.kind();
 
 		// Ore vein: metals vs gems
@@ -123,14 +123,14 @@ public final class AssetsTheme {
 				pick(k, Slot.CRYSTAL_CLUSTER, rnd) : Optional.empty();
 		Optional<Identifier> tintedGlass = pick(k, Slot.TINTED_CRYSTAL_GLASS, rnd);
 
-		return new TextureDef1(
+		return new BlockTextureSet(
 				oreVein, storageBlock, rawBlock, plateBlock, shingles,
 				sandstoneTop, sandstoneSide, sandstoneBottom, cut, chiseled,
 				budding, budSmall, budMedium, budLarge, cluster, tintedGlass
 		);
 	}
 
-	private TextureDef2 buildTextureDef2(MaterialDef m, Random rnd) {
+	private ItemTextureSet buildItemTextureSet(MaterialDef m, Random rnd) {
 		var k = m.kind();
 		Optional<Identifier> crystalGlass = pick(k, Slot.CRYSTAL_GLASS, rnd);
 		Optional<Identifier> crystalBricks = pick(k, Slot.CRYSTAL_BRICKS, rnd);
@@ -151,14 +151,14 @@ public final class AssetsTheme {
 		Optional<Identifier> pickHead = pick(k, Slot.PICK_HEAD, rnd);
 		Optional<Identifier> pickHandle = pick(k, Slot.PICK_STICK, rnd);
 
-		return new TextureDef2(
+		return new ItemTextureSet(
 				crystalGlass, crystalBricks, lampOverlay1, lampOverlay2,
 				raw, ingot, dust, nugget, plate, gear, gem, shard, clayBall,
 				pickHead, pickHandle
 		);
 	}
 
-	private TextureDef3 buildTextureDef3(MaterialDef m, Random rnd) {
+	private ToolStoneTextureSet buildToolStoneTextureSet(MaterialDef m, Random rnd) {
 		var k = m.kind();
 		Optional<Identifier> axeHead = pick(k, Slot.AXE_HEAD, rnd);
 		Optional<Identifier> axeHandle = pick(k, Slot.AXE_STICK, rnd);
@@ -175,7 +175,7 @@ public final class AssetsTheme {
 		Optional<Identifier> nail = pick(k, Slot.NAIL_ITEM, rnd);
 		Optional<Identifier> ring = pick(k, Slot.RING_ITEM, rnd);
 
-		return new TextureDef3(
+		return new ToolStoneTextureSet(
 				axeHead, axeHandle, swordBlade, swordHandle,
 				shovelHead, shovelHandle, hoeHead, hoeHandle,
 				cobblestone, chiseled, bricks, polished,
@@ -183,7 +183,7 @@ public final class AssetsTheme {
 		);
 	}
 
-	private TextureDef4 buildTextureDef4(MaterialDef m, Random rnd) {
+	private DecorTextureSet buildDecorTextureSet(MaterialDef m, Random rnd) {
 		var k = m.kind();
 		Optional<Identifier> chain = pickForm(k, Form.CHAIN, rnd);
 		Optional<Identifier> lantern = pickForm(k, Form.LANTERN, rnd);
@@ -198,7 +198,7 @@ public final class AssetsTheme {
 		Optional<Identifier> fence = pickForm(k, Form.FENCE, rnd);
 		Optional<Identifier> fenceGate = pickForm(k, Form.FENCE_GATE, rnd);
 
-		return new TextureDef4(chain, lantern, doorItem, doorBottom, doorTop, trapdoor, fence, fenceGate);
+		return new DecorTextureSet(chain, lantern, doorItem, doorBottom, doorTop, trapdoor, fence, fenceGate);
 	}
 
 	public MaterialAssetsDef resolve(MaterialDef m) {
@@ -207,10 +207,10 @@ public final class AssetsTheme {
 				1,
 				m.nameInformation().id(),
 				m.assetSeed(),
-				buildTextureDef1(m, rnd),
-				buildTextureDef2(m, rnd),
-				buildTextureDef3(m, rnd),
-				buildTextureDef4(m, rnd)
+				buildBlockTextureSet(m, rnd),
+				buildItemTextureSet(m, rnd),
+				buildToolStoneTextureSet(m, rnd),
+				buildDecorTextureSet(m, rnd)
 		);
 	}
 

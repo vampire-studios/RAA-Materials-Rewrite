@@ -122,6 +122,75 @@ public final class MaterialAssetBuilders {
     private MaterialAssetBuilders() {
     }
 
+    /**
+     * Pre-validates that every material has the textures required by its forms.
+     * Collects all failures and logs them together before throwing, so the full
+     * picture is visible in a single log scan rather than one crash per missing texture.
+     */
+    public static void validateTextures(MaterialAssetContext ctx) {
+        var failures = new ArrayList<String>();
+        var materials = ctx.materials();
+
+        for (int idx = 0; idx < materials.size(); idx++) {
+            var def = materials.get(idx);
+            var id = def.nameInformation().id().toString();
+            var assets = textures(def);
+            var forms = def.forms();
+
+            // block textures
+            requireTex(failures, idx, id, forms, Form.ORE,           "oreVein",          assets.blockTextures().oreVein());
+            requireTex(failures, idx, id, forms, Form.RAW_BLOCK,     "rawBlock",         assets.blockTextures().rawBlock());
+            requireTex(failures, idx, id, forms, Form.TINTED_GLASS,  "tintedGlass",      assets.blockTextures().tintedGlass());
+            requireTex(failures, idx, id, forms, Form.SHINGLES,      "shingles",         assets.blockTextures().shingles());
+            requireTex(failures, idx, id, forms, Form.PLATE_BLOCK,   "plateBlock",       assets.blockTextures().plateBlock());
+            requireTex(failures, idx, id, forms, Form.CRYSTAL_BRICKS,"crystalBricks",    assets.itemTextures().crystalBricks());
+            requireTex(failures, idx, id, forms, Form.GLASS,         "crystalGlass",     assets.itemTextures().crystalGlass());
+            requireTex(failures, idx, id, forms, Form.COBBLED,       "cobblestone",      assets.toolStoneTextures().cobblestone());
+            requireTex(failures, idx, id, forms, Form.BRICKS,        "bricks",           assets.toolStoneTextures().bricks());
+            requireTex(failures, idx, id, forms, Form.POLISHED,      "polished",         assets.toolStoneTextures().polished());
+
+            // item textures
+            requireTex(failures, idx, id, forms, Form.INGOT,  "ingot",  assets.itemTextures().ingot());
+            requireTex(failures, idx, id, forms, Form.RAW,    "raw",    assets.itemTextures().raw());
+            requireTex(failures, idx, id, forms, Form.NUGGET, "nugget", assets.itemTextures().nugget());
+            requireTex(failures, idx, id, forms, Form.DUST,   "dust",   assets.itemTextures().dust());
+            requireTex(failures, idx, id, forms, Form.SHEET,  "plate",  assets.itemTextures().plate());
+            requireTex(failures, idx, id, forms, Form.SHARD,  "shard",  assets.itemTextures().shard());
+            requireTex(failures, idx, id, forms, Form.GEAR,   "gear",   assets.itemTextures().gear());
+            requireTex(failures, idx, id, forms, Form.GEM,    "gem",    assets.itemTextures().gem());
+
+            // tool textures (SPEAR reuses SWORD layers)
+            requireTex(failures, idx, id, forms, Form.PICKAXE, "toolPickaxeHead",  assets.itemTextures().toolPickaxeHead());
+            requireTex(failures, idx, id, forms, Form.PICKAXE, "toolPickaxeStick", assets.itemTextures().toolPickaxeStick());
+            requireTex(failures, idx, id, forms, Form.AXE,     "toolAxeHead",      assets.toolStoneTextures().toolAxeHead());
+            requireTex(failures, idx, id, forms, Form.AXE,     "toolAxeStick",     assets.toolStoneTextures().toolAxeStick());
+            requireTex(failures, idx, id, forms, Form.SHOVEL,  "toolShovelHead",   assets.toolStoneTextures().toolShovelHead());
+            requireTex(failures, idx, id, forms, Form.SHOVEL,  "toolShovelStick",  assets.toolStoneTextures().toolShovelStick());
+            requireTex(failures, idx, id, forms, Form.HOE,     "toolHoeHead",      assets.toolStoneTextures().toolHoeHead());
+            requireTex(failures, idx, id, forms, Form.HOE,     "toolHoeStick",     assets.toolStoneTextures().toolHoeStick());
+            boolean needsSwordTex = forms.contains(Form.SWORD) || forms.contains(Form.SPEAR);
+            if (needsSwordTex && assets.toolStoneTextures().toolSwordBlade().isEmpty())
+                failures.add("  " + id + " [" + idx + "] SWORD/SPEAR missing toolSwordBlade");
+            if (needsSwordTex && assets.toolStoneTextures().toolSwordHandle().isEmpty())
+                failures.add("  " + id + " [" + idx + "] SWORD/SPEAR missing toolSwordHandle");
+        }
+
+        if (!failures.isEmpty()) {
+            RAAMaterials.LOGGER.error("[RAA] {} missing texture(s) detected before asset build:", failures.size());
+            failures.forEach(msg -> RAAMaterials.LOGGER.error("[RAA]{}", msg));
+            throw new IllegalStateException(
+                "[RAA] Asset build aborted: " + failures.size() + " missing texture(s) — see log for details");
+        }
+    }
+
+    private static void requireTex(List<String> failures, int idx, String matId,
+                                   List<Form> forms, Form form, String texName,
+                                   Optional<Identifier> tex) {
+        if (forms.contains(form) && tex.isEmpty()) {
+            failures.add("  " + matId + " [" + idx + "] " + form + " missing " + texName);
+        }
+    }
+
     public static void addFallbackModels(MaterialAssetContext ctx) {
         var rp = ctx.pack();
 
@@ -136,7 +205,8 @@ public final class MaterialAssetBuilders {
 
     public static void buildOreFamilies(MaterialAssetContext ctx) {
         buildOreFamily(ctx, ORE_SHARED_ID, "block/material_ore/",
-                idx -> textures(ctx.materials().get(idx)).textures1().oreVein().orElseThrow());
+                idx -> textures(ctx.materials().get(idx)).blockTextures().oreVein()
+                        .orElseThrow(() -> new IllegalStateException("Missing oreVein texture for material at index " + idx)));
     }
 
     public static void buildBlockFamilies(MaterialAssetContext ctx) {
@@ -151,42 +221,48 @@ public final class MaterialAssetBuilders {
                 List.of(Form.RAW_BLOCK),
                 RAW_BLOCK_SHARED_ID,
                 "block/material_raw_block/",
-                idx -> textures(ctx.materials().get(idx)).textures1().rawBlock().orElseThrow()
+                idx -> textures(ctx.materials().get(idx)).blockTextures().rawBlock()
+                        .orElseThrow(() -> new IllegalStateException("Missing rawBlock texture for material at index " + idx))
         ));
 
         buildBlockFamily(ctx, new BlockFamilySpec(
                 List.of(Form.CRYSTAL_BRICKS),
                 RAAMaterials.id("material_crystal_bricks"),
                 "block/material_crystal_bricks/",
-                idx -> textures(ctx.materials().get(idx)).textures2().crystalBricks().orElseThrow()
+                idx -> textures(ctx.materials().get(idx)).itemTextures().crystalBricks()
+                        .orElseThrow(() -> new IllegalStateException("Missing crystalBricks texture for material at index " + idx))
         ));
 
         buildBlockFamily(ctx, new BlockFamilySpec(
                 List.of(Form.GLASS),
                 RAAMaterials.id("material_glass"),
                 "block/material_glass/",
-                idx -> textures(ctx.materials().get(idx)).textures2().crystalGlass().orElseThrow()
+                idx -> textures(ctx.materials().get(idx)).itemTextures().crystalGlass()
+                        .orElseThrow(() -> new IllegalStateException("Missing crystalGlass texture for material at index " + idx))
         ));
 
         buildBlockFamily(ctx, new BlockFamilySpec(
                 List.of(Form.TINTED_GLASS),
                 RAAMaterials.id("material_tinted_glass"),
                 "block/material_tinted_glass/",
-                idx -> textures(ctx.materials().get(idx)).textures1().tintedGlass().orElseThrow()
+                idx -> textures(ctx.materials().get(idx)).blockTextures().tintedGlass()
+                        .orElseThrow(() -> new IllegalStateException("Missing tintedGlass texture for material at index " + idx))
         ));
 
         buildBlockFamily(ctx, new BlockFamilySpec(
                 List.of(Form.SHINGLES),
                 SHINGLES_SHARED_ID,
                 "block/material_shingles/",
-                idx -> textures(ctx.materials().get(idx)).textures1().shingles().orElseThrow()
+                idx -> textures(ctx.materials().get(idx)).blockTextures().shingles()
+                        .orElseThrow(() -> new IllegalStateException("Missing shingles texture for material at index " + idx))
         ));
 
         buildBlockFamily(ctx, new BlockFamilySpec(
                 List.of(Form.PLATE_BLOCK),
                 PLATE_BLOCK_SHARED_ID,
                 "block/material_plate_block/",
-                idx -> textures(ctx.materials().get(idx)).textures1().plateBlock().orElseThrow()
+                idx -> textures(ctx.materials().get(idx)).blockTextures().plateBlock()
+                        .orElseThrow(() -> new IllegalStateException("Missing plateBlock texture for material at index " + idx))
         ));
 
         buildBuildingFamilies(ctx);
@@ -197,28 +273,31 @@ public final class MaterialAssetBuilders {
                 List.of(Form.COBBLED),
                 RAAMaterials.id("material_cobbled"),
                 "block/material_cobbled/",
-                idx -> textures(ctx.materials().get(idx)).textures3().cobblestone().orElseThrow()
+                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().cobblestone()
+                        .orElseThrow(() -> new IllegalStateException("Missing cobblestone texture for material at index " + idx))
         ));
 
         buildBlockFamily(ctx, new BlockFamilySpec(
                 List.of(Form.BRICKS),
                 RAAMaterials.id("material_bricks"),
                 "block/material_bricks/",
-                idx -> textures(ctx.materials().get(idx)).textures3().bricks().orElseThrow()
+                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().bricks()
+                        .orElseThrow(() -> new IllegalStateException("Missing bricks texture for material at index " + idx))
         ));
 
         buildBlockFamily(ctx, new BlockFamilySpec(
                 List.of(Form.POLISHED),
                 RAAMaterials.id("material_polished"),
                 "block/material_polished/",
-                idx -> textures(ctx.materials().get(idx)).textures3().polished().orElseThrow()
+                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().polished()
+                        .orElseThrow(() -> new IllegalStateException("Missing polished texture for material at index " + idx))
         ));
 
         buildBlockFamily(ctx, new BlockFamilySpec(
                 List.of(Form.SANDSTONE),
                 RAAMaterials.id("material_sandstone"),
                 "block/material_sandstone/",
-                idx -> textures(ctx.materials().get(idx)).textures1().sandstoneSide()
+                idx -> textures(ctx.materials().get(idx)).blockTextures().sandstoneSide()
                         .orElse(RAAMaterials.id("storage_blocks/sand_" + oneIndexed(idx, 3)))
         ));
 
@@ -226,7 +305,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.CUT),
                 RAAMaterials.id("material_cut"),
                 "block/material_cut/",
-                idx -> textures(ctx.materials().get(idx)).textures1().cutSandstoneSide()
+                idx -> textures(ctx.materials().get(idx)).blockTextures().cutSandstoneSide()
                         .orElse(RAAMaterials.id("storage_blocks/sand_" + oneIndexed(idx, 3)))
         ));
 
@@ -234,7 +313,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.SMOOTH),
                 RAAMaterials.id("material_smooth"),
                 "block/material_smooth/",
-                idx -> textures(ctx.materials().get(idx)).textures1().sandstoneTop()
+                idx -> textures(ctx.materials().get(idx)).blockTextures().sandstoneTop()
                         .orElse(RAAMaterials.id("storage_blocks/sand_" + oneIndexed(idx, 3)))
         ));
 
@@ -242,7 +321,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.CHISELED),
                 RAAMaterials.id("material_chiseled"),
                 "block/material_chiseled/",
-                idx -> textures(ctx.materials().get(idx)).textures3().chiseled()
+                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().chiseled()
                         .orElse(RAAMaterials.id("stone/stone_chiseled_" + oneIndexed(idx, 4)))
         ));
 
@@ -278,7 +357,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.MOSSY),
                 RAAMaterials.id("material_mossy"),
                 "block/material_mossy/",
-                idx -> textures(ctx.materials().get(idx)).textures3().bricks()
+                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().bricks()
                         .orElse(RAAMaterials.id("stone/stone_bricks_" + oneIndexed(idx, 24)))
         ));
 
@@ -286,7 +365,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.CRACKED),
                 RAAMaterials.id("material_cracked"),
                 "block/material_cracked/",
-                idx -> textures(ctx.materials().get(idx)).textures3().cobblestone()
+                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().cobblestone()
                         .orElse(RAAMaterials.id("stone/stone_cobbled_" + oneIndexed(idx, 7)))
         ));
 
@@ -304,7 +383,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.BASALT_LAMP),
                 RAAMaterials.id("material_basalt_lamp"),
                 "block/material_basalt_lamp/",
-                idx -> textures(ctx.materials().get(idx)).textures2().lampBasalt()
+                idx -> textures(ctx.materials().get(idx)).itemTextures().lampBasalt()
                         .orElse(RAAMaterials.id("crystal/basalt_lamp"))
         ));
 
@@ -312,7 +391,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.CALCITE_LAMP),
                 RAAMaterials.id("material_calcite_lamp"),
                 "block/material_calcite_lamp/",
-                idx -> textures(ctx.materials().get(idx)).textures2().lampCalcite()
+                idx -> textures(ctx.materials().get(idx)).itemTextures().lampCalcite()
                         .orElse(RAAMaterials.id("crystal/calcite_lamp"))
         ));
 
@@ -320,7 +399,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.LAMP),
                 RAAMaterials.id("material_lamp"),
                 "block/material_lamp/",
-                idx -> textures(ctx.materials().get(idx)).textures2().lampCalcite()
+                idx -> textures(ctx.materials().get(idx)).itemTextures().lampCalcite()
                         .orElse(pickBlockTexture(ctx.materials().get(idx), idx))
         ));
 
@@ -338,7 +417,7 @@ public final class MaterialAssetBuilders {
                 RAAMaterials.id("material_crystal_cluster"),
                 Form.CLUSTER,
                 "block/material_crystal_cluster/",
-                idx -> textures(ctx.materials().get(idx)).textures1().cluster()
+                idx -> textures(ctx.materials().get(idx)).blockTextures().cluster()
                         .orElse(RAAMaterials.id("crystal/crystal_" + oneIndexed(idx, 9)))
         );
 
@@ -347,7 +426,7 @@ public final class MaterialAssetBuilders {
                 RAAMaterials.id("material_crystal_bud_small"),
                 Form.BUD_SMALL,
                 "block/material_crystal_bud_small/",
-                idx -> textures(ctx.materials().get(idx)).textures1().budSmall()
+                idx -> textures(ctx.materials().get(idx)).blockTextures().budSmall()
                         .orElse(RAAMaterials.id("crystal/crystal_" + oneIndexed(idx, 9)))
         );
 
@@ -356,7 +435,7 @@ public final class MaterialAssetBuilders {
                 RAAMaterials.id("material_crystal_bud_medium"),
                 Form.BUD_MEDIUM,
                 "block/material_crystal_bud_medium/",
-                idx -> textures(ctx.materials().get(idx)).textures1().budMedium()
+                idx -> textures(ctx.materials().get(idx)).blockTextures().budMedium()
                         .orElse(RAAMaterials.id("crystal/crystal_" + oneIndexed(idx, 9)))
         );
 
@@ -365,7 +444,7 @@ public final class MaterialAssetBuilders {
                 RAAMaterials.id("material_crystal_bud_large"),
                 Form.BUD_LARGE,
                 "block/material_crystal_bud_large/",
-                idx -> textures(ctx.materials().get(idx)).textures1().budLarge()
+                idx -> textures(ctx.materials().get(idx)).blockTextures().budLarge()
                         .orElse(RAAMaterials.id("crystal/crystal_" + oneIndexed(idx, 9)))
         );
 
@@ -373,7 +452,7 @@ public final class MaterialAssetBuilders {
                 ctx,
                 RAAMaterials.id("material_crystal_pane"),
                 "block/material_crystal_pane/",
-                idx -> textures(ctx.materials().get(idx)).textures2().crystalGlass()
+                idx -> textures(ctx.materials().get(idx)).itemTextures().crystalGlass()
                         .orElse(RAAMaterials.id("crystal/crystal_glass"))
         );
 
@@ -396,81 +475,101 @@ public final class MaterialAssetBuilders {
                 List.of(Form.INGOT),
                 INGOT_SHARED_ID,
                 "item/material_ingot/",
-                idx -> textures(ctx.materials().get(idx)).textures2().ingot().orElseThrow()
+                idx -> textures(ctx.materials().get(idx)).itemTextures().ingot()
+                        .orElseThrow(() -> new IllegalStateException("Missing ingot texture for material at index " + idx))
         ));
 
         buildItemFamily(ctx, new ItemFamilySpec(
                 List.of(Form.RAW),
                 RAW_SHARED_ID,
                 "item/material_raw/",
-                idx -> textures(ctx.materials().get(idx)).textures2().raw().orElseThrow()
+                idx -> textures(ctx.materials().get(idx)).itemTextures().raw()
+                        .orElseThrow(() -> new IllegalStateException("Missing raw texture for material at index " + idx))
         ));
 
         buildItemFamily(ctx, new ItemFamilySpec(
                 List.of(Form.NUGGET),
                 NUGGET_SHARED_ID,
                 "item/material_nugget/",
-                idx -> textures(ctx.materials().get(idx)).textures2().nugget().orElseThrow()
+                idx -> textures(ctx.materials().get(idx)).itemTextures().nugget()
+                        .orElseThrow(() -> new IllegalStateException("Missing nugget texture for material at index " + idx))
         ));
 
         buildItemFamily(ctx, new ItemFamilySpec(
                 List.of(Form.DUST),
                 DUST_SHARED_ID,
                 "item/material_dust/",
-                idx -> textures(ctx.materials().get(idx)).textures2().dust().orElseThrow()
+                idx -> textures(ctx.materials().get(idx)).itemTextures().dust()
+                        .orElseThrow(() -> new IllegalStateException("Missing dust texture for material at index " + idx))
         ));
 
         buildItemFamily(ctx, new ItemFamilySpec(
                 List.of(Form.SHEET),
                 PLATE_SHARED_ID,
                 "item/material_plate/",
-                idx -> textures(ctx.materials().get(idx)).textures2().plate().orElseThrow()
+                idx -> textures(ctx.materials().get(idx)).itemTextures().plate()
+                        .orElseThrow(() -> new IllegalStateException("Missing plate texture for material at index " + idx))
         ));
 
         buildItemFamily(ctx, new ItemFamilySpec(
                 List.of(Form.SHARD),
                 SHARD_SHARED_ID,
                 "item/material_shard/",
-                idx -> textures(ctx.materials().get(idx)).textures2().shard().orElseThrow()
+                idx -> textures(ctx.materials().get(idx)).itemTextures().shard()
+                        .orElseThrow(() -> new IllegalStateException("Missing shard texture for material at index " + idx))
         ));
 
         buildItemFamily(ctx, new ItemFamilySpec(
                 List.of(Form.GEAR),
                 GEAR_SHARED_ID,
                 "item/material_gear/",
-                idx -> textures(ctx.materials().get(idx)).textures2().gear().orElseThrow()
+                idx -> textures(ctx.materials().get(idx)).itemTextures().gear()
+                        .orElseThrow(() -> new IllegalStateException("Missing gear texture for material at index " + idx))
         ));
 
         buildItemFamily(ctx, new ItemFamilySpec(
                 List.of(Form.GEM),
                 GEM_SHARED_ID,
                 "item/material_gem/",
-                idx -> textures(ctx.materials().get(idx)).textures2().gem().orElseThrow()
+                idx -> textures(ctx.materials().get(idx)).itemTextures().gem()
+                        .orElseThrow(() -> new IllegalStateException("Missing gem texture for material at index " + idx))
         ));
 
         buildLayeredItemFamily(ctx, Form.SHOVEL, SHOVEL_SHARED_ID, "item/material_shovel/",
-                idx -> textures(ctx.materials().get(idx)).textures3().toolShovelHead().orElseThrow(),
-                idx -> textures(ctx.materials().get(idx)).textures3().toolShovelStick().orElseThrow());
+                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().toolShovelHead()
+                        .orElseThrow(() -> new IllegalStateException("Missing toolShovelHead texture for material at index " + idx)),
+                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().toolShovelStick()
+                        .orElseThrow(() -> new IllegalStateException("Missing toolShovelStick texture for material at index " + idx)));
 
         buildLayeredItemFamily(ctx, Form.HOE, HOE_SHARED_ID, "item/material_hoe/",
-                idx -> textures(ctx.materials().get(idx)).textures3().toolHoeHead().orElseThrow(),
-                idx -> textures(ctx.materials().get(idx)).textures3().toolHoeStick().orElseThrow());
+                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().toolHoeHead()
+                        .orElseThrow(() -> new IllegalStateException("Missing toolHoeHead texture for material at index " + idx)),
+                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().toolHoeStick()
+                        .orElseThrow(() -> new IllegalStateException("Missing toolHoeStick texture for material at index " + idx)));
 
         buildLayeredItemFamily(ctx, Form.SWORD, SWORD_SHARED_ID, "item/material_sword/",
-                idx -> textures(ctx.materials().get(idx)).textures3().toolSwordBlade().orElseThrow(),
-                idx -> textures(ctx.materials().get(idx)).textures3().toolSwordHandle().orElseThrow());
+                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().toolSwordBlade()
+                        .orElseThrow(() -> new IllegalStateException("Missing toolSwordBlade texture for material at index " + idx)),
+                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().toolSwordHandle()
+                        .orElseThrow(() -> new IllegalStateException("Missing toolSwordHandle texture for material at index " + idx)));
 
         buildLayeredItemFamily(ctx, Form.PICKAXE, PICKAXE_SHARED_ID, "item/material_pickaxe/",
-                idx -> textures(ctx.materials().get(idx)).textures2().toolPickaxeHead().orElseThrow(),
-                idx -> textures(ctx.materials().get(idx)).textures2().toolPickaxeStick().orElseThrow());
+                idx -> textures(ctx.materials().get(idx)).itemTextures().toolPickaxeHead()
+                        .orElseThrow(() -> new IllegalStateException("Missing toolPickaxeHead texture for material at index " + idx)),
+                idx -> textures(ctx.materials().get(idx)).itemTextures().toolPickaxeStick()
+                        .orElseThrow(() -> new IllegalStateException("Missing toolPickaxeStick texture for material at index " + idx)));
 
         buildLayeredItemFamily(ctx, Form.AXE, AXE_SHARED_ID, "item/material_axe/",
-                idx -> textures(ctx.materials().get(idx)).textures3().toolAxeHead().orElseThrow(),
-                idx -> textures(ctx.materials().get(idx)).textures3().toolAxeStick().orElseThrow());
+                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().toolAxeHead()
+                        .orElseThrow(() -> new IllegalStateException("Missing toolAxeHead texture for material at index " + idx)),
+                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().toolAxeStick()
+                        .orElseThrow(() -> new IllegalStateException("Missing toolAxeStick texture for material at index " + idx)));
 
         buildSpearItemFamily(ctx, SPEAR_SHARED_ID, "item/material_spear/",
-                idx -> textures(ctx.materials().get(idx)).textures3().toolSwordBlade().orElseThrow(),
-                idx -> textures(ctx.materials().get(idx)).textures3().toolSwordHandle().orElseThrow());
+                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().toolSwordBlade()
+                        .orElseThrow(() -> new IllegalStateException("Missing toolSwordBlade (spear) texture for material at index " + idx)),
+                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().toolSwordHandle()
+                        .orElseThrow(() -> new IllegalStateException("Missing toolSwordHandle (spear) texture for material at index " + idx)));
     }
 
     private static void buildBlockFamily(MaterialAssetContext ctx, BlockFamilySpec spec) {
@@ -701,7 +800,7 @@ public final class MaterialAssetBuilders {
             addSlabModels(ctx.pack(), bottom, top, tex);
             BlockstateTemplates.addSlab(variant, Map.of("mat", idx), JState.model(bottom), JState.model(top), JState.model(full));
 
-            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(bottom.toString())));
+            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(bottom, def)));
             cases++;
         }
 
@@ -736,7 +835,7 @@ public final class MaterialAssetBuilders {
             addStairModels(ctx.pack(), normal, inner, outer, tex);
             BlockstateTemplates.addStairs(variant, Map.of("mat", idx), JState.model(normal), JState.model(inner), JState.model(outer));
 
-            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(normal.toString())));
+            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(normal, def)));
             cases++;
         }
 
@@ -771,7 +870,7 @@ public final class MaterialAssetBuilders {
             addWallModels(ctx.pack(), post, side, sideTall, tex);
             addWallParts(state, Map.of("mat", idx), post, side, sideTall);
 
-            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), JModelBasic.model(side.toString())));
+            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(side, def)));
             cases++;
         }
 
@@ -937,8 +1036,8 @@ public final class MaterialAssetBuilders {
 
         ctx.forEachMaterialWith(Form.DOOR, (idx, def) -> {
             var bottomTexture = pickDecorTexture(Form.DOOR, def, idx);
-            var topTexture = textures(def).textures4().doorTop().orElseGet(() -> pairedDoorTopTexture(bottomTexture));
-            var itemTexture = textures(def).textures4().doorItem().orElse(bottomTexture);
+            var topTexture = textures(def).decorTextures().doorTop().orElseGet(() -> pairedDoorTopTexture(bottomTexture));
+            var itemTexture = textures(def).decorTextures().doorItem().orElse(bottomTexture);
             var path = def.nameInformation().id().getPath();
             var itemModel = RAAMaterials.id(modelPrefix + path + "_item");
             var bottomLeft = RAAMaterials.id(modelPrefix + path + "_bottom_left");
@@ -1203,13 +1302,13 @@ public final class MaterialAssetBuilders {
     private static void addSlabModels(RuntimeResourcePack rp, Identifier bottom, Identifier top, Identifier texture) {
         var tex = blockTexture(texture);
 
-        rp.addModel(JModel.model("minecraft:block/slab")
+        rp.addModel(JModel.model("raa_materials:block/raa_slab")
                 .textures(JModel.textures()
                         .var("bottom", tex)
                         .var("top", tex)
                         .var("side", tex)), bottom);
 
-        rp.addModel(JModel.model("minecraft:block/slab_top")
+        rp.addModel(JModel.model("raa_materials:block/raa_slab_top")
                 .textures(JModel.textures()
                         .var("bottom", tex)
                         .var("top", tex)
@@ -1223,21 +1322,21 @@ public final class MaterialAssetBuilders {
                 .var("top", tex)
                 .var("side", tex);
 
-        rp.addModel(JModel.model("minecraft:block/stairs").textures(textures), normal);
-        rp.addModel(JModel.model("minecraft:block/inner_stairs").textures(textures), inner);
-        rp.addModel(JModel.model("minecraft:block/outer_stairs").textures(textures), outer);
+        rp.addModel(JModel.model("raa_materials:block/raa_stairs").textures(textures), normal);
+        rp.addModel(JModel.model("raa_materials:block/raa_inner_stairs").textures(textures), inner);
+        rp.addModel(JModel.model("raa_materials:block/raa_outer_stairs").textures(textures), outer);
     }
 
     private static void addWallModels(RuntimeResourcePack rp, Identifier post, Identifier side, Identifier sideTall, Identifier texture) {
         var tex = blockTexture(texture);
 
-        rp.addModel(JModel.model("minecraft:block/template_wall_post")
+        rp.addModel(JModel.model("raa_materials:block/raa_wall_post")
                 .textures(JModel.textures().var("wall", tex)), post);
 
-        rp.addModel(JModel.model("minecraft:block/template_wall_side")
+        rp.addModel(JModel.model("raa_materials:block/raa_wall_side")
                 .textures(JModel.textures().var("wall", tex)), side);
 
-        rp.addModel(JModel.model("minecraft:block/template_wall_side_tall")
+        rp.addModel(JModel.model("raa_materials:block/raa_wall_side_tall")
                 .textures(JModel.textures().var("wall", tex)), sideTall);
     }
 
@@ -1248,21 +1347,21 @@ public final class MaterialAssetBuilders {
                 .var("bottom", blockTexture(bottomTexture))
                 .var("top", blockTexture(topTexture));
 
-        rp.addModel(JModel.model("minecraft:block/door_bottom_left").textures(textures), bottomLeft);
-        rp.addModel(JModel.model("minecraft:block/door_bottom_left_open").textures(textures), bottomLeftOpen);
-        rp.addModel(JModel.model("minecraft:block/door_bottom_right").textures(textures), bottomRight);
-        rp.addModel(JModel.model("minecraft:block/door_bottom_right_open").textures(textures), bottomRightOpen);
-        rp.addModel(JModel.model("minecraft:block/door_top_left").textures(textures), topLeft);
-        rp.addModel(JModel.model("minecraft:block/door_top_left_open").textures(textures), topLeftOpen);
-        rp.addModel(JModel.model("minecraft:block/door_top_right").textures(textures), topRight);
-        rp.addModel(JModel.model("minecraft:block/door_top_right_open").textures(textures), topRightOpen);
+        rp.addModel(JModel.model("raa_materials:block/raa_door_bottom_left").textures(textures), bottomLeft);
+        rp.addModel(JModel.model("raa_materials:block/raa_door_bottom_left_open").textures(textures), bottomLeftOpen);
+        rp.addModel(JModel.model("raa_materials:block/raa_door_bottom_right").textures(textures), bottomRight);
+        rp.addModel(JModel.model("raa_materials:block/raa_door_bottom_right_open").textures(textures), bottomRightOpen);
+        rp.addModel(JModel.model("raa_materials:block/raa_door_top_left").textures(textures), topLeft);
+        rp.addModel(JModel.model("raa_materials:block/raa_door_top_left_open").textures(textures), topLeftOpen);
+        rp.addModel(JModel.model("raa_materials:block/raa_door_top_right").textures(textures), topRight);
+        rp.addModel(JModel.model("raa_materials:block/raa_door_top_right_open").textures(textures), topRightOpen);
     }
 
     private static void addTrapdoorModels(RuntimeResourcePack rp, Identifier bottom, Identifier top, Identifier open, Identifier texture) {
         var textures = JModel.textures().var("texture", blockTexture(texture));
-        rp.addModel(JModel.model("minecraft:block/template_trapdoor_bottom").textures(textures), bottom);
-        rp.addModel(JModel.model("minecraft:block/template_trapdoor_top").textures(textures), top);
-        rp.addModel(JModel.model("minecraft:block/template_trapdoor_open").textures(textures), open);
+        rp.addModel(JModel.model("raa_materials:block/raa_trapdoor_bottom").textures(textures), bottom);
+        rp.addModel(JModel.model("raa_materials:block/raa_trapdoor_top").textures(textures), top);
+        rp.addModel(JModel.model("raa_materials:block/raa_trapdoor_open").textures(textures), open);
     }
 
     private static void addFenceModels(RuntimeResourcePack rp, Identifier post, Identifier side, Identifier inventory, Identifier texture) {
@@ -1305,16 +1404,20 @@ public final class MaterialAssetBuilders {
         state.add(JState.multipart(JState.model(side).uvlock().y(270)).when(BlockstateTemplates.plus(base, "west", "true")));
     }
 
+    /** Standard Minecraft facing → Y rotation: south=0°, west=90°, north=180°, east=270°. */
+    private static int facingToY(String facing) {
+        return switch (facing) {
+            case "west" -> 90;
+            case "north" -> 180;
+            case "east" -> 270;
+            default -> 0; // south
+        };
+    }
+
     private static void addFenceGateVariants(net.vampirestudios.arrp.json.blockstate.JVariant variant, int mat,
                                              Identifier gate, Identifier gateOpen, Identifier gateWall, Identifier gateWallOpen) {
         for (String facing : List.of("south", "west", "north", "east")) {
-            int y = switch (facing) {
-                case "west" -> 90;
-                case "north" -> 180;
-                case "east" -> 270;
-                default -> 0;
-            };
-
+            int y = facingToY(facing);
             putFenceGate(variant, mat, facing, false, false, JState.model(gate).uvlock().y(y));
             putFenceGate(variant, mat, facing, false, true, JState.model(gateOpen).uvlock().y(y));
             putFenceGate(variant, mat, facing, true, false, JState.model(gateWall).uvlock().y(y));
@@ -1328,13 +1431,7 @@ public final class MaterialAssetBuilders {
 
     private static void addTrapdoorVariants(net.vampirestudios.arrp.json.blockstate.JVariant variant, int mat, Identifier bottom, Identifier top, Identifier openModel) {
         for (String facing : List.of("north", "east", "south", "west")) {
-            int y = switch (facing) {
-                case "east" -> 90;
-                case "south" -> 180;
-                case "west" -> 270;
-                default -> 0;
-            };
-
+            int y = facingToY(facing);
             variant.put(Map.of("mat", mat, "facing", facing, "half", "bottom", "open", "false"), JState.model(bottom));
             variant.put(Map.of("mat", mat, "facing", facing, "half", "top", "open", "false"), JState.model(top));
             variant.put(Map.of("mat", mat, "facing", facing, "half", "bottom", "open", "true"), JState.model(openModel).y(y));
@@ -1388,7 +1485,7 @@ public final class MaterialAssetBuilders {
     }
 
     private static Identifier pickDecorTexture(Form form, MaterialDef def, int idx) {
-        var decor = textures(def).textures4();
+        var decor = textures(def).decorTextures();
         Optional<Identifier> texture = switch (form) {
             case CHAIN -> decor.chain();
             case LANTERN -> decor.lantern();

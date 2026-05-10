@@ -3,18 +3,27 @@ package net.vampirestudios.raaMaterials.material;
 
 import net.minecraft.world.item.ItemStack;
 
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public final class Forms {
 	// -------- canonical token <-> form maps --------
 	private static final Map<String, Form> TOKEN_TO_FORM = new HashMap<>();
 	private static final Map<Form, String> FORM_TO_TOKEN = new EnumMap<>(Form.class);
-	// Hot-path cache for arbitrary description ids
-	private static final Map<String, Form> DESCID_CACHE = new ConcurrentHashMap<>();
+	// Hot-path cache for arbitrary description ids — bounded LRU to prevent unbounded growth
+	private static final int MAX_CACHE_SIZE = 4096;
+	private static final Map<String, Form> DESCID_CACHE = Collections.synchronizedMap(
+		new LinkedHashMap<>(256, 0.75f, true) {
+			@Override
+			protected boolean removeEldestEntry(Map.Entry<String, Form> eldest) {
+				return size() > MAX_CACHE_SIZE;
+			}
+		}
+	);
 
 	static {
 		// ---- Core blocks
@@ -283,7 +292,11 @@ public final class Forms {
 
 	/** From description id with caching. */
 	public static Form fromDescriptionId(String descriptionId) {
-		return DESCID_CACHE.computeIfAbsent(descriptionId, id -> fromToken(tokenFromDescId(id)));
+		Form cached = DESCID_CACHE.get(descriptionId);
+		if (cached != null) return cached;
+		Form result = fromToken(tokenFromDescId(descriptionId));
+		DESCID_CACHE.put(descriptionId, result);
+		return result;
 	}
 
 	/** From stack: prefer a form component if present, else description id. */

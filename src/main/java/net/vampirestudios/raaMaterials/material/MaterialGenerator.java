@@ -7,8 +7,10 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.util.StringRepresentable;
+import net.vampirestudios.raaMaterials.GeoNameGen;
 import net.vampirestudios.raaMaterials.RAAConfig;
 import net.vampirestudios.raaMaterials.material.MaterialDef.OreHost;
+import net.vampirestudios.raaMaterials.palette.OKLCh;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -70,7 +72,7 @@ public final class MaterialGenerator {
 
 			Optional<ToolMaterialSpec> toolSpec = toolSpecFor(kind, tier, rng);
 
-			FormDependencies.validate(name, forms);
+			forms = FormDependencies.resolve(name, forms);
 			RAAConfig.BlockStats blockStats = cfg.blockStats();
 			float resistance = blastFor(kind, tier) * multiplier(blockStats.blastMul(), kind);
 			float efficiency = effFor(kind, tier) * multiplier(blockStats.effMul(), kind);
@@ -108,7 +110,8 @@ public final class MaterialGenerator {
 				spec.attackDamageBonus(),
 				spec.enchantmentValue(),
 				spec.incorrectBlocksForDropsTag(),
-				spec.repairItemsTag()
+				spec.repairItemsTag(),
+				spec.spearSpec()
 		);
 	}
 
@@ -352,92 +355,100 @@ public final class MaterialGenerator {
 	}
 
 	private static int randomColorFor(MaterialKind kind, Random rng) {
+		RAAConfig.ColorRanges cr = RAAConfig.active().colorRanges()
+				.getOrDefault(kind, new RAAConfig.ColorRanges(0.45f, 0.80f, 0.12f, 0.30f));
 		return switch (kind) {
-			case METAL, ALLOY -> randomMetalColor(rng);
-			case GEM -> randomGemColor(rng);
-			case CRYSTAL -> randomCrystalColor(rng);
-			case SAND -> randomWarmEarthColor(rng);
-			case GRAVEL, STONE -> randomStoneColor(rng);
-			case CLAY, MUD, SOIL -> randomEarthColor(rng);
-			case SALT -> randomSaltColor(rng);
-			case VOLCANIC -> randomVolcanicColor(rng);
-			case WOOD -> randomWoodColor(rng);
-			default -> randomColor(rng);
+			case METAL, ALLOY -> randomMetalColor(rng, cr);
+			case GEM           -> randomGemColor(rng, cr);
+			case CRYSTAL       -> randomCrystalColor(rng, cr);
+			case SAND          -> randomSandColor(rng, cr);
+			case GRAVEL        -> randomGravelColor(rng, cr);
+			case STONE         -> randomStoneColor(rng, cr);
+			case CLAY, MUD, SOIL -> randomEarthColor(rng, cr);
+			case SALT          -> randomSaltColor(rng, cr);
+			case VOLCANIC      -> randomVolcanicColor(rng, cr);
+			case WOOD          -> randomWoodColor(rng, cr);
+			default            -> randomColor(rng, cr);
 		};
 	}
 
-	private static int randomMetalColor(Random rng) {
-		float hue = pickFloat(rng, 0.04f, 0.09f, 0.11f, 0.58f, 0.67f);
-		float saturation = 0.25f + rng.nextFloat() * 0.55f;
-		float brightness = 0.45f + rng.nextFloat() * 0.40f;
-		return hsb(hue, saturation, brightness);
+	// OKLCh hue landmarks (radians): red≈0.09, orange≈0.75, yellow≈1.4,
+	// green≈2.3, teal≈2.7, cyan≈3.1, blue≈4.1, violet≈4.9, magenta≈5.5
+
+	private static int randomMetalColor(Random rng, RAAConfig.ColorRanges cr) {
+		// Biased toward real-world metal hues; exotic tones occasionally
+		float h = pickFloat(rng, 0.10f, 0.75f, 0.95f, 1.35f, 4.10f, 4.80f, 0.10f, 1.35f);
+		return oklch(lerp(cr.lMin(), cr.lMax(), rng.nextFloat()),
+		             lerp(cr.cMin(), cr.cMax(), rng.nextFloat()), h);
 	}
 
-	private static int randomGemColor(Random rng) {
-		float hue = rng.nextFloat();
-		float saturation = 0.65f + rng.nextFloat() * 0.35f;
-		float brightness = 0.55f + rng.nextFloat() * 0.40f;
-		return hsb(hue, saturation, brightness);
+	private static int randomGemColor(Random rng, RAAConfig.ColorRanges cr) {
+		return oklch(lerp(cr.lMin(), cr.lMax(), rng.nextFloat()),
+		             lerp(cr.cMin(), cr.cMax(), rng.nextFloat()),
+		             rng.nextFloat() * 6.28f);
 	}
 
-	private static int randomCrystalColor(Random rng) {
-		float hue = rng.nextFloat();
-		float saturation = 0.25f + rng.nextFloat() * 0.55f;
-		float brightness = 0.70f + rng.nextFloat() * 0.25f;
-		return hsb(hue, saturation, brightness);
+	private static int randomCrystalColor(Random rng, RAAConfig.ColorRanges cr) {
+		return oklch(lerp(cr.lMin(), cr.lMax(), rng.nextFloat()),
+		             lerp(cr.cMin(), cr.cMax(), rng.nextFloat()),
+		             rng.nextFloat() * 6.28f);
 	}
 
-	private static int randomStoneColor(Random rng) {
-		float hue = 0.05f + rng.nextFloat() * 0.15f;
-		float saturation = 0.08f + rng.nextFloat() * 0.25f;
-		float brightness = 0.35f + rng.nextFloat() * 0.45f;
-		return hsb(hue, saturation, brightness);
+	private static int randomStoneColor(Random rng, RAAConfig.ColorRanges cr) {
+		float h = 0.60f + rng.nextFloat() * 0.80f; // warm neutrals
+		return oklch(lerp(cr.lMin(), cr.lMax(), rng.nextFloat()),
+		             lerp(cr.cMin(), cr.cMax(), rng.nextFloat()), h);
 	}
 
-	private static int randomEarthColor(Random rng) {
-		float hue = 0.04f + rng.nextFloat() * 0.13f;
-		float saturation = 0.30f + rng.nextFloat() * 0.45f;
-		float brightness = 0.30f + rng.nextFloat() * 0.40f;
-		return hsb(hue, saturation, brightness);
+	private static int randomEarthColor(Random rng, RAAConfig.ColorRanges cr) {
+		float h = 0.50f + rng.nextFloat() * 0.70f; // orange-brown
+		return oklch(lerp(cr.lMin(), cr.lMax(), rng.nextFloat()),
+		             lerp(cr.cMin(), cr.cMax(), rng.nextFloat()), h);
 	}
 
-	private static int randomWarmEarthColor(Random rng) {
-		float hue = 0.08f + rng.nextFloat() * 0.08f;
-		float saturation = 0.35f + rng.nextFloat() * 0.40f;
-		float brightness = 0.55f + rng.nextFloat() * 0.35f;
-		return hsb(hue, saturation, brightness);
+	private static int randomSandColor(Random rng, RAAConfig.ColorRanges cr) {
+		float h = 0.65f + rng.nextFloat() * 0.65f; // orange to yellow
+		return oklch(lerp(cr.lMin(), cr.lMax(), rng.nextFloat()),
+		             lerp(cr.cMin(), cr.cMax(), rng.nextFloat()), h);
 	}
 
-	private static int randomSaltColor(Random rng) {
-		float hue = pickFloat(rng, 0.0f, 0.08f, 0.55f, 0.75f);
-		float saturation = 0.08f + rng.nextFloat() * 0.35f;
-		float brightness = 0.70f + rng.nextFloat() * 0.25f;
-		return hsb(hue, saturation, brightness);
+	private static int randomGravelColor(Random rng, RAAConfig.ColorRanges cr) {
+		return oklch(lerp(cr.lMin(), cr.lMax(), rng.nextFloat()),
+		             lerp(cr.cMin(), cr.cMax(), rng.nextFloat()),
+		             rng.nextFloat() * 6.28f);
 	}
 
-	private static int randomVolcanicColor(Random rng) {
-		float hue = pickFloat(rng, 0.0f, 0.04f, 0.08f, 0.72f);
-		float saturation = 0.25f + rng.nextFloat() * 0.65f;
-		float brightness = 0.20f + rng.nextFloat() * 0.45f;
-		return hsb(hue, saturation, brightness);
+	private static int randomSaltColor(Random rng, RAAConfig.ColorRanges cr) {
+		return oklch(lerp(cr.lMin(), cr.lMax(), rng.nextFloat()),
+		             lerp(cr.cMin(), cr.cMax(), rng.nextFloat()),
+		             rng.nextFloat() * 6.28f);
 	}
 
-	private static int randomWoodColor(Random rng) {
-		float hue = 0.06f + rng.nextFloat() * 0.08f;
-		float saturation = 0.35f + rng.nextFloat() * 0.45f;
-		float brightness = 0.35f + rng.nextFloat() * 0.35f;
-		return hsb(hue, saturation, brightness);
+	private static int randomVolcanicColor(Random rng, RAAConfig.ColorRanges cr) {
+		float h = pickFloat(rng, 0.09f, 0.20f, 0.75f, 0.09f, 0.09f); // biased toward reds
+		return oklch(lerp(cr.lMin(), cr.lMax(), rng.nextFloat()),
+		             lerp(cr.cMin(), cr.cMax(), rng.nextFloat()), h);
 	}
 
-	private static int randomColor(Random rng) {
-		float hue = rng.nextFloat();
-		float saturation = 0.45f + rng.nextFloat() * 0.55f;
-		float brightness = 0.50f + rng.nextFloat() * 0.40f;
-		return hsb(hue, saturation, brightness);
+	private static int randomWoodColor(Random rng, RAAConfig.ColorRanges cr) {
+		float h = 0.70f + rng.nextFloat() * 0.40f; // orange-brown
+		return oklch(lerp(cr.lMin(), cr.lMax(), rng.nextFloat()),
+		             lerp(cr.cMin(), cr.cMax(), rng.nextFloat()), h);
 	}
 
-	private static int hsb(float hue, float saturation, float brightness) {
-		return java.awt.Color.HSBtoRGB(hue, saturation, brightness) & 0xFFFFFF;
+	private static int randomColor(Random rng, RAAConfig.ColorRanges cr) {
+		return oklch(lerp(cr.lMin(), cr.lMax(), rng.nextFloat()),
+		             lerp(cr.cMin(), cr.cMax(), rng.nextFloat()),
+		             rng.nextFloat() * 6.28f);
+	}
+
+	private static float lerp(float a, float b, float t) { return a + (b - a) * t; }
+
+	/** Convert OKLCh to sRGB int. h is in radians. */
+	private static int oklch(float L, float C, float h) {
+		float A = (float) (Math.cos(h) * C);
+		float B = (float) (Math.sin(h) * C);
+		return OKLCh.oklabToSRGB(L, A, B) & 0xFFFFFF;
 	}
 
 	private static float pickFloat(Random rng, float... values) {
@@ -445,27 +456,7 @@ public final class MaterialGenerator {
 	}
 
 	private static HarvestTier pickTierFor(MaterialKind kind, Random rng) {
-		return switch (kind) {
-			case METAL, ALLOY -> pickTier(rng);
-			case GEM -> pickGemTier(rng);
-			default -> HarvestTier.IRON;
-		};
-	}
-
-	private static HarvestTier pickTier(Random rng) {
-		int roll = rng.nextInt(100);
-		if (roll < 40) return HarvestTier.STONE;
-		if (roll < 80) return HarvestTier.IRON;
-		if (roll < 95) return HarvestTier.DIAMOND;
-		return HarvestTier.NETHERITE;
-	}
-
-	private static HarvestTier pickGemTier(Random rng) {
-		int roll = rng.nextInt(100);
-		if (roll < 15) return HarvestTier.STONE;
-		if (roll < 65) return HarvestTier.IRON;
-		if (roll < 95) return HarvestTier.DIAMOND;
-		return HarvestTier.NETHERITE;
+		return PROFILES.get(kind).pickTier(rng);
 	}
 
 	private static MaterialKind pickKind(Random rng) {
@@ -585,50 +576,68 @@ public final class MaterialGenerator {
 	}
 
 	private static float hardnessFor(MaterialKind kind, HarvestTier tier) {
-		return switch (kind) {
-			case METAL, ALLOY -> switch (tier) {
-				case STONE -> 3.0f;
-				case IRON -> 4.0f;
-				case DIAMOND -> 5.0f;
-				case NETHERITE -> 6.0f;
-			};
-
-			case GEM -> 5.5f;
-			case CRYSTAL -> 4.0f;
-			case STONE -> 3.0f;
-			case SAND, MUD -> 0.5f;
-			case GRAVEL -> 0.8f;
-			case CLAY, SOIL -> 0.6f;
-			case SALT -> 1.5f;
-			case VOLCANIC -> 2.5f;
-			case WOOD -> 2.0f;
-			case OTHER -> 3.0f;
-		};
+		return PROFILES.get(kind).hardness(tier);
 	}
 
 	private static float blastFor(MaterialKind kind, HarvestTier tier) {
-		return switch (kind) {
-			case METAL, ALLOY -> 6.0f + tier.ordinal() * 2.0f;
-			case GEM -> 8.0f;
-			case CRYSTAL -> 5.0f;
-			case STONE -> 6.0f;
-			case SAND, MUD -> 0.2f;
-			case GRAVEL -> 0.4f;
-			case CLAY -> 0.5f;
-			case SOIL -> 0.3f;
-			case SALT -> 1.0f;
-			case VOLCANIC -> 4.0f;
-			case WOOD -> 3.0f;
-			case OTHER -> 3.0f;
-		};
+		return PROFILES.get(kind).blast(tier);
 	}
 
 	private static float effFor(MaterialKind kind, HarvestTier tier) {
-		return switch (kind) {
-			case METAL, ALLOY -> 1.0f + tier.ordinal() * 0.25f;
-			case GEM -> 1.15f;
-			default -> 1.0f;
-		};
+		return PROFILES.get(kind).eff(tier);
+	}
+
+	// ---- Per-kind profile table ----
+
+	private record MaterialKindProfile(
+			float hardnessBase, float hardnessTierStep,
+			float blastBase,    float blastTierStep,
+			float effBase,      float effTierStep,
+			int[] tierWeights   // {stone, iron, diamond, netherite}
+	) {
+		float hardness(HarvestTier tier) { return hardnessBase + hardnessTierStep * tier.ordinal(); }
+		float blast(HarvestTier tier)    { return blastBase    + blastTierStep    * tier.ordinal(); }
+		float eff(HarvestTier tier)      { return effBase      + effTierStep      * tier.ordinal(); }
+
+		HarvestTier pickTier(Random rng) {
+			int total = 0;
+			for (int w : tierWeights) total += w;
+			if (total == 0) return HarvestTier.IRON;
+			int roll = rng.nextInt(total);
+			int acc = 0;
+			HarvestTier[] tiers = HarvestTier.values();
+			for (int i = 0; i < tierWeights.length && i < tiers.length; i++) {
+				acc += tierWeights[i];
+				if (roll < acc) return tiers[i];
+			}
+			return HarvestTier.IRON;
+		}
+	}
+
+	// Tier weight shorthand: {stone, iron, diamond, netherite}
+	private static final int[] TIER_METAL  = {40, 40, 15,  5};
+	private static final int[] TIER_GEM    = {15, 50, 30,  5};
+	private static final int[] TIER_IRON   = { 0,100,  0,  0};
+
+	private static final Map<MaterialKind, MaterialKindProfile> PROFILES;
+	static {
+		var p = new EnumMap<MaterialKind, MaterialKindProfile>(MaterialKind.class);
+		//                       hardBase  hardStep  blastBase  blastStep  effBase  effStep  tierWeights
+		p.put(MaterialKind.METAL,    new MaterialKindProfile(3.0f, 1.0f,  6.0f, 2.0f,  1.00f, 0.25f, TIER_METAL));
+		p.put(MaterialKind.ALLOY,    new MaterialKindProfile(3.0f, 1.0f,  6.0f, 2.0f,  1.00f, 0.25f, TIER_METAL));
+		p.put(MaterialKind.GEM,      new MaterialKindProfile(5.5f, 0.0f,  8.0f, 0.0f,  1.15f, 0.00f, TIER_GEM));
+		p.put(MaterialKind.CRYSTAL,  new MaterialKindProfile(4.0f, 0.0f,  5.0f, 0.0f,  1.00f, 0.00f, TIER_IRON));
+		p.put(MaterialKind.STONE,    new MaterialKindProfile(3.0f, 0.0f,  6.0f, 0.0f,  1.00f, 0.00f, TIER_IRON));
+		p.put(MaterialKind.SAND,     new MaterialKindProfile(0.5f, 0.0f,  0.2f, 0.0f,  1.00f, 0.00f, TIER_IRON));
+		p.put(MaterialKind.GRAVEL,   new MaterialKindProfile(0.8f, 0.0f,  0.4f, 0.0f,  1.00f, 0.00f, TIER_IRON));
+		p.put(MaterialKind.CLAY,     new MaterialKindProfile(0.6f, 0.0f,  0.5f, 0.0f,  1.00f, 0.00f, TIER_IRON));
+		p.put(MaterialKind.MUD,      new MaterialKindProfile(0.5f, 0.0f,  0.2f, 0.0f,  1.00f, 0.00f, TIER_IRON));
+		p.put(MaterialKind.SOIL,     new MaterialKindProfile(0.6f, 0.0f,  0.3f, 0.0f,  1.00f, 0.00f, TIER_IRON));
+		p.put(MaterialKind.SALT,     new MaterialKindProfile(1.5f, 0.0f,  1.0f, 0.0f,  1.00f, 0.00f, TIER_IRON));
+		p.put(MaterialKind.VOLCANIC, new MaterialKindProfile(2.5f, 0.0f,  4.0f, 0.0f,  1.00f, 0.00f, TIER_IRON));
+		p.put(MaterialKind.WOOD,     new MaterialKindProfile(2.0f, 0.0f,  3.0f, 0.0f,  1.00f, 0.00f, TIER_IRON));
+		p.put(MaterialKind.OTHER,    new MaterialKindProfile(3.0f, 0.0f,  3.0f, 0.0f,  1.00f, 0.00f, TIER_IRON));
+		PROFILES = Collections.unmodifiableMap(p);
 	}
 
 	private static long mix(long worldSeed, Identifier id) {

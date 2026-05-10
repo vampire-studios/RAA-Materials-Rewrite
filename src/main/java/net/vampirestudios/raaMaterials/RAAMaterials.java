@@ -43,6 +43,11 @@ public class RAAMaterials implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			var overworld = server.overworld();
 
+			if (!MaterialRegistry.all(overworld).isEmpty()) {
+				LOGGER.warn("[RAA] SERVER_STARTED fired but registry already populated — skipping duplicate init");
+				return;
+			}
+
 			var set = overworld.getAttached(MaterialAttachments.MATERIALS);
 			if (set == null || set.all().isEmpty()) {
 				set = MaterialGenerator.generate(overworld.getSeed());

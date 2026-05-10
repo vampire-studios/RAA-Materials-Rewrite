@@ -361,6 +361,7 @@ public final class RAAConfigScreen {
 		EnumMap<MaterialKind, MutablePolicy> formControls;
 		int toolChancePercent;
 		MaterialGenerator.Profile defaultProfile;
+		Map<MaterialKind, RAAConfig.ColorRanges> colorRanges;
 
 		Draft(RAAConfig config) {
 			var defaults = RAAConfig.defaults();
@@ -403,6 +404,7 @@ public final class RAAConfigScreen {
 			}
 			toolChancePercent = config.toolChancePercent();
 			defaultProfile = config.defaultProfile();
+			colorRanges = config.colorRanges();
 		}
 
 		MutableModeWeights mode(MaterialKind kind) {
@@ -430,15 +432,18 @@ public final class RAAConfigScreen {
 					modeMap(),
 					new RAAConfig.BlockStats(hardnessMul, blastMul, effMul),
 					depthMap(),
-					parseRanges(shallowRangeRows),
-					parseRanges(midRangeRows),
-					parseRanges(deepRangeRows),
+					new RAAConfig.DepthYRanges(
+							parseRanges(shallowRangeRows),
+							parseRanges(midRangeRows),
+							parseRanges(deepRangeRows)
+					),
 					parseReplaceables(replaceableRows),
 					new RAAConfig.NameGen(useColorPrefixes, useBiomeBias, useReplaceableBias, hashLen, banned),
 					policyMap(),
 					toolChancePercent,
 					spawnProfileMap(),
-					defaultProfile
+					defaultProfile,
+					colorRanges
 			);
 		}
 

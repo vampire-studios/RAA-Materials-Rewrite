@@ -1,26 +1,25 @@
-// NameGen2.java
 package net.vampirestudios.raaMaterials;
 
 import com.ibm.icu.text.MessageFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.locale.Language;
-import net.minecraft.server.MinecraftServer;
 
 import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-public final class NameGen2 {
-    private static final Map<String, String> CACHE = new ConcurrentHashMap<>();
+/**
+ * Resolves lang keys and formats them using ICU MessageFormat with the client's active locale.
+ * This enables language-aware select patterns in translations, e.g. French vowel elision:
+ * {@code "block.raa_materials.form.ore": "Minerai {2, select, a {d'{1}} ... other {de {1}}}"}
+ */
+public final class ICUFormatter {
+    private ICUFormatter() {}
 
-    private NameGen2() {}
-
-    /** Resolve a lang pattern for the current language (falls back to the key). */
+    /** Resolve a lang key to its translation pattern for the current language. */
     public static String resolve(String key) {
         return Language.getInstance().getOrDefault(key);
     }
 
-    /** Format ICU MessageFormat with the client's selected language. */
+    /** Format a lang key's translation pattern with ICU MessageFormat and the client's locale. */
     public static String format(String key, Object... args) {
         String pattern = resolve(key);
         return new MessageFormat(pattern, clientLocale()).format(args);
@@ -34,8 +33,6 @@ public final class NameGen2 {
     private static Locale clientLocale() {
         String code = clientLanguageCode();
         if (code.isEmpty()) return Locale.ROOT;
-
-        // Code is like "fr_fr", "en_us"
         String[] parts = code.split("_", 2);
         return parts.length == 2
                 ? new Locale(parts[0], parts[1].toUpperCase(Locale.ROOT))
