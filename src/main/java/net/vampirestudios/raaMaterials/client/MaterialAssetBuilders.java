@@ -19,12 +19,14 @@ import net.vampirestudios.raaMaterials.ARRPGenerationHelper;
 import net.vampirestudios.raaMaterials.RAAMaterials;
 import net.vampirestudios.raaMaterials.material.Form;
 import net.vampirestudios.raaMaterials.material.MaterialAssets;
+import net.vampirestudios.raaMaterials.material.MaterialAssetsDef;
 import net.vampirestudios.raaMaterials.material.MaterialDef;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static net.vampirestudios.raaMaterials.client.MaterialTexturePickers.*;
 
@@ -131,6 +133,66 @@ public final class MaterialAssetBuilders {
     private MaterialAssetBuilders() {
     }
 
+    private static final List<TextureRequirement> REQUIRED_TEXTURES = List.of(
+            new TextureRequirement(Form.ORE, "oreVein", assets -> assets.blockTextures().oreVein()),
+            new TextureRequirement(Form.RAW_BLOCK, "rawBlock", assets -> assets.blockTextures().rawBlock()),
+            new TextureRequirement(Form.TINTED_GLASS, "tintedGlass", assets -> assets.crystalTextures().tintedGlass()),
+            new TextureRequirement(Form.SHINGLES, "shingles", assets -> assets.blockTextures().shingles()),
+            new TextureRequirement(Form.PLATE_BLOCK, "plateBlock", assets -> assets.blockTextures().plateBlock()),
+            new TextureRequirement(Form.CRYSTAL_BRICKS, "crystalBricks", assets -> assets.crystalTextures().crystalBricks()),
+            new TextureRequirement(Form.GLASS, "crystalGlass", assets -> assets.crystalTextures().crystalGlass()),
+            new TextureRequirement(Form.COBBLED, "cobblestone", assets -> assets.blockTextures().cobblestone()),
+            new TextureRequirement(Form.BRICKS, "bricks", assets -> assets.blockTextures().bricks()),
+            new TextureRequirement(Form.POLISHED, "polished", assets -> assets.blockTextures().polished()),
+            new TextureRequirement(Form.SANDSTONE, "sandstoneSide", assets -> assets.sandstoneTextures().sandstoneSide()),
+            new TextureRequirement(Form.CUT, "cutSandstoneSide", assets -> assets.sandstoneTextures().cutSandstoneSide()),
+            new TextureRequirement(Form.SMOOTH, "sandstoneTop", assets -> assets.sandstoneTextures().sandstoneTop()),
+            new TextureRequirement(Form.INGOT, "ingot", assets -> assets.itemTextures().ingot()),
+            new TextureRequirement(Form.RAW, "raw", assets -> assets.itemTextures().raw()),
+            new TextureRequirement(Form.NUGGET, "nugget", assets -> assets.itemTextures().nugget()),
+            new TextureRequirement(Form.DUST, "dust", assets -> assets.itemTextures().dust()),
+            new TextureRequirement(Form.SHEET, "plate", assets -> assets.itemTextures().plate()),
+            new TextureRequirement(Form.SHARD, "shard", assets -> assets.itemTextures().shard()),
+            new TextureRequirement(Form.GEAR, "gear", assets -> assets.itemTextures().gear()),
+            new TextureRequirement(Form.GEM, "gem", assets -> assets.itemTextures().gem()),
+            new TextureRequirement(Form.BALL, "ball", assets -> assets.itemTextures().ball()),
+            new TextureRequirement(Form.ROD, "rod", assets -> assets.itemTextures().rod()),
+            new TextureRequirement(Form.WIRE, "wire", assets -> assets.itemTextures().wire()),
+            new TextureRequirement(Form.COIL, "coil", assets -> assets.itemTextures().coil()),
+            new TextureRequirement(Form.RIVET, "rivet", assets -> assets.itemTextures().rivet()),
+            new TextureRequirement(Form.BOLT, "bolt", assets -> assets.itemTextures().bolt()),
+            new TextureRequirement(Form.NAIL, "nail", assets -> assets.itemTextures().nail()),
+            new TextureRequirement(Form.RING, "ring", assets -> assets.itemTextures().ring()),
+            new TextureRequirement(Form.BUDDING, "budding", assets -> assets.crystalTextures().budding()),
+            new TextureRequirement(Form.BUD_SMALL, "budSmall", assets -> assets.crystalTextures().budSmall()),
+            new TextureRequirement(Form.BUD_MEDIUM, "budMedium", assets -> assets.crystalTextures().budMedium()),
+            new TextureRequirement(Form.BUD_LARGE, "budLarge", assets -> assets.crystalTextures().budLarge()),
+            new TextureRequirement(Form.CLUSTER, "cluster", assets -> assets.crystalTextures().cluster()),
+            new TextureRequirement(Form.CRYSTAL, "crystalItem", assets -> assets.crystalTextures().crystalItem()),
+            new TextureRequirement(Form.BASALT_LAMP, "lampBasalt", assets -> assets.crystalTextures().lampBasalt()),
+            new TextureRequirement(Form.CALCITE_LAMP, "lampCalcite", assets -> assets.crystalTextures().lampCalcite()),
+            new TextureRequirement(Form.PICKAXE, "pickaxeHead", assets -> assets.toolTextures().pickaxeHead()),
+            new TextureRequirement(Form.PICKAXE, "pickaxeStick", assets -> assets.toolTextures().pickaxeStick()),
+            new TextureRequirement(Form.AXE, "axeHead", assets -> assets.toolTextures().axeHead()),
+            new TextureRequirement(Form.AXE, "axeStick", assets -> assets.toolTextures().axeStick()),
+            new TextureRequirement(Form.SHOVEL, "shovelHead", assets -> assets.toolTextures().shovelHead()),
+            new TextureRequirement(Form.SHOVEL, "shovelStick", assets -> assets.toolTextures().shovelStick()),
+            new TextureRequirement(Form.HOE, "hoeHead", assets -> assets.toolTextures().hoeHead()),
+            new TextureRequirement(Form.HOE, "hoeStick", assets -> assets.toolTextures().hoeStick()),
+            new TextureRequirement(Form.SWORD, "swordBlade", assets -> assets.toolTextures().swordBlade()),
+            new TextureRequirement(Form.SWORD, "swordHandle", assets -> assets.toolTextures().swordHandle()),
+            new TextureRequirement(Form.SPEAR, "spearHead", assets -> assets.toolTextures().spearHead()),
+            new TextureRequirement(Form.SPEAR, "spearHandle", assets -> assets.toolTextures().spearHandle()),
+            new TextureRequirement(Form.SPEAR, "spearHeadInHand", assets -> assets.toolTextures().spearHeadInHand()),
+            new TextureRequirement(Form.SPEAR, "spearHandleInHand", assets -> assets.toolTextures().spearHandleInHand()),
+            new TextureRequirement(Form.CHAIN, "chain", assets -> assets.decorTextures().chain()),
+            new TextureRequirement(Form.LANTERN, "lantern", assets -> assets.decorTextures().lantern()),
+            new TextureRequirement(Form.DOOR, "doorBottom", assets -> assets.decorTextures().doorBottom()),
+            new TextureRequirement(Form.TRAPDOOR, "trapdoor", assets -> assets.decorTextures().trapdoor()),
+            new TextureRequirement(Form.FENCE, "fence", assets -> assets.decorTextures().fence()),
+            new TextureRequirement(Form.FENCE_GATE, "fenceGate", assets -> assets.decorTextures().fenceGate())
+    );
+
     /**
      * Pre-validates that every material has the textures required by its forms.
      * Collects all failures and logs them together before throwing, so the full
@@ -145,83 +207,26 @@ public final class MaterialAssetBuilders {
             var id = def.nameInformation().id().toString();
             var assets = textures(def);
             var forms = def.forms();
+            int materialIndex = idx;
 
-            // block textures
-            requireTex(failures, idx, id, forms, Form.ORE,           "oreVein",          assets.blockTextures().oreVein());
-            requireTex(failures, idx, id, forms, Form.RAW_BLOCK,     "rawBlock",         assets.blockTextures().rawBlock());
-            requireTex(failures, idx, id, forms, Form.TINTED_GLASS,  "tintedGlass",      assets.crystalTextures().tintedGlass());
-            requireTex(failures, idx, id, forms, Form.SHINGLES,      "shingles",         assets.blockTextures().shingles());
-            requireTex(failures, idx, id, forms, Form.PLATE_BLOCK,   "plateBlock",       assets.blockTextures().plateBlock());
-            requireTex(failures, idx, id, forms, Form.CRYSTAL_BRICKS,"crystalBricks",    assets.crystalTextures().crystalBricks());
-            requireTex(failures, idx, id, forms, Form.GLASS,         "crystalGlass",     assets.crystalTextures().crystalGlass());
-            requireTex(failures, idx, id, forms, Form.COBBLED,       "cobblestone",      assets.blockTextures().cobblestone());
-            requireTex(failures, idx, id, forms, Form.BRICKS,        "bricks",           assets.blockTextures().bricks());
-            requireTex(failures, idx, id, forms, Form.POLISHED,      "polished",         assets.blockTextures().polished());
-            requireTex(failures, idx, id, forms, Form.SANDSTONE,     "sandstoneSide",    assets.sandstoneTextures().sandstoneSide());
-            requireTex(failures, idx, id, forms, Form.CUT,           "cutSandstoneSide", assets.sandstoneTextures().cutSandstoneSide());
-            requireTex(failures, idx, id, forms, Form.SMOOTH,        "sandstoneTop",     assets.sandstoneTextures().sandstoneTop());
-
-            // item textures
-            requireTex(failures, idx, id, forms, Form.INGOT,  "ingot",  assets.itemTextures().ingot());
-            requireTex(failures, idx, id, forms, Form.RAW,    "raw",    assets.itemTextures().raw());
-            requireTex(failures, idx, id, forms, Form.NUGGET, "nugget", assets.itemTextures().nugget());
-            requireTex(failures, idx, id, forms, Form.DUST,   "dust",   assets.itemTextures().dust());
-            requireTex(failures, idx, id, forms, Form.SHEET,  "plate",  assets.itemTextures().plate());
-            requireTex(failures, idx, id, forms, Form.SHARD,  "shard",  assets.itemTextures().shard());
-            requireTex(failures, idx, id, forms, Form.GEAR,   "gear",   assets.itemTextures().gear());
-            requireTex(failures, idx, id, forms, Form.GEM,    "gem",    assets.itemTextures().gem());
-            requireTex(failures, idx, id, forms, Form.BALL,   "ball",   assets.itemTextures().ball());
-            requireTex(failures, idx, id, forms, Form.ROD,    "rod",    assets.itemTextures().rod());
-            requireTex(failures, idx, id, forms, Form.WIRE,   "wire",   assets.itemTextures().wire());
-            requireTex(failures, idx, id, forms, Form.COIL,   "coil",   assets.itemTextures().coil());
-            requireTex(failures, idx, id, forms, Form.RIVET,  "rivet",  assets.itemTextures().rivet());
-            requireTex(failures, idx, id, forms, Form.BOLT,   "bolt",   assets.itemTextures().bolt());
-            requireTex(failures, idx, id, forms, Form.NAIL,   "nail",   assets.itemTextures().nail());
-            requireTex(failures, idx, id, forms, Form.RING,   "ring",   assets.itemTextures().ring());
-
-            // crystal and glow textures
-            requireTex(failures, idx, id, forms, Form.BUDDING,      "budding",      assets.crystalTextures().budding());
-            requireTex(failures, idx, id, forms, Form.BUD_SMALL,    "budSmall",     assets.crystalTextures().budSmall());
-            requireTex(failures, idx, id, forms, Form.BUD_MEDIUM,   "budMedium",    assets.crystalTextures().budMedium());
-            requireTex(failures, idx, id, forms, Form.BUD_LARGE,    "budLarge",     assets.crystalTextures().budLarge());
-            requireTex(failures, idx, id, forms, Form.CLUSTER,      "cluster",      assets.crystalTextures().cluster());
-            requireTex(failures, idx, id, forms, Form.CRYSTAL,      "crystalItem",  assets.crystalTextures().crystalItem());
-            requireTex(failures, idx, id, forms, Form.BASALT_LAMP,  "lampBasalt",   assets.crystalTextures().lampBasalt());
-            requireTex(failures, idx, id, forms, Form.CALCITE_LAMP, "lampCalcite",  assets.crystalTextures().lampCalcite());
-            requireTex(failures, idx, id, forms, Form.LAMP,         "lampCalcite",  assets.crystalTextures().lampCalcite());
-
-            // tool textures
-            requireTex(failures, idx, id, forms, Form.PICKAXE, "pickaxeHead",  assets.toolTextures().pickaxeHead());
-            requireTex(failures, idx, id, forms, Form.PICKAXE, "pickaxeStick", assets.toolTextures().pickaxeStick());
-            requireTex(failures, idx, id, forms, Form.AXE,     "axeHead",      assets.toolTextures().axeHead());
-            requireTex(failures, idx, id, forms, Form.AXE,     "axeStick",     assets.toolTextures().axeStick());
-            requireTex(failures, idx, id, forms, Form.SHOVEL,  "shovelHead",   assets.toolTextures().shovelHead());
-            requireTex(failures, idx, id, forms, Form.SHOVEL,  "shovelStick",  assets.toolTextures().shovelStick());
-            requireTex(failures, idx, id, forms, Form.HOE,     "hoeHead",      assets.toolTextures().hoeHead());
-            requireTex(failures, idx, id, forms, Form.HOE,     "hoeStick",     assets.toolTextures().hoeStick());
-            if (forms.contains(Form.SWORD) && assets.toolTextures().swordBlade().isEmpty())
-                failures.add("  " + id + " [" + idx + "] SWORD missing swordBlade");
-            if (forms.contains(Form.SWORD) && assets.toolTextures().swordHandle().isEmpty())
-                failures.add("  " + id + " [" + idx + "] SWORD missing swordHandle");
-            requireTex(failures, idx, id, forms, Form.SPEAR, "spearHead",         assets.toolTextures().spearHead());
-            requireTex(failures, idx, id, forms, Form.SPEAR, "spearHandle",       assets.toolTextures().spearHandle());
-            requireTex(failures, idx, id, forms, Form.SPEAR, "spearHeadInHand",   assets.toolTextures().spearHeadInHand());
-            requireTex(failures, idx, id, forms, Form.SPEAR, "spearHandleInHand", assets.toolTextures().spearHandleInHand());
-
-            // decor textures
-            requireTex(failures, idx, id, forms, Form.CHAIN,      "chain",      assets.decorTextures().chain());
-            requireTex(failures, idx, id, forms, Form.LANTERN,    "lantern",    assets.decorTextures().lantern());
-            requireTex(failures, idx, id, forms, Form.DOOR,       "doorBottom", assets.decorTextures().doorBottom());
-            requireTex(failures, idx, id, forms, Form.TRAPDOOR,   "trapdoor",   assets.decorTextures().trapdoor());
-            requireTex(failures, idx, id, forms, Form.FENCE,      "fence",      assets.decorTextures().fence());
-            requireTex(failures, idx, id, forms, Form.FENCE_GATE, "fenceGate",  assets.decorTextures().fenceGate());
+            REQUIRED_TEXTURES.forEach(requirement -> requirement.validate(failures, materialIndex, id, forms, assets));
         }
 
         if (!failures.isEmpty()) {
             RAAMaterials.LOGGER.error("[RAA] {} missing texture(s) detected before asset build:", failures.size());
             failures.forEach(msg -> RAAMaterials.LOGGER.error("[RAA]{}", msg));
             throw new IllegalStateException(
-                "[RAA] Asset build aborted: " + failures.size() + " missing texture(s) — see log for details");
+                "[RAA] Asset build aborted: " + failures.size() + " missing texture(s) - see log for details");
+        }
+    }
+
+    private record TextureRequirement(
+            Form form,
+            String textureName,
+            Function<MaterialAssetsDef, Optional<Identifier>> texture
+    ) {
+        void validate(List<String> failures, int idx, String matId, List<Form> forms, MaterialAssetsDef assets) {
+            requireTex(failures, idx, matId, forms, form, textureName, texture.apply(assets));
         }
     }
 
@@ -441,8 +446,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.LAMP),
                 RAAMaterials.id("material_lamp"),
                 "block/material_lamp/",
-                idx -> textures(ctx.materials().get(idx)).crystalTextures().lampCalcite()
-                        .orElse(pickBlockTexture(ctx.materials().get(idx), idx))
+                idx -> pickFormTexture(Form.LAMP, ctx.materials().get(idx), idx)
         ));
 
         buildDoorFamily(ctx, RAAMaterials.id("material_door_metal"), "block/material_door_metal/");

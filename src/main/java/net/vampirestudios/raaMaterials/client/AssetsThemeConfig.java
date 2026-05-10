@@ -129,10 +129,7 @@ public final class AssetsThemeConfig {
 		global.put(AssetsTheme.Slot.HOE_STICK, numbered("tools/hoe/hoe_stick_", 9));
 		global.put(AssetsTheme.Slot.SHEARS_BASE, List.of(id("tools/shears_base")));
 		global.put(AssetsTheme.Slot.SHEARS_METAL, List.of(id("tools/shears_metal")));
-		global.put(AssetsTheme.Slot.SPEAR_HEAD, List.of(id("tools/spear/head")));
-		global.put(AssetsTheme.Slot.SPEAR_HANDLE, List.of(id("tools/spear/handle")));
-		global.put(AssetsTheme.Slot.SPEAR_HEAD_IN_HAND, List.of(id("tools/spear/head_in_hand")));
-		global.put(AssetsTheme.Slot.SPEAR_HANDLE_IN_HAND, List.of(id("tools/spear/handle_in_hand")));
+		putMissingSpearDefaults(global);
 		global.put(AssetsTheme.Slot.COBBLESTONE, numbered("stone/stone_cobbled_", 13));
 		global.put(AssetsTheme.Slot.CHISELED, numbered("stone/stone_chiseled_", 4));
 		global.put(AssetsTheme.Slot.STONE_BRICKS, numbered("stone/stone_bricks_", 24));
@@ -221,10 +218,7 @@ public final class AssetsThemeConfig {
 			perKindForm.put(kind, copy);
 		});
 
-		global.putIfAbsent(AssetsTheme.Slot.SPEAR_HEAD, List.of(id("tools/spear/head")));
-		global.putIfAbsent(AssetsTheme.Slot.SPEAR_HANDLE, List.of(id("tools/spear/handle")));
-		global.putIfAbsent(AssetsTheme.Slot.SPEAR_HEAD_IN_HAND, List.of(id("tools/spear/head_in_hand")));
-		global.putIfAbsent(AssetsTheme.Slot.SPEAR_HANDLE_IN_HAND, List.of(id("tools/spear/handle_in_hand")));
+		putMissingSpearDefaults(global);
 
 		replaceIfEquals(fallbacks, AssetsTheme.Slot.DOOR_ITEM_METAL,
 				List.of(withDefaultNamespace("item/iron_door")), List.of(id("decor/door")));
@@ -254,6 +248,13 @@ public final class AssetsThemeConfig {
 		if (oldValue.equals(map.get(key))) {
 			map.put(key, newValue);
 		}
+	}
+
+	private static void putMissingSpearDefaults(Map<AssetsTheme.Slot, List<Identifier>> global) {
+		global.putIfAbsent(AssetsTheme.Slot.SPEAR_HEAD, List.of(id("tools/spear/head")));
+		global.putIfAbsent(AssetsTheme.Slot.SPEAR_HANDLE, List.of(id("tools/spear/handle")));
+		global.putIfAbsent(AssetsTheme.Slot.SPEAR_HEAD_IN_HAND, List.of(id("tools/spear/head_in_hand")));
+		global.putIfAbsent(AssetsTheme.Slot.SPEAR_HANDLE_IN_HAND, List.of(id("tools/spear/handle_in_hand")));
 	}
 
 	private static void migrateMetalDecor(Map<MaterialKind, Map<Form, List<Identifier>>> perKindForm, MaterialKind kind) {
