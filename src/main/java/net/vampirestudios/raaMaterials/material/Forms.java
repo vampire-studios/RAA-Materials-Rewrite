@@ -75,7 +75,11 @@ public final class Forms {
 		put("material_button", Form.BUTTON);
 		put("material_pressure_plate", Form.PRESSURE_PLATE);
 		put("material_door", Form.DOOR);
+		put("material_door_metal", Form.DOOR);
+		put("material_door_wood", Form.DOOR);
 		put("material_trapdoor", Form.TRAPDOOR);
+		put("material_trapdoor_metal", Form.TRAPDOOR);
+		put("material_trapdoor_wood", Form.TRAPDOOR);
 		put("material_fence", Form.FENCE);
 		put("material_fence_gate", Form.FENCE_GATE);
 

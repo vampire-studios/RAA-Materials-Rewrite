@@ -1,11 +1,18 @@
 package net.vampirestudios.raaMaterials.material;
 
+import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.ByIdMap;
+import net.minecraft.util.StringRepresentable;
 import net.vampirestudios.raaMaterials.RAAConfig;
 import net.vampirestudios.raaMaterials.material.MaterialDef.OreHost;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.IntFunction;
 
 import static java.util.Map.entry;
 import static net.vampirestudios.raaMaterials.material.Form.*;
@@ -13,13 +20,20 @@ import static net.vampirestudios.raaMaterials.material.Form.*;
 public final class MaterialGenerator {
 	private MaterialGenerator() {}
 
-	private static final List<Form> TOOLS = List.of(PICKAXE, AXE, SWORD, SHOVEL, HOE);
-
-	private enum Profile {
+	public enum Profile implements StringRepresentable {
 		BALANCED,
 		TECH_HEAVY,
 		GEO_HEAVY,
-		FANTASY_HEAVY
+		FANTASY_HEAVY;
+
+		public static final Codec<Profile> CODEC = StringRepresentable.fromEnum(Profile::values);
+		private static final IntFunction<Profile> BY_ID = ByIdMap.continuous(Profile::ordinal, values(), ByIdMap.OutOfBoundsStrategy.ZERO);
+		public static final StreamCodec<ByteBuf, Profile> STREAM_CODEC = ByteBufCodecs.idMapper(BY_ID, Profile::ordinal);
+
+		@Override
+		public String getSerializedName() {
+			return name().toLowerCase(Locale.ROOT);
+		}
 	}
 
 	public static MaterialSet generate(long worldSeed) {
@@ -113,7 +127,7 @@ public final class MaterialGenerator {
 	private static Optional<ToolMaterialSpec> toolSpecFor(MaterialKind kind, HarvestTier tier, Random rng) {
 		return switch (kind) {
 			case METAL, ALLOY -> Optional.of(ToolMaterialPresets.forMetal(tier));
-			case GEM -> Optional.of(ToolMaterialPresets.forGem(pickTier(rng)));
+			case GEM -> Optional.of(ToolMaterialPresets.forGem(tier));
 			default -> Optional.empty();
 		};
 	}
@@ -165,49 +179,131 @@ public final class MaterialGenerator {
 		return OreHost.CALCITE;
 	}
 
+	private static final List<Form> STANDARD_EQUIPMENT_SET = List.of(
+			PICKAXE, AXE, SWORD, SHOVEL, HOE
+	);
+
+	private static final List<Form> ARMOR_SET = List.of(
+			HELMET, CHESTPLATE, LEGGINGS, BOOTS
+	);
+
+	private static final List<Form> METAL_PARTS = List.of(
+			INGOT, SHEET, GEAR, ROD, WIRE, COIL,
+			RIVET, BOLT, NAIL, RING
+	);
+
+	private static final List<Form> METAL_DECOR_BLOCKS = List.of(
+			BRICKS, BLOCK, PLATE_BLOCK, SHINGLES,
+			PILLAR, TILES, CHISELED, BARS, GRATE
+	);
+
+	private static final List<Form> METAL_INTERACTIVE_BLOCKS = List.of(
+			BUTTON, PRESSURE_PLATE,
+			DOOR, TRAPDOOR,
+			CHAIN, LANTERN, LAMP
+	);
+
+	private static final List<Form> BLOCK_SHAPES = List.of(
+			SLAB, STAIRS, WALL
+	);
+
+	private static final List<Form> BASIC_INTERACTIVE_BLOCKS = List.of(
+			BUTTON, PRESSURE_PLATE
+	);
+
+	private static final List<Form> WOOD_NATURAL = List.of(
+			LOG, WOOD, LEAVES, SAPLING
+	);
+
+	private static final List<Form> WOOD_PROCESSED = List.of(
+			STRIPPED_LOG, STRIPPED_WOOD, PLANKS, BEAM, BOARDS
+	);
+
+	private static final List<Form> WOOD_BUILDING = List.of(
+			SLAB, STAIRS, FENCE, FENCE_GATE,
+			DOOR, TRAPDOOR, BUTTON, PRESSURE_PLATE,
+			SIGN, HANGING_SIGN, LADDER
+	);
+
 	private static @NotNull List<Form> getForms(MaterialKind kind, Random rng) {
 		return switch (kind) {
 			case METAL -> join(
-					List.of(RAW, INGOT, DUST, NUGGET, SHEET, GEAR, ROD, WIRE, COIL, RIVET, BOLT, NAIL, RING),
-					List.of(ORE, BRICKS, BLOCK, RAW_BLOCK, PLATE_BLOCK, SHINGLES, PILLAR, TILES, CHISELED, BARS, GRATE, BUTTON, PRESSURE_PLATE,
-							DOOR, TRAPDOOR, CHAIN, LANTERN, LAMP),
-					TOOLS
+					List.of(ORE, RAW, DUST, NUGGET, RAW_BLOCK),
+					METAL_PARTS,
+					METAL_DECOR_BLOCKS,
+					METAL_INTERACTIVE_BLOCKS,
+					STANDARD_EQUIPMENT_SET,
+					ARMOR_SET
 			);
 
 			case ALLOY -> join(
-					List.of(INGOT, SHEET, GEAR, ROD, WIRE, COIL, RIVET, BOLT, NAIL, RING),
-					List.of(BLOCK, BRICKS, PLATE_BLOCK, SHINGLES, PILLAR, TILES, CHISELED, BARS, GRATE, BUTTON, PRESSURE_PLATE,
-							DOOR, TRAPDOOR, CHAIN, LANTERN, LAMP),
-					TOOLS
+					METAL_PARTS,
+					METAL_DECOR_BLOCKS,
+					METAL_INTERACTIVE_BLOCKS,
+					STANDARD_EQUIPMENT_SET,
+					ARMOR_SET
 			);
 
 			case GEM -> join(
 					List.of(ORE, BLOCK, GEM, SHARD),
-					TOOLS
+					STANDARD_EQUIPMENT_SET
 			);
 
 			case CRYSTAL -> List.of(
 					CLUSTER, BLOCK, CRYSTAL, SHARD, DUST,
 					BUDDING, BUD_SMALL, BUD_MEDIUM, BUD_LARGE,
-					CRYSTAL_BRICKS, GLASS, TINTED_GLASS, PANE, MOSAIC,
-					CALCITE_LAMP, BASALT_LAMP, LAMP, LANTERN, CHIME, ROD_BLOCK
+					GLASS, TINTED_GLASS, PANE,
+					CRYSTAL_BRICKS, MOSAIC,
+					CALCITE_LAMP, BASALT_LAMP, LAMP,
+					CHIME, ROD_BLOCK
 			);
 
-			case STONE -> List.of(
-					BLOCK, CHISELED, POLISHED, BRICKS,
-					SLAB, STAIRS, WALL,
-					PILLAR, TILES, MOSAIC, MOSSY, CRACKED, COBBLED,
-					BUTTON, PRESSURE_PLATE, LAMP
+			case STONE -> join(
+					List.of(
+							BLOCK, CHISELED, POLISHED, BRICKS, PILLAR, TILES,
+							MOSAIC, MOSSY, CRACKED, COBBLED
+					),
+					BLOCK_SHAPES,
+					BASIC_INTERACTIVE_BLOCKS,
+					List.of(LAMP)
 			);
 
 			case SAND -> sandForms(rng);
-			case GRAVEL -> List.of(BLOCK, POLISHED, SLAB, STAIRS, WALL);
-			case CLAY -> List.of(BLOCK, BALL, CERAMIC);
-			case MUD -> List.of(BLOCK, DRIED, BRICKS, SLAB, STAIRS, WALL);
-			case SOIL -> List.of(BLOCK, PACKED_SOIL);
-			case SALT -> List.of(BLOCK, DUST, LAMP);
-			case VOLCANIC -> List.of(BLOCK, COBBLED, POLISHED, BRICKS, PILLAR, MOSSY, BUTTON, PRESSURE_PLATE, LAMP);
-			case WOOD -> List.of(BLOCK, PILLAR, BUTTON, PRESSURE_PLATE, FENCE, FENCE_GATE, DOOR, TRAPDOOR, LANTERN);
+
+			case GRAVEL -> join(
+					List.of(BLOCK, POLISHED),
+					BLOCK_SHAPES
+			);
+
+			case CLAY -> List.of(
+					BLOCK, BALL, CERAMIC
+			);
+
+			case MUD -> join(
+					List.of(BLOCK, DRIED, BRICKS),
+					BLOCK_SHAPES
+			);
+
+			case SOIL -> List.of(
+					BLOCK, PACKED_SOIL
+			);
+
+			case SALT -> List.of(
+					BLOCK, DUST, LAMP
+			);
+
+			case VOLCANIC -> join(
+					List.of(BLOCK, COBBLED, POLISHED, BRICKS, PILLAR, MOSSY),
+					BASIC_INTERACTIVE_BLOCKS,
+					List.of(LAMP)
+			);
+
+			case WOOD -> join(
+					WOOD_NATURAL,
+					WOOD_PROCESSED,
+					WOOD_BUILDING
+			);
+
 			case OTHER -> List.of(DUST);
 		};
 	}
@@ -225,7 +321,7 @@ public final class MaterialGenerator {
 
 	@SafeVarargs
 	private static @NotNull List<Form> join(List<Form>... groups) {
-		ArrayList<Form> out = new ArrayList<>();
+		LinkedHashSet<Form> out = new LinkedHashSet<>();
 
 		for (List<Form> group : groups) {
 			out.addAll(group);
@@ -358,7 +454,7 @@ public final class MaterialGenerator {
 			return pickKind(rng, cfg);
 		}
 
-		return pickKind(rng, defaultWeights(Profile.FANTASY_HEAVY));
+		return pickKind(rng, defaultWeights(RAAConfig.active().defaultProfile()));
 	}
 
 	private static MaterialKind pickKind(Random rng, Map<MaterialKind, Integer> weights) {

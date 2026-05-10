@@ -64,7 +64,7 @@ public final class YBlocks {
 	public static Block PARAM_BARS, PARAM_GRATE;
 	public static Block PARAM_BUTTON_STONE, PARAM_BUTTON_METAL, PARAM_BUTTON_WOOD,
 			PARAM_PRESSURE_PLATE_STONE, PARAM_PRESSURE_PLATE_METAL, PARAM_PRESSURE_PLATE_WOOD,
-			PARAM_DOOR, PARAM_TRAPDOOR, PARAM_DOOR_METAL, PARAM_DOOR_WOOD, PARAM_TRAPDOOR_METAL, PARAM_TRAPDOOR_WOOD,
+			PARAM_DOOR_METAL, PARAM_DOOR_WOOD, PARAM_TRAPDOOR_METAL, PARAM_TRAPDOOR_WOOD,
 			PARAM_FENCE, PARAM_FENCE_GATE, PARAM_CHAIN, PARAM_LANTERN, PARAM_LAMP;
 
 	// + NEW crystal-ish
@@ -343,12 +343,6 @@ public final class YBlocks {
 						.strength(0.5F).pushReaction(PushReaction.DESTROY)
 						.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_pressure_plate_metal")))
 		);
-		PARAM_DOOR = regBlock("material_door", new ParametricDoorBlock(BlockSetType.OAK, Block.Properties.of()
-				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_door")))
-				.strength(3.0F).instrument(NoteBlockInstrument.BASS).sound(SoundType.WOOD).noOcclusion()));
-		PARAM_TRAPDOOR = regBlock("material_trapdoor", new ParametricTrapdoorBlock(BlockSetType.OAK, Block.Properties.of()
-				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_trapdoor")))
-				.strength(3.0F).instrument(NoteBlockInstrument.BASS).sound(SoundType.WOOD).noOcclusion()));
 		PARAM_FENCE = regBlock("material_fence", new ParametricFenceBlock(Block.Properties.of()
 				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_fence")))
 				.strength(3.0F).sound(SoundType.WOOD).noOcclusion()));

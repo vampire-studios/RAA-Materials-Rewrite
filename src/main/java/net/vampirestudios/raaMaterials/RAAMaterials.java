@@ -56,8 +56,9 @@ public class RAAMaterials implements ModInitializer {
 						.all(overworld).stream().map(m -> m.nameInformation().id()).toList();
 
 				var uniqueForms = java.util.List.of(
-						Form.BATTLE_AXE, Form.WAR_HAMMER, Form.SPEAR, Form.SICKLE, Form.CROWN, Form.CLOAK,
-						Form.AMULET, Form.ORB, Form.MUSIC_DISC
+						Form.BATTLE_AXE, Form.WAR_HAMMER, Form.SPEAR, Form.SICKLE, Form.DAGGER, Form.HAMMER,
+						Form.SCYTHE, Form.SHIELD, Form.BOW, Form.CROSSBOW, Form.STAFF, Form.WAND, Form.CROWN,
+						Form.CLOAK, Form.AMULET, Form.ORB, Form.MUSIC_DISC
 				);
 
 				var rng = new java.util.Random(overworld.getSeed());

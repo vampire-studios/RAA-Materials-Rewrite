@@ -18,7 +18,8 @@ public record MaterialAssetsDef(
 		Long paletteSeed,          // for deterministic client regen
 		TextureDef1 textures1,     // your split structs
 		TextureDef2 textures2,
-		TextureDef3 textures3
+		TextureDef3 textures3,
+		TextureDef4 textures4
 ) {
 	/* ------------ JSON codec (data-pack / disk) ------------ */
 	public static final Codec<MaterialAssetsDef> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -27,7 +28,8 @@ public record MaterialAssetsDef(
 			Codec.LONG.fieldOf("palette_seed").forGetter(MaterialAssetsDef::paletteSeed),
 			TextureDef1.CODEC.fieldOf("textures1").forGetter(MaterialAssetsDef::textures1),
 			TextureDef2.CODEC.fieldOf("textures2").forGetter(MaterialAssetsDef::textures2),
-			TextureDef3.CODEC.fieldOf("textures3").forGetter(MaterialAssetsDef::textures3)
+			TextureDef3.CODEC.fieldOf("textures3").forGetter(MaterialAssetsDef::textures3),
+			TextureDef4.CODEC.optionalFieldOf("textures4", TextureDef4.EMPTY).forGetter(MaterialAssetsDef::textures4)
 	).apply(i, MaterialAssetsDef::new));
 
 	/* ------------ Network codec (compact) ------------ */
@@ -39,6 +41,7 @@ public record MaterialAssetsDef(
 					TextureDef1.STREAM_CODEC, MaterialAssetsDef::textures1,
 					TextureDef2.STREAM_CODEC, MaterialAssetsDef::textures2,
 					TextureDef3.STREAM_CODEC, MaterialAssetsDef::textures3,
+					TextureDef4.STREAM_CODEC, MaterialAssetsDef::textures4,
 					MaterialAssetsDef::new
 			);
 }

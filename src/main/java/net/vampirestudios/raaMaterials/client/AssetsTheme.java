@@ -86,6 +86,17 @@ public final class AssetsTheme {
 		return id(base + (rnd.nextInt(max) + 1));
 	}
 
+	private static Identifier pairedDoorTopTexture(Identifier bottomTexture) {
+		String path = bottomTexture.getPath();
+		if (path.endsWith("_bottom")) {
+			return Identifier.fromNamespaceAndPath(bottomTexture.getNamespace(), path.substring(0, path.length() - "_bottom".length()) + "_top");
+		}
+		if (path.endsWith("bottom")) {
+			return Identifier.fromNamespaceAndPath(bottomTexture.getNamespace(), path.substring(0, path.length() - "bottom".length()) + "top");
+		}
+		return bottomTexture;
+	}
+
 	// ---------- Texture definition builders ----------
 	private TextureDef1 buildTextureDef1(MaterialDef m, Random rnd) {
 		var k = m.kind();
@@ -196,6 +207,23 @@ public final class AssetsTheme {
 		);
 	}
 
+	private TextureDef4 buildTextureDef4(MaterialDef m, Random rnd) {
+		Optional<Identifier> chain = pickForm(m.kind(), Form.CHAIN, rnd);
+		Optional<Identifier> lantern = pickForm(m.kind(), Form.LANTERN, rnd);
+		Optional<Identifier> doorItem = switch (m.kind()) {
+			case METAL, ALLOY -> Optional.of(withDefaultNamespace("item/iron_door"));
+			case WOOD -> Optional.of(withDefaultNamespace("item/oak_door"));
+			default -> Optional.empty();
+		};
+		Optional<Identifier> doorBottom = pickForm(m.kind(), Form.DOOR, rnd);
+		Optional<Identifier> doorTop = doorBottom.map(AssetsTheme::pairedDoorTopTexture);
+		Optional<Identifier> trapdoor = pickForm(m.kind(), Form.TRAPDOOR, rnd);
+		Optional<Identifier> fence = pickForm(m.kind(), Form.FENCE, rnd);
+		Optional<Identifier> fenceGate = pickForm(m.kind(), Form.FENCE_GATE, rnd);
+
+		return new TextureDef4(chain, lantern, doorItem, doorBottom, doorTop, trapdoor, fence, fenceGate);
+	}
+
 	public MaterialAssetsDef resolve(MaterialDef m) {
 		Random rnd = new Random(m.assetSeed());
 		return new MaterialAssetsDef(
@@ -204,7 +232,8 @@ public final class AssetsTheme {
 				m.assetSeed(),
 				buildTextureDef1(m, rnd),
 				buildTextureDef2(m, rnd),
-				buildTextureDef3(m, rnd)
+				buildTextureDef3(m, rnd),
+				buildTextureDef4(m, rnd)
 		);
 	}
 
@@ -249,6 +278,18 @@ public final class AssetsTheme {
 				.set(Slot.MOSAIC, withDefaultNamespace("block/bamboo_mosaic"))
 				.set(Slot.PILLAR_SIDE, withDefaultNamespace("block/quartz_block_side"))
 				.set(Slot.PILLAR_TOP, withDefaultNamespace("block/quartz_block_top"))
+				.choose(Form.CHAIN, List.of(id("metal/chain_1"), id("metal/chain_2")))
+				.set(Form.LANTERN, withDefaultNamespace("block/lantern"))
+				.set(Form.DOOR, withDefaultNamespace("block/oak_door_bottom"))
+				.set(Form.TRAPDOOR, withDefaultNamespace("block/oak_trapdoor"))
+				.set(Form.FENCE, withDefaultNamespace("block/oak_planks"))
+				.set(Form.FENCE_GATE, withDefaultNamespace("block/oak_planks"))
+				.kindForm(MaterialKind.METAL, k -> k
+						.set(Form.DOOR, withDefaultNamespace("block/iron_door_bottom"))
+						.set(Form.TRAPDOOR, withDefaultNamespace("block/iron_trapdoor")))
+				.kindForm(MaterialKind.ALLOY, k -> k
+						.set(Form.DOOR, withDefaultNamespace("block/iron_door_bottom"))
+						.set(Form.TRAPDOOR, withDefaultNamespace("block/iron_trapdoor")))
 
 				// Item icons
 				.fallback(Slot.CLAY_ITEM, withDefaultNamespace("item/clay_ball"))

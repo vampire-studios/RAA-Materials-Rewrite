@@ -10,6 +10,7 @@ import dev.lukebemish.codecextras.structured.IdentityInterpreter;
 import dev.lukebemish.codecextras.structured.Structure;
 import net.minecraft.util.GsonHelper;
 import net.vampirestudios.raaMaterials.material.Form;
+import net.vampirestudios.raaMaterials.material.MaterialGenerator;
 import net.vampirestudios.raaMaterials.material.MaterialKind;
 
 import java.io.IOException;
@@ -23,13 +24,13 @@ import static net.vampirestudios.raaMaterials.material.MaterialKind.*;
 
 public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, Integer> kindWeights,
                         net.vampirestudios.raaMaterials.RAAConfig.TierWeights tiers,
-                        Map<MaterialKind, ModeWeights> spawnMode, Map<MaterialKind, Float> hardnessMul,
-                        Map<MaterialKind, Float> blastMul, Map<MaterialKind, Float> effMul,
+                        Map<MaterialKind, ModeWeights> spawnMode, BlockStats blockStats,
                         Map<MaterialKind, DepthBand> depthWeights, Map<String, YRange> shallowRange,
                         Map<String, YRange> midRange, Map<String, YRange> deepRange,
                         Map<String, List<String>> replaceables,
                         net.vampirestudios.raaMaterials.RAAConfig.NameGen nameGen,
-                        Map<MaterialKind, KindPolicy> formControls, int toolChancePercent) {
+                        Map<MaterialKind, KindPolicy> formControls, int toolChancePercent,
+                        MaterialGenerator.Profile defaultProfile) {
     // ----- Records / Beans -----
     public record TierWeights(int stone, int iron, int diamond, int netherite) {
         public static final Codec<TierWeights> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -160,6 +161,22 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
     private static final Structure<Map<MaterialKind, KindPolicy>> POLICY_MAP_STRUCTURE =
             Structure.unboundedMap(MaterialKind.STRUCTURE, KindPolicy.STRUCTURE);
 
+    public record BlockStats(Map<MaterialKind, Float> hardnessMul, Map<MaterialKind, Float> blastMul, Map<MaterialKind, Float> effMul) {
+        public static final Codec<BlockStats> CODEC = RecordCodecBuilder.create(i -> i.group(
+                FLOAT_MUL_CODEC.fieldOf("hardnessMul").forGetter(BlockStats::hardnessMul),
+                FLOAT_MUL_CODEC.fieldOf("blastMul").forGetter(BlockStats::blastMul),
+                FLOAT_MUL_CODEC.fieldOf("effMul").forGetter(BlockStats::effMul)
+        ).apply(i, BlockStats::new));
+        public static final Structure<BlockStats> STRUCTURE = Structure.record(builder -> {
+            var a = builder.add("hardnessMul", FLOAT_MUL_STRUCTURE, BlockStats::hardnessMul);
+            var b = builder.add("blastMul", FLOAT_MUL_STRUCTURE, BlockStats::blastMul);
+            var c = builder.add("effMul", FLOAT_MUL_STRUCTURE, BlockStats::effMul);
+            return container -> new BlockStats(
+                    a.apply(container), b.apply(container), c.apply(container)
+            );
+        });
+    }
+
     // ----- Main config schema -----
     public static final Codec<RAAConfig> CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.INT.fieldOf("materialsMin").forGetter(c -> c.materialsMin),
@@ -169,9 +186,7 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
             TierWeights.CODEC.fieldOf("tiers").forGetter(c -> c.tiers),
             MODE_MAP_CODEC.fieldOf("spawnMode").forGetter(c -> c.spawnMode),
 
-            FLOAT_MUL_CODEC.fieldOf("hardnessMul").forGetter(c -> c.hardnessMul),
-            FLOAT_MUL_CODEC.fieldOf("blastMul").forGetter(c -> c.blastMul),
-            FLOAT_MUL_CODEC.fieldOf("effMul").forGetter(c -> c.effMul),
+            BlockStats.CODEC.fieldOf("blockStats").forGetter(RAAConfig::blockStats),
 
             DEPTH_CODEC.fieldOf("depthWeights").forGetter(c -> c.depthWeights),
             Codec.unboundedMap(Codec.STRING, YRange.CODEC).fieldOf("shallowRange").forGetter(c -> c.shallowRange),
@@ -183,7 +198,8 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
 
             POLICY_MAP_CODEC.fieldOf("formControls").forGetter(c -> c.formControls),
 
-            Codec.INT.fieldOf("toolChancePercent").forGetter(c -> c.toolChancePercent)
+            Codec.INT.fieldOf("toolChancePercent").forGetter(c -> c.toolChancePercent),
+            MaterialGenerator.Profile.CODEC.fieldOf("defaultProfile").forGetter(RAAConfig::defaultProfile)
     ).apply(i, RAAConfig::new));
 
     public static final Structure<RAAConfig> STRUCTURE = Structure.record(builder -> {
@@ -192,9 +208,7 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
         var kindWeights = builder.add("kindWeights", KIND_WEIGHTS_STRUCTURE.annotate(Annotation.DESCRIPTION, "This is a test"), RAAConfig::kindWeights);
         var tiers = builder.add("tiers", TierWeights.STRUCTURE, RAAConfig::tiers);
         var spawnMode = builder.add("spawnMode", MODE_MAP_STRUCTURE, RAAConfig::spawnMode);
-        var hardnessMul = builder.add("hardnessMul", FLOAT_MUL_STRUCTURE, RAAConfig::hardnessMul);
-        var blastMul = builder.add("blastMul", FLOAT_MUL_STRUCTURE, RAAConfig::blastMul);
-        var effMul = builder.add("effMul", FLOAT_MUL_STRUCTURE, RAAConfig::effMul);
+        var blockStats = builder.add("blockStats", BlockStats.STRUCTURE, RAAConfig::blockStats);
         var depthWeights = builder.add("depthWeights", DEPTH_STRUCTURE, RAAConfig::depthWeights);
         var shallowRange = builder.add("shallowRange", Structure.unboundedMap(Structure.STRING, YRange.STRUCTURE), RAAConfig::shallowRange);
         var midRange = builder.add("midRange", Structure.unboundedMap(Structure.STRING, YRange.STRUCTURE), RAAConfig::midRange);
@@ -203,13 +217,13 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
         var nameGen = builder.add("nameGen", NameGen.STRUCTURE, RAAConfig::nameGen);
         var formControl = builder.add("formControls", POLICY_MAP_STRUCTURE, RAAConfig::formControls);
         var toolChancePercent = builder.add("toolChancePercent", Structure.INT, RAAConfig::toolChancePercent);
+        var defaultProfile = builder.add("defaultProfile", Structure.INT, RAAConfig::toolChancePercent);
         return container -> new RAAConfig(
                 materialsMin.apply(container), materialsMax.apply(container), kindWeights.apply(container),
-                tiers.apply(container), spawnMode.apply(container), hardnessMul.apply(container),
-                blastMul.apply(container), effMul.apply(container), depthWeights.apply(container),
-                shallowRange.apply(container), midRange.apply(container), deepRange.apply(container),
-                replacables.apply(container), nameGen.apply(container), formControl.apply(container),
-                toolChancePercent.apply(container)
+                tiers.apply(container), spawnMode.apply(container), blockStats.apply(container),
+                depthWeights.apply(container), shallowRange.apply(container), midRange.apply(container),
+                deepRange.apply(container), replacables.apply(container), nameGen.apply(container),
+                formControl.apply(container), toolChancePercent.apply(container)
         );
     });
 
@@ -241,7 +255,7 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
                         MaterialKind.CRYSTAL, new ModeWeights(0, 50, 50),
                         MaterialKind.VOLCANIC, new ModeWeights(30, 0, 70)
                 ),
-                Map.of(), Map.of(), Map.of(),
+                new BlockStats(Map.of(), Map.of(), Map.of()),
                 Map.of(
                         METAL, new DepthBand(20, 40, 40),
                         GEM, new DepthBand(35, 45, 20)
@@ -255,7 +269,8 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
                 ),
                 new NameGen(),
                 defaultPolicies(),
-                100
+                100,
+                MaterialGenerator.Profile.FANTASY_HEAVY
         );
     }
 
@@ -345,9 +360,7 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
                      Map<MaterialKind, Integer> kindWeights,
                      TierWeights tiers,
                      Map<MaterialKind, ModeWeights> spawnMode,
-                     Map<MaterialKind, Float> hardnessMul,
-                     Map<MaterialKind, Float> blastMul,
-                     Map<MaterialKind, Float> effMul,
+                     BlockStats blockStats,
                      Map<MaterialKind, DepthBand> depthWeights,
                      Map<String, YRange> shallowRange,
                      Map<String, YRange> midRange,
@@ -355,16 +368,15 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
                      Map<String, List<String>> replaceables,
                      NameGen nameGen,
                      Map<MaterialKind, KindPolicy> formControls,
-                     int toolChancePercent) {
+                     int toolChancePercent,
+                     MaterialGenerator.Profile defaultProfile) {
 
         this.materialsMin = materialsMin;
         this.materialsMax = materialsMax;
         this.tiers = tiers;
         this.kindWeights = wrapEnumMap(kindWeights);
         this.spawnMode = wrapEnumMap(spawnMode);
-        this.hardnessMul = wrapEnumMap(hardnessMul);
-        this.blastMul = wrapEnumMap(blastMul);
-        this.effMul = wrapEnumMap(effMul);
+        this.blockStats = blockStats;
         this.depthWeights = wrapEnumMap(depthWeights);
         this.formControls = wrapEnumMap(formControls);
         this.shallowRange = shallowRange;
@@ -373,6 +385,7 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
         this.replaceables = replaceables;
         this.nameGen = nameGen;
         this.toolChancePercent = toolChancePercent;
+        this.defaultProfile = defaultProfile;
     }
 
     private static <K extends Enum<K>, V> Map<K, V> wrapEnumMap(Map<K, V> input) {

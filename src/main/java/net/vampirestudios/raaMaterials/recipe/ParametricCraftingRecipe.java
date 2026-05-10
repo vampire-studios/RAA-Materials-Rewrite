@@ -9,7 +9,10 @@ import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import net.vampirestudios.raaMaterials.material.Form;
+import net.vampirestudios.raaMaterials.material.MaterialKind;
 import net.vampirestudios.raaMaterials.registry.YItems;
+
+import java.util.Optional;
 
 public final class ParametricCraftingRecipe extends CustomRecipe {
 	private final Kind kind;
@@ -25,7 +28,9 @@ public final class ParametricCraftingRecipe extends CustomRecipe {
 		var material = ParametricRecipeUtil.firstMaterial(input);
 		return material.isPresent()
 				&& ParametricRecipeUtil.hasForm(level, material.get(), kind.inputForm)
-				&& ParametricRecipeUtil.hasForm(level, material.get(), kind.outputForm);
+				&& (kind.extraInputForm == null || ParametricRecipeUtil.hasForm(level, material.get(), kind.extraInputForm))
+				&& ParametricRecipeUtil.hasForm(level, material.get(), kind.outputForm)
+				&& kind.family.matches(level, material.get());
 	}
 
 	@Override
@@ -61,13 +66,17 @@ public final class ParametricCraftingRecipe extends CustomRecipe {
 			case POLISHED_SLAB_FROM_POLISHED -> ParametricRecipes.POLISHED_SLAB_FROM_POLISHED;
 			case POLISHED_STAIRS_FROM_POLISHED -> ParametricRecipes.POLISHED_STAIRS_FROM_POLISHED;
 			case POLISHED_WALL_FROM_POLISHED -> ParametricRecipes.POLISHED_WALL_FROM_POLISHED;
-			case DOOR_FROM_BLOCK -> ParametricRecipes.DOOR_FROM_BLOCK;
-			case TRAPDOOR_FROM_BLOCK -> ParametricRecipes.TRAPDOOR_FROM_BLOCK;
-			case FENCE_FROM_BLOCK -> ParametricRecipes.FENCE_FROM_BLOCK;
-			case FENCE_GATE_FROM_BLOCK -> ParametricRecipes.FENCE_GATE_FROM_BLOCK;
-			case CHAIN_FROM_ROD -> ParametricRecipes.CHAIN_FROM_ROD;
+			case METAL_DOOR_FROM_INGOTS -> ParametricRecipes.METAL_DOOR_FROM_INGOTS;
+			case WOOD_DOOR_FROM_BLOCKS -> ParametricRecipes.WOOD_DOOR_FROM_BLOCKS;
+			case METAL_TRAPDOOR_FROM_INGOTS -> ParametricRecipes.METAL_TRAPDOOR_FROM_INGOTS;
+			case WOOD_TRAPDOOR_FROM_BLOCKS -> ParametricRecipes.WOOD_TRAPDOOR_FROM_BLOCKS;
+			case METAL_FENCE_FROM_INGOTS -> ParametricRecipes.METAL_FENCE_FROM_INGOTS;
+			case WOOD_FENCE_FROM_BLOCKS -> ParametricRecipes.WOOD_FENCE_FROM_BLOCKS;
+			case METAL_FENCE_GATE_FROM_INGOTS -> ParametricRecipes.METAL_FENCE_GATE_FROM_INGOTS;
+			case WOOD_FENCE_GATE_FROM_BLOCKS -> ParametricRecipes.WOOD_FENCE_GATE_FROM_BLOCKS;
+			case CHAIN_FROM_INGOT_AND_NUGGETS -> ParametricRecipes.CHAIN_FROM_INGOT_AND_NUGGETS;
 			case LAMP_FROM_BLOCK -> ParametricRecipes.LAMP_FROM_BLOCK;
-			case LANTERN_FROM_LAMP -> ParametricRecipes.LANTERN_FROM_LAMP;
+			case LANTERN_FROM_LAMP_AND_NUGGETS -> ParametricRecipes.LANTERN_FROM_LAMP_AND_NUGGETS;
 		};
 	}
 
@@ -83,16 +92,18 @@ public final class ParametricCraftingRecipe extends CustomRecipe {
 					stairs(input, kind.input);
 			case WALL_FROM_BLOCK, SANDSTONE_WALL_FROM_SANDSTONE, BRICK_WALL_FROM_BRICKS, POLISHED_WALL_FROM_POLISHED ->
 					blockRows(input, kind.input, 2, 3);
-			case DOOR_FROM_BLOCK ->
+			case METAL_DOOR_FROM_INGOTS, WOOD_DOOR_FROM_BLOCKS ->
 					blockRows(input, kind.input, 3, 2);
-			case TRAPDOOR_FROM_BLOCK, FENCE_FROM_BLOCK ->
+			case WOOD_TRAPDOOR_FROM_BLOCKS, METAL_FENCE_FROM_INGOTS, WOOD_FENCE_FROM_BLOCKS ->
 					blockRows(input, kind.input, 2, 3);
-			case FENCE_GATE_FROM_BLOCK ->
+			case METAL_TRAPDOOR_FROM_INGOTS, METAL_FENCE_GATE_FROM_INGOTS, WOOD_FENCE_GATE_FROM_BLOCKS ->
 					blockRows(input, kind.input, 2, 2);
-			case CHAIN_FROM_ROD ->
-					blockColumn(input, kind.input, 3);
-			case LAMP_FROM_BLOCK, LANTERN_FROM_LAMP ->
+			case CHAIN_FROM_INGOT_AND_NUGGETS ->
+					chain(input);
+			case LAMP_FROM_BLOCK ->
 					ParametricRecipeUtil.allSameItemAndMaterial(input, kind.input, 1);
+			case LANTERN_FROM_LAMP_AND_NUGGETS ->
+					lantern(input);
 		};
 	}
 
@@ -116,12 +127,6 @@ public final class ParametricCraftingRecipe extends CustomRecipe {
 		return matchesStair(input, box, false) || matchesStair(input, box, true);
 	}
 
-	private static boolean blockColumn(CraftingInput input, Item item, int height) {
-		if (!ParametricRecipeUtil.allSameItemAndMaterial(input, item, height)) return false;
-		var box = bounds(input);
-		return box.width() == 1 && box.height() == height;
-	}
-
 	private static boolean matchesStair(CraftingInput input, Bounds box, boolean mirrored) {
 		for (int y = 0; y < 3; y++) {
 			for (int x = 0; x < 3; x++) {
@@ -131,6 +136,57 @@ public final class ParametricCraftingRecipe extends CustomRecipe {
 				if (filled != shouldBeFilled) return false;
 			}
 		}
+		return true;
+	}
+
+	private static boolean chain(CraftingInput input) {
+		if (input.ingredientCount() != 3) return false;
+		var box = bounds(input);
+		if (box.width() != 1 || box.height() != 3) return false;
+
+		var top = input.getItem(box.minX, box.minY);
+		var middle = input.getItem(box.minX, box.minY + 1);
+		var bottom = input.getItem(box.minX, box.minY + 2);
+
+		return top.is(YItems.PARAM_NUGGET)
+				&& middle.is(YItems.PARAM_INGOT)
+				&& bottom.is(YItems.PARAM_NUGGET)
+				&& sameMaterial(top, middle, bottom);
+	}
+
+	private static boolean lantern(CraftingInput input) {
+		if (input.ingredientCount() != 9) return false;
+		var box = bounds(input);
+		if (box.width() != 3 || box.height() != 3) return false;
+
+		ItemStack center = input.getItem(box.minX + 1, box.minY + 1);
+		if (!center.is(YItems.PARAM_LAMP_ITEM)) return false;
+
+		Optional<net.minecraft.resources.Identifier> material = ParametricRecipeUtil.material(center);
+		if (material.isEmpty()) return false;
+
+		for (int y = 0; y < 3; y++) {
+			for (int x = 0; x < 3; x++) {
+				if (x == 1 && y == 1) continue;
+				ItemStack stack = input.getItem(box.minX + x, box.minY + y);
+				if (!stack.is(YItems.PARAM_NUGGET)) return false;
+				if (!ParametricRecipeUtil.material(stack).filter(material.get()::equals).isPresent()) return false;
+			}
+		}
+
+		return true;
+	}
+
+	private static boolean sameMaterial(ItemStack first, ItemStack... rest) {
+		Optional<net.minecraft.resources.Identifier> material = ParametricRecipeUtil.material(first);
+		if (material.isEmpty()) return false;
+
+		for (ItemStack stack : rest) {
+			if (!ParametricRecipeUtil.material(stack).filter(material.get()::equals).isPresent()) {
+				return false;
+			}
+		}
+
 		return true;
 	}
 
@@ -176,28 +232,44 @@ public final class ParametricCraftingRecipe extends CustomRecipe {
 		POLISHED_SLAB_FROM_POLISHED("polished_slab_from_polished", Form.POLISHED, Form.SLAB, YItems.PARAM_POLISHED_BLOCK_ITEM, YItems.PARAM_POLISHED_SLAB_ITEM, 6),
 		POLISHED_STAIRS_FROM_POLISHED("polished_stairs_from_polished", Form.POLISHED, Form.STAIRS, YItems.PARAM_POLISHED_BLOCK_ITEM, YItems.PARAM_POLISHED_STAIRS_ITEM, 4),
 		POLISHED_WALL_FROM_POLISHED("polished_wall_from_polished", Form.POLISHED, Form.WALL, YItems.PARAM_POLISHED_BLOCK_ITEM, YItems.PARAM_POLISHED_WALL_ITEM, 6),
-		DOOR_FROM_BLOCK("door_from_block", Form.BLOCK, Form.DOOR, YItems.PARAM_BLOCK_ITEM, YItems.PARAM_DOOR_ITEM, 3),
-		TRAPDOOR_FROM_BLOCK("trapdoor_from_block", Form.BLOCK, Form.TRAPDOOR, YItems.PARAM_BLOCK_ITEM, YItems.PARAM_TRAPDOOR_ITEM, 2),
-		FENCE_FROM_BLOCK("fence_from_block", Form.BLOCK, Form.FENCE, YItems.PARAM_BLOCK_ITEM, YItems.PARAM_FENCE_ITEM, 3),
-		FENCE_GATE_FROM_BLOCK("fence_gate_from_block", Form.BLOCK, Form.FENCE_GATE, YItems.PARAM_BLOCK_ITEM, YItems.PARAM_FENCE_GATE_ITEM, 1),
-		CHAIN_FROM_ROD("chain_from_rod", Form.ROD, Form.CHAIN, YItems.PARAM_ROD, YItems.PARAM_CHAIN_ITEM, 3),
+		METAL_DOOR_FROM_INGOTS("metal_door_from_ingots", Form.INGOT, Form.DOOR, YItems.PARAM_INGOT, YItems.PARAM_DOOR_METAL_ITEM, 3, Family.METAL_LIKE),
+		WOOD_DOOR_FROM_BLOCKS("wood_door_from_blocks", Form.BLOCK, Form.DOOR, YItems.PARAM_BLOCK_ITEM, YItems.PARAM_DOOR_WOOD_ITEM, 3, Family.WOOD),
+		METAL_TRAPDOOR_FROM_INGOTS("metal_trapdoor_from_ingots", Form.INGOT, Form.TRAPDOOR, YItems.PARAM_INGOT, YItems.PARAM_TRAPDOOR_METAL_ITEM, 1, Family.METAL_LIKE),
+		WOOD_TRAPDOOR_FROM_BLOCKS("wood_trapdoor_from_blocks", Form.BLOCK, Form.TRAPDOOR, YItems.PARAM_BLOCK_ITEM, YItems.PARAM_TRAPDOOR_WOOD_ITEM, 2, Family.WOOD),
+		METAL_FENCE_FROM_INGOTS("metal_fence_from_ingots", Form.INGOT, Form.FENCE, YItems.PARAM_INGOT, YItems.PARAM_FENCE_ITEM, 3, Family.METAL_LIKE),
+		WOOD_FENCE_FROM_BLOCKS("wood_fence_from_blocks", Form.BLOCK, Form.FENCE, YItems.PARAM_BLOCK_ITEM, YItems.PARAM_FENCE_ITEM, 3, Family.WOOD),
+		METAL_FENCE_GATE_FROM_INGOTS("metal_fence_gate_from_ingots", Form.INGOT, Form.FENCE_GATE, YItems.PARAM_INGOT, YItems.PARAM_FENCE_GATE_ITEM, 1, Family.METAL_LIKE),
+		WOOD_FENCE_GATE_FROM_BLOCKS("wood_fence_gate_from_blocks", Form.BLOCK, Form.FENCE_GATE, YItems.PARAM_BLOCK_ITEM, YItems.PARAM_FENCE_GATE_ITEM, 1, Family.WOOD),
+		CHAIN_FROM_INGOT_AND_NUGGETS("chain_from_ingot_and_nuggets", Form.INGOT, Form.CHAIN, YItems.PARAM_INGOT, YItems.PARAM_CHAIN_ITEM, 1, Family.METAL_LIKE, Form.NUGGET),
 		LAMP_FROM_BLOCK("lamp_from_block", Form.BLOCK, Form.LAMP, YItems.PARAM_BLOCK_ITEM, YItems.PARAM_LAMP_ITEM, 1),
-		LANTERN_FROM_LAMP("lantern_from_lamp", Form.LAMP, Form.LANTERN, YItems.PARAM_LAMP_ITEM, YItems.PARAM_LANTERN_ITEM, 1);
+		LANTERN_FROM_LAMP_AND_NUGGETS("lantern_from_lamp_and_nuggets", Form.LAMP, Form.LANTERN, YItems.PARAM_LAMP_ITEM, YItems.PARAM_LANTERN_ITEM, 1, Family.METAL_LIKE, Form.NUGGET);
 
 		private final String id;
 		private final Form inputForm;
+		private final Form extraInputForm;
 		private final Form outputForm;
 		private final Item input;
 		private final Item output;
 		private final int outputCount;
+		private final Family family;
 
 		Kind(String id, Form inputForm, Form outputForm, Item input, Item output, int outputCount) {
+			this(id, inputForm, outputForm, input, output, outputCount, Family.ANY);
+		}
+
+		Kind(String id, Form inputForm, Form outputForm, Item input, Item output, int outputCount, Family family) {
+			this(id, inputForm, outputForm, input, output, outputCount, family, null);
+		}
+
+		Kind(String id, Form inputForm, Form outputForm, Item input, Item output, int outputCount, Family family, Form extraInputForm) {
 			this.id = id;
 			this.inputForm = inputForm;
+			this.extraInputForm = extraInputForm;
 			this.outputForm = outputForm;
 			this.input = input;
 			this.output = output;
 			this.outputCount = outputCount;
+			this.family = family;
 		}
 
 		public String id() {
@@ -206,6 +278,22 @@ public final class ParametricCraftingRecipe extends CustomRecipe {
 
 		Item output() {
 			return output;
+		}
+	}
+
+	private enum Family {
+		ANY,
+		METAL_LIKE,
+		WOOD;
+
+		boolean matches(Level level, net.minecraft.resources.Identifier material) {
+			return switch (this) {
+				case ANY -> true;
+				case METAL_LIKE ->
+						ParametricRecipeUtil.hasKind(level, material, MaterialKind.METAL)
+								|| ParametricRecipeUtil.hasKind(level, material, MaterialKind.ALLOY);
+				case WOOD -> ParametricRecipeUtil.hasKind(level, material, MaterialKind.WOOD);
+			};
 		}
 	}
 }

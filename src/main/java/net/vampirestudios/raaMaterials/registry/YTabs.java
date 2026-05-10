@@ -218,11 +218,17 @@ public final class YTabs {
 									});
 								}
 
-								// Doors / Trapdoors (already present)
-								addBlocksIf(output, def, idx, new Object[][]{
-										{Form.DOOR, YItems.PARAM_DOOR_ITEM},
-										{Form.TRAPDOOR, YItems.PARAM_TRAPDOOR_ITEM}
-								});
+								if (isMetalLike(def)) {
+									addBlocksIf(output, def, idx, new Object[][]{
+											{Form.DOOR, YItems.PARAM_DOOR_METAL_ITEM},
+											{Form.TRAPDOOR, YItems.PARAM_TRAPDOOR_METAL_ITEM}
+									});
+								} else if (isWoodLike(def)) {
+									addBlocksIf(output, def, idx, new Object[][]{
+											{Form.DOOR, YItems.PARAM_DOOR_WOOD_ITEM},
+											{Form.TRAPDOOR, YItems.PARAM_TRAPDOOR_WOOD_ITEM}
+									});
+								}
 
 								// NEW: Fences (by family)
 								addBlocksIf(output, def, idx, new Object[][]{

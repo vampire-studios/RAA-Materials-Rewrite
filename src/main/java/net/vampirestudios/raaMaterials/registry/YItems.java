@@ -52,7 +52,8 @@ public final class YItems {
 	public static Item PARAM_BARS_ITEM, PARAM_GRATE_ITEM;
 	public static Item PARAM_BUTTON_METAL_ITEM, PARAM_BUTTON_STONE_ITEM, PARAM_BUTTON_WOOD_ITEM,
 			PARAM_PRESSURE_PLATE_METAL_ITEM, PARAM_PRESSURE_PLATE_STONE_ITEM, PARAM_PRESSURE_PLATE_WOOD_ITEM,
-			PARAM_DOOR_ITEM, PARAM_TRAPDOOR_ITEM, PARAM_FENCE_ITEM, PARAM_FENCE_GATE_ITEM,
+			PARAM_DOOR_METAL_ITEM, PARAM_DOOR_WOOD_ITEM, PARAM_TRAPDOOR_METAL_ITEM, PARAM_TRAPDOOR_WOOD_ITEM,
+			PARAM_FENCE_ITEM, PARAM_FENCE_GATE_ITEM,
 			PARAM_CHAIN_ITEM, PARAM_LANTERN_ITEM, PARAM_LAMP_ITEM;
 
 	public static Item PARAM_CRYSTAL_PANE_ITEM, PARAM_ROD_BLOCK_ITEM; // pane + rod-like light
@@ -156,8 +157,10 @@ public final class YItems {
 		PARAM_PRESSURE_PLATE_METAL_ITEM = regBlockItem("material_pressure_plate_metal", YBlocks.PARAM_PRESSURE_PLATE_METAL);
 		PARAM_PRESSURE_PLATE_STONE_ITEM = regBlockItem("material_pressure_plate_stone", YBlocks.PARAM_PRESSURE_PLATE_STONE);
 		PARAM_PRESSURE_PLATE_WOOD_ITEM = regBlockItem("material_pressure_plate_wood", YBlocks.PARAM_PRESSURE_PLATE_WOOD);
-		PARAM_DOOR_ITEM = regBlockItem("material_door", YBlocks.PARAM_DOOR);
-		PARAM_TRAPDOOR_ITEM = regBlockItem("material_trapdoor", YBlocks.PARAM_TRAPDOOR);
+		PARAM_DOOR_METAL_ITEM = regBlockItem("material_door_metal", YBlocks.PARAM_DOOR_METAL);
+		PARAM_DOOR_WOOD_ITEM = regBlockItem("material_door_wood", YBlocks.PARAM_DOOR_WOOD);
+		PARAM_TRAPDOOR_METAL_ITEM = regBlockItem("material_trapdoor_metal", YBlocks.PARAM_TRAPDOOR_METAL);
+		PARAM_TRAPDOOR_WOOD_ITEM = regBlockItem("material_trapdoor_wood", YBlocks.PARAM_TRAPDOOR_WOOD);
 		PARAM_FENCE_ITEM = regBlockItem("material_fence", YBlocks.PARAM_FENCE);
 		PARAM_FENCE_GATE_ITEM = regBlockItem("material_fence_gate", YBlocks.PARAM_FENCE_GATE);
 		PARAM_CHAIN_ITEM = regBlockItem("material_chain", YBlocks.PARAM_CHAIN);

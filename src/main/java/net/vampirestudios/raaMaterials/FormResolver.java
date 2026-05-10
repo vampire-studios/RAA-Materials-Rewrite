@@ -32,16 +32,16 @@ public final class FormResolver {
         // Base groups
         for (var g : baseGroups) out.addAll(formsFor(g));
         // Apply +/- groups from policy
-        for (var g : policy.groupsPlus) out.addAll(formsFor(g));
-        for (var g : policy.groupsMinus) formsFor(g).forEach(out::remove);
+        for (var g : policy.groupsPlus()) out.addAll(formsFor(g));
+        for (var g : policy.groupsMinus()) formsFor(g).forEach(out::remove);
         // Explicit adds/removes
-        out.addAll(policy.add);
-        policy.remove.forEach(out::remove);
+        out.addAll(policy.add());
+        policy.remove().forEach(out::remove);
         // Shape clamp
-        if (policy.maxShapeForms >= 0) {
+        if (policy.maxShapeForms() >= 0) {
             var shapes = out.stream().filter(f -> f == SLAB || f == STAIRS || f == WALL).toList();
-            if (shapes.size() > policy.maxShapeForms) {
-                shapes.stream().skip(policy.maxShapeForms).forEach(out::remove);
+            if (shapes.size() > policy.maxShapeForms()) {
+                shapes.stream().skip(policy.maxShapeForms()).forEach(out::remove);
             }
         }
         return out;

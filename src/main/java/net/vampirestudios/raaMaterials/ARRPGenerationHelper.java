@@ -65,7 +65,8 @@ public class ARRPGenerationHelper {
             "material_pressure_plate_metal",
             "material_pressure_plate_stone",
             "material_pressure_plate_wood",
-            "material_trapdoor",
+            "material_trapdoor_metal",
+            "material_trapdoor_wood",
             "material_fence",
             "material_fence_gate",
             "material_chain",
@@ -91,7 +92,8 @@ public class ARRPGenerationHelper {
 
     public static void generateParametricBlockLootTables(RuntimeResourcePack pack) {
         addOreLootTable(pack);
-        addDoorLootTable(pack);
+        addDoorLootTable(pack, "material_door_metal");
+        addDoorLootTable(pack, "material_door_wood");
         for (String blockId : PARAMETRIC_BLOCK_DROPS) {
             addSelfDropLootTable(pack, blockId, false);
         }
@@ -119,13 +121,17 @@ public class ARRPGenerationHelper {
         addSpecialRecipe(pack, "polished_slab_from_polished");
         addSpecialRecipe(pack, "polished_stairs_from_polished");
         addSpecialRecipe(pack, "polished_wall_from_polished");
-        addSpecialRecipe(pack, "door_from_block");
-        addSpecialRecipe(pack, "trapdoor_from_block");
-        addSpecialRecipe(pack, "fence_from_block");
-        addSpecialRecipe(pack, "fence_gate_from_block");
-        addSpecialRecipe(pack, "chain_from_rod");
+        addSpecialRecipe(pack, "metal_door_from_ingots");
+        addSpecialRecipe(pack, "wood_door_from_blocks");
+        addSpecialRecipe(pack, "metal_trapdoor_from_ingots");
+        addSpecialRecipe(pack, "wood_trapdoor_from_blocks");
+        addSpecialRecipe(pack, "metal_fence_from_ingots");
+        addSpecialRecipe(pack, "wood_fence_from_blocks");
+        addSpecialRecipe(pack, "metal_fence_gate_from_ingots");
+        addSpecialRecipe(pack, "wood_fence_gate_from_blocks");
+        addSpecialRecipe(pack, "chain_from_ingot_and_nuggets");
         addSpecialRecipe(pack, "lamp_from_block");
-        addSpecialRecipe(pack, "lantern_from_lamp");
+        addSpecialRecipe(pack, "lantern_from_lamp_and_nuggets");
         addSpecialRecipe(pack, "smelt_ore_to_ingot");
         addSpecialRecipe(pack, "blast_ore_to_ingot");
         addSpecialRecipe(pack, "smelt_raw_to_ingot");
@@ -166,8 +172,8 @@ public class ARRPGenerationHelper {
                         .randomSequence(RAAMaterials.id("blocks/" + blockId)));
     }
 
-    private static void addDoorLootTable(RuntimeResourcePack pack) {
-        var id = RAAMaterials.id("material_door");
+    private static void addDoorLootTable(RuntimeResourcePack pack, String blockId) {
+        var id = RAAMaterials.id(blockId);
         JsonObject properties = new JsonObject();
         properties.addProperty("half", "lower");
 
@@ -187,10 +193,10 @@ public class ARRPGenerationHelper {
                 .condition(net.vampirestudios.arrp.json.loot.JLootTable.predicate("minecraft:survives_explosion"))
                 .entry(entry);
 
-        pack.addLootTable(RAAMaterials.id("blocks/material_door"),
+        pack.addLootTable(RAAMaterials.id("blocks/" + blockId),
                 net.vampirestudios.arrp.json.loot.JLootTable.loot("minecraft:block")
                         .pool(pool)
-                        .randomSequence(RAAMaterials.id("blocks/material_door")));
+                        .randomSequence(RAAMaterials.id("blocks/" + blockId)));
     }
 
     private static void addOreLootTable(RuntimeResourcePack pack) {

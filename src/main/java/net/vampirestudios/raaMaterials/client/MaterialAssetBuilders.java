@@ -17,6 +17,7 @@ import net.vampirestudios.arrp.json.models.JModel;
 import net.vampirestudios.raaMaterials.ARRPGenerationHelper;
 import net.vampirestudios.raaMaterials.RAAMaterials;
 import net.vampirestudios.raaMaterials.material.Form;
+import net.vampirestudios.raaMaterials.material.MaterialAssets;
 import net.vampirestudios.raaMaterials.material.MaterialDef;
 
 import java.util.ArrayList;
@@ -73,10 +74,32 @@ public final class MaterialAssetBuilders {
             RAAMaterials.id("material_lamp"),
             RAAMaterials.id("material_chain"),
             RAAMaterials.id("material_lantern"),
-            RAAMaterials.id("material_door"),
-            RAAMaterials.id("material_trapdoor"),
+            RAAMaterials.id("material_door_metal"),
+            RAAMaterials.id("material_door_wood"),
+            RAAMaterials.id("material_trapdoor_metal"),
+            RAAMaterials.id("material_trapdoor_wood"),
             RAAMaterials.id("material_fence"),
             RAAMaterials.id("material_fence_gate"),
+            RAAMaterials.id("material_slab"),
+            RAAMaterials.id("material_stairs"),
+            RAAMaterials.id("material_wall"),
+            RAAMaterials.id("material_sandstone_slab"),
+            RAAMaterials.id("material_sandstone_stairs"),
+            RAAMaterials.id("material_sandstone_wall"),
+            RAAMaterials.id("material_brick_slab"),
+            RAAMaterials.id("material_brick_stairs"),
+            RAAMaterials.id("material_brick_wall"),
+            RAAMaterials.id("material_polished_slab"),
+            RAAMaterials.id("material_polished_stairs"),
+            RAAMaterials.id("material_polished_wall"),
+            RAAMaterials.id("material_bars"),
+            RAAMaterials.id("material_grate"),
+            RAAMaterials.id("material_button_metal"),
+            RAAMaterials.id("material_button_stone"),
+            RAAMaterials.id("material_button_wood"),
+            RAAMaterials.id("material_pressure_plate_metal"),
+            RAAMaterials.id("material_pressure_plate_stone"),
+            RAAMaterials.id("material_pressure_plate_wood"),
             RAAMaterials.id("material_crystal_pane"),
             RAAMaterials.id("material_rod_block"),
             RAAMaterials.id("material_cobbled"),
@@ -300,8 +323,10 @@ public final class MaterialAssetBuilders {
                         .orElse(pickBlockTexture(ctx.materials().get(idx), idx))
         ));
 
-        buildDoorFamily(ctx, RAAMaterials.id("material_door"), "block/material_door/");
-        buildTrapdoorFamily(ctx, RAAMaterials.id("material_trapdoor"), "block/material_trapdoor/");
+        buildDoorFamily(ctx, RAAMaterials.id("material_door_metal"), "block/material_door_metal/");
+        buildDoorFamily(ctx, RAAMaterials.id("material_door_wood"), "block/material_door_wood/");
+        buildTrapdoorFamily(ctx, RAAMaterials.id("material_trapdoor_metal"), "block/material_trapdoor_metal/");
+        buildTrapdoorFamily(ctx, RAAMaterials.id("material_trapdoor_wood"), "block/material_trapdoor_wood/");
         buildFenceFamily(ctx, RAAMaterials.id("material_fence"), "block/material_fence/");
         buildFenceGateFamily(ctx, RAAMaterials.id("material_fence_gate"), "block/material_fence_gate/");
         buildChainFamily(ctx, RAAMaterials.id("material_chain"), "block/material_chain/");
@@ -838,8 +863,11 @@ public final class MaterialAssetBuilders {
         int cases = 0;
 
         ctx.forEachMaterialWith(Form.DOOR, (idx, def) -> {
-            var tex = pickBlockTexture(def, idx);
+            var bottomTexture = pickDecorTexture(Form.DOOR, def, idx);
+            var topTexture = textures(def).textures4().doorTop().orElseGet(() -> pairedDoorTopTexture(bottomTexture));
+            var itemTexture = textures(def).textures4().doorItem().orElse(bottomTexture);
             var path = def.nameInformation().id().getPath();
+            var itemModel = RAAMaterials.id(modelPrefix + path + "_item");
             var bottomLeft = RAAMaterials.id(modelPrefix + path + "_bottom_left");
             var bottomLeftOpen = RAAMaterials.id(modelPrefix + path + "_bottom_left_open");
             var bottomRight = RAAMaterials.id(modelPrefix + path + "_bottom_right");
@@ -849,9 +877,10 @@ public final class MaterialAssetBuilders {
             var topRight = RAAMaterials.id(modelPrefix + path + "_top_right");
             var topRightOpen = RAAMaterials.id(modelPrefix + path + "_top_right_open");
 
-            addDoorModels(ctx.pack(), bottomLeft, bottomLeftOpen, bottomRight, bottomRightOpen, topLeft, topLeftOpen, topRight, topRightOpen, tex);
+            addGeneratedItemModel(ctx.pack(), itemModel, itemTexture);
+            addDoorModels(ctx.pack(), bottomLeft, bottomLeftOpen, bottomRight, bottomRightOpen, topLeft, topLeftOpen, topRight, topRightOpen, bottomTexture, topTexture);
             addDoorVariants(variant, idx, bottomLeft, bottomLeftOpen, bottomRight, bottomRightOpen, topLeft, topLeftOpen, topRight, topRightOpen);
-            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(bottomLeft, def)));
+            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(itemModel, def)));
         });
 
         for (MaterialDef def : ctx.materials()) {
@@ -871,7 +900,7 @@ public final class MaterialAssetBuilders {
         int cases = 0;
 
         ctx.forEachMaterialWith(Form.TRAPDOOR, (idx, def) -> {
-            var tex = pickBlockTexture(def, idx);
+            var tex = pickDecorTexture(Form.TRAPDOOR, def, idx);
             var path = def.nameInformation().id().getPath();
             var bottom = RAAMaterials.id(modelPrefix + path + "_bottom");
             var top = RAAMaterials.id(modelPrefix + path + "_top");
@@ -899,7 +928,7 @@ public final class MaterialAssetBuilders {
         int cases = 0;
 
         ctx.forEachMaterialWith(Form.FENCE, (idx, def) -> {
-            var tex = pickBlockTexture(def, idx);
+            var tex = pickDecorTexture(Form.FENCE, def, idx);
             var path = def.nameInformation().id().getPath();
             var post = RAAMaterials.id(modelPrefix + path + "_post");
             var side = RAAMaterials.id(modelPrefix + path + "_side");
@@ -927,7 +956,7 @@ public final class MaterialAssetBuilders {
         int cases = 0;
 
         ctx.forEachMaterialWith(Form.FENCE_GATE, (idx, def) -> {
-            var tex = pickBlockTexture(def, idx);
+            var tex = pickDecorTexture(Form.FENCE_GATE, def, idx);
             var path = def.nameInformation().id().getPath();
             var gate = RAAMaterials.id(modelPrefix + path);
             var gateOpen = RAAMaterials.id(modelPrefix + path + "_open");
@@ -958,7 +987,7 @@ public final class MaterialAssetBuilders {
         ctx.forEachMaterialWith(Form.CHAIN, (idx, def) -> {
             var modelId = RAAMaterials.id(modelPrefix + def.nameInformation().id().getPath());
             ctx.pack().addModel(JModel.model("minecraft:block/template_chain")
-                    .textures(JModel.textures().var("texture", blockTexture(pickBlockTexture(def, idx)))), modelId);
+                    .textures(JModel.textures().var("texture", blockTexture(pickDecorTexture(Form.CHAIN, def, idx)))), modelId);
 
             variant.put(Map.of("mat", idx, "axis", "y"), JState.model(modelId));
             variant.put(Map.of("mat", idx, "axis", "x"), JState.model(modelId).x(90).y(90));
@@ -983,7 +1012,7 @@ public final class MaterialAssetBuilders {
         int cases = 0;
 
         ctx.forEachMaterialWith(Form.LANTERN, (idx, def) -> {
-            var tex = blockTexture(pickBlockTexture(def, idx));
+            var tex = blockTexture(pickDecorTexture(Form.LANTERN, def, idx));
             var base = RAAMaterials.id(modelPrefix + def.nameInformation().id().getPath());
             var hanging = RAAMaterials.id(modelPrefix + def.nameInformation().id().getPath() + "_hanging");
 
@@ -1140,9 +1169,11 @@ public final class MaterialAssetBuilders {
     }
 
     private static void addDoorModels(RuntimeResourcePack rp, Identifier bottomLeft, Identifier bottomLeftOpen, Identifier bottomRight, Identifier bottomRightOpen,
-                                      Identifier topLeft, Identifier topLeftOpen, Identifier topRight, Identifier topRightOpen, Identifier texture) {
-        var tex = blockTexture(texture);
-        var textures = JModel.textures().var("bottom", tex).var("top", tex);
+                                      Identifier topLeft, Identifier topLeftOpen, Identifier topRight, Identifier topRightOpen,
+                                      Identifier bottomTexture, Identifier topTexture) {
+        var textures = JModel.textures()
+                .var("bottom", blockTexture(bottomTexture))
+                .var("top", blockTexture(topTexture));
 
         rp.addModel(JModel.model("minecraft:block/door_bottom_left").textures(textures), bottomLeft);
         rp.addModel(JModel.model("minecraft:block/door_bottom_left_open").textures(textures), bottomLeftOpen);
@@ -1277,6 +1308,34 @@ public final class MaterialAssetBuilders {
     private static JModelBasic tintedModel(Identifier modelId, MaterialDef def) {
         return (JModelBasic) JModelBasic.model(modelId.toString())
                 .tint(JTint.constant(MaterialsAssets.opaqueColor(def.primaryColor())));
+    }
+
+    private static Identifier pickFormTexture(Form form, MaterialDef def, int idx) {
+        return MaterialAssets.texture(form, def).orElseGet(() -> pickBlockTexture(def, idx));
+    }
+
+    private static Identifier pickDecorTexture(Form form, MaterialDef def, int idx) {
+        var decor = textures(def).textures4();
+        return switch (form) {
+            case CHAIN -> decor.chain();
+            case LANTERN -> decor.lantern();
+            case DOOR -> decor.doorBottom();
+            case TRAPDOOR -> decor.trapdoor();
+            case FENCE -> decor.fence();
+            case FENCE_GATE -> decor.fenceGate();
+            default -> java.util.Optional.<Identifier>empty();
+        }.orElseGet(() -> pickFormTexture(form, def, idx));
+    }
+
+    private static Identifier pairedDoorTopTexture(Identifier bottomTexture) {
+        String path = bottomTexture.getPath();
+        if (path.endsWith("_bottom")) {
+            return Identifier.fromNamespaceAndPath(bottomTexture.getNamespace(), path.substring(0, path.length() - "_bottom".length()) + "_top");
+        }
+        if (path.endsWith("bottom")) {
+            return Identifier.fromNamespaceAndPath(bottomTexture.getNamespace(), path.substring(0, path.length() - "bottom".length()) + "top");
+        }
+        return bottomTexture;
     }
 
     private static void addFallbackItemModel(RuntimeResourcePack rp, Identifier itemId) {
