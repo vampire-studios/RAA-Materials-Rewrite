@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
 import net.vampirestudios.raaMaterials.material.*;
+import net.vampirestudios.raaMaterials.material.textureSets.*;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -99,44 +100,38 @@ public final class AssetsTheme {
 		// Metal decor
 		Optional<Identifier> plateBlock = pick(k, Slot.PLATE_SHEET, rnd);
 		Optional<Identifier> shingles = pick(k, Slot.SHINGLES_SHEET, rnd);
+		Optional<Identifier> cobblestone = pick(k, Slot.COBBLESTONE, rnd);
+		Optional<Identifier> chiseled = pick(k, Slot.CHISELED, rnd);
+		Optional<Identifier> bricks = pick(k, Slot.STONE_BRICKS, rnd);
+		Optional<Identifier> polished = pick(k, Slot.POLISHED_RANDOM, rnd);
+
+		return new BlockTextureSet(
+				oreVein, storageBlock, rawBlock, plateBlock, shingles,
+				cobblestone, chiseled, bricks, polished
+		);
+	}
+
+	private SandstoneTextureSet buildSandstoneTextureSet(MaterialDef m, Random rnd) {
+		var k = m.kind();
 
 		// Sandstone family (vanilla parity)
 		Optional<Identifier> sandstoneTop = pick(k, Slot.SANDSTONE_TOP, rnd);
 		Optional<Identifier> sandstoneSide = pick(k, Slot.SANDSTONE_SIDE, rnd);
 		Optional<Identifier> sandstoneBottom = pick(k, Slot.SANDSTONE_BOTTOM, rnd);
 		Optional<Identifier> cut = pick(k, Slot.SANDSTONE_CUT, rnd);
-		Optional<Identifier> chiseled = switch (k) {
+		Optional<Identifier> chiseledSandstone = switch (k) {
 			case STONE -> pick(k, Slot.CHISELED, rnd);
 			case SAND -> pick(k, Slot.SANDSTONE_CHISELED, rnd);
 			default -> Optional.empty();
 		};
 
-		// Budding & buds (crystal-like)
-		Optional<Identifier> budding = (k == MaterialKind.CRYSTAL) ?
-				pick(k, Slot.CRYSTAL_BUDDING, rnd) : Optional.empty();
-		Optional<Identifier> budSmall = pick(k, Slot.CRYSTAL_BUD_S, rnd);
-		Optional<Identifier> budMedium = pick(k, Slot.CRYSTAL_BUD_M, rnd);
-		Optional<Identifier> budLarge = pick(k, Slot.CRYSTAL_BUD_L, rnd);
-
-		// Cluster + tinted glass overlay
-		Optional<Identifier> cluster = (k == MaterialKind.CRYSTAL) ?
-				pick(k, Slot.CRYSTAL_CLUSTER, rnd) : Optional.empty();
-		Optional<Identifier> tintedGlass = pick(k, Slot.TINTED_CRYSTAL_GLASS, rnd);
-
-		return new BlockTextureSet(
-				oreVein, storageBlock, rawBlock, plateBlock, shingles,
-				sandstoneTop, sandstoneSide, sandstoneBottom, cut, chiseled,
-				budding, budSmall, budMedium, budLarge, cluster, tintedGlass
+		return new SandstoneTextureSet(
+				sandstoneTop, sandstoneSide, sandstoneBottom, cut, chiseledSandstone
 		);
 	}
 
 	private ItemTextureSet buildItemTextureSet(MaterialDef m, Random rnd) {
 		var k = m.kind();
-		Optional<Identifier> crystalGlass = pick(k, Slot.CRYSTAL_GLASS, rnd);
-		Optional<Identifier> crystalBricks = pick(k, Slot.CRYSTAL_BRICKS, rnd);
-		Optional<Identifier> lampOverlay1 = pick(k, Slot.LAMP_OVERLAY_1, rnd);
-		Optional<Identifier> lampOverlay2 = pick(k, Slot.LAMP_OVERLAY_2, rnd);
-
 		Optional<Identifier> raw = pick(k, Slot.RAW_ITEM, rnd);
 		Optional<Identifier> ingot = pick(k, Slot.INGOT_ITEM, rnd);
 		Optional<Identifier> dust = pick(k, Slot.DUST_ITEM, rnd);
@@ -146,20 +141,24 @@ public final class AssetsTheme {
 		Optional<Identifier> gem = pick(k, Slot.GEM_ITEM, rnd);
 		Optional<Identifier> shard = pick(k, Slot.SHARD_ITEM, rnd);
 		Optional<Identifier> clayBall = pick(k, Slot.CLAY_ITEM, rnd);
-
-		// Tool parts
-		Optional<Identifier> pickHead = pick(k, Slot.PICK_HEAD, rnd);
-		Optional<Identifier> pickHandle = pick(k, Slot.PICK_STICK, rnd);
+		Optional<Identifier> rod = pick(k, Slot.ROD_ITEM, rnd);
+		Optional<Identifier> wire = pick(k, Slot.WIRE_ITEM, rnd);
+		Optional<Identifier> coil = pick(k, Slot.COIL_ITEM, rnd);
+		Optional<Identifier> rivet = pick(k, Slot.RIVET_ITEM, rnd);
+		Optional<Identifier> bolt = pick(k, Slot.BOLT_ITEM, rnd);
+		Optional<Identifier> nail = pick(k, Slot.NAIL_ITEM, rnd);
+		Optional<Identifier> ring = pick(k, Slot.RING_ITEM, rnd);
 
 		return new ItemTextureSet(
-				crystalGlass, crystalBricks, lampOverlay1, lampOverlay2,
 				raw, ingot, dust, nugget, plate, gear, gem, shard, clayBall,
-				pickHead, pickHandle
+				rod, wire, coil, rivet, bolt, nail, ring
 		);
 	}
 
-	private ToolStoneTextureSet buildToolStoneTextureSet(MaterialDef m, Random rnd) {
+	private ToolTextureSet buildToolTextureSet(MaterialDef m, Random rnd) {
 		var k = m.kind();
+		Optional<Identifier> pickHead = pick(k, Slot.PICK_HEAD, rnd);
+		Optional<Identifier> pickHandle = pick(k, Slot.PICK_STICK, rnd);
 		Optional<Identifier> axeHead = pick(k, Slot.AXE_HEAD, rnd);
 		Optional<Identifier> axeHandle = pick(k, Slot.AXE_STICK, rnd);
 		Optional<Identifier> swordBlade = pick(k, Slot.SWORD_BLADE, rnd);
@@ -168,18 +167,40 @@ public final class AssetsTheme {
 		Optional<Identifier> shovelHandle = pick(k, Slot.SHOVEL_STICK, rnd);
 		Optional<Identifier> hoeHead = pick(k, Slot.HOE_HEAD, rnd);
 		Optional<Identifier> hoeHandle = pick(k, Slot.HOE_STICK, rnd);
-		Optional<Identifier> cobblestone = pick(k, Slot.COBBLESTONE, rnd);
-		Optional<Identifier> chiseled = pick(k, Slot.CHISELED, rnd);
-		Optional<Identifier> bricks = pick(k, Slot.STONE_BRICKS, rnd);
-		Optional<Identifier> polished = pick(k, Slot.POLISHED_RANDOM, rnd);
-		Optional<Identifier> nail = pick(k, Slot.NAIL_ITEM, rnd);
-		Optional<Identifier> ring = pick(k, Slot.RING_ITEM, rnd);
+		Optional<Identifier> shearsBase = pick(k, Slot.SHEARS_BASE, rnd);
+		Optional<Identifier> shearsMetal = pick(k, Slot.SHEARS_METAL, rnd);
+		Optional<Identifier> spearHead = pick(k, Slot.SPEAR_HEAD, rnd);
+		Optional<Identifier> spearHandle = pick(k, Slot.SPEAR_HANDLE, rnd);
+		Optional<Identifier> spearHeadInHand = pick(k, Slot.SPEAR_HEAD_IN_HAND, rnd);
+		Optional<Identifier> spearHandleInHand = pick(k, Slot.SPEAR_HANDLE_IN_HAND, rnd);
 
-		return new ToolStoneTextureSet(
-				axeHead, axeHandle, swordBlade, swordHandle,
-				shovelHead, shovelHandle, hoeHead, hoeHandle,
-				cobblestone, chiseled, bricks, polished,
-				nail, ring
+		return new ToolTextureSet(
+				pickHead, pickHandle, axeHead, axeHandle, swordBlade, swordHandle,
+				shovelHead, shovelHandle, hoeHead, hoeHandle, shearsBase, shearsMetal,
+				spearHead, spearHandle, spearHeadInHand, spearHandleInHand
+		);
+	}
+
+	private CrystalTextureSet buildCrystalTextureSet(MaterialDef m, Random rnd) {
+		var k = m.kind();
+		Optional<Identifier> budding = (k == MaterialKind.CRYSTAL) ?
+				pick(k, Slot.CRYSTAL_BUDDING, rnd) : Optional.empty();
+		Optional<Identifier> budSmall = pick(k, Slot.CRYSTAL_BUD_S, rnd);
+		Optional<Identifier> budMedium = pick(k, Slot.CRYSTAL_BUD_M, rnd);
+		Optional<Identifier> budLarge = pick(k, Slot.CRYSTAL_BUD_L, rnd);
+		Optional<Identifier> cluster = (k == MaterialKind.CRYSTAL) ?
+				pick(k, Slot.CRYSTAL_CLUSTER, rnd) : Optional.empty();
+		Optional<Identifier> crystalItem = pick(k, Slot.CRYSTAL_ITEM, rnd);
+		Optional<Identifier> tintedGlass = pick(k, Slot.TINTED_CRYSTAL_GLASS, rnd);
+		Optional<Identifier> crystalGlass = pick(k, Slot.CRYSTAL_GLASS, rnd);
+		Optional<Identifier> crystalBricks = pick(k, Slot.CRYSTAL_BRICKS, rnd);
+		Optional<Identifier> lampOverlay1 = pick(k, Slot.LAMP_OVERLAY_1, rnd);
+		Optional<Identifier> lampOverlay2 = pick(k, Slot.LAMP_OVERLAY_2, rnd);
+		Optional<Identifier> chime = pick(k, Slot.CHIME, rnd);
+
+		return new CrystalTextureSet(
+				budding, budSmall, budMedium, budLarge, cluster, crystalItem, tintedGlass,
+				crystalGlass, crystalBricks, lampOverlay1, lampOverlay2, chime
 		);
 	}
 
@@ -208,9 +229,11 @@ public final class AssetsTheme {
 				m.nameInformation().id(),
 				m.assetSeed(),
 				buildBlockTextureSet(m, rnd),
+				buildSandstoneTextureSet(m, rnd),
 				buildItemTextureSet(m, rnd),
-				buildToolStoneTextureSet(m, rnd),
-				buildDecorTextureSet(m, rnd)
+				buildToolTextureSet(m, rnd),
+				buildDecorTextureSet(m, rnd),
+				buildCrystalTextureSet(m, rnd)
 		);
 	}
 
@@ -226,11 +249,12 @@ public final class AssetsTheme {
 		PLATE_SHEET, SHINGLES_SHEET,
 		SANDSTONE_TOP, SANDSTONE_SIDE, SANDSTONE_BOTTOM, SANDSTONE_CUT, SANDSTONE_CHISELED,
 		CRYSTAL_BUDDING, CRYSTAL_BUD_S, CRYSTAL_BUD_M, CRYSTAL_BUD_L, CRYSTAL_BLOCK, CRYSTAL_CLUSTER,
-		TINTED_CRYSTAL_GLASS, CRYSTAL_GLASS, CRYSTAL_BRICKS, LAMP_OVERLAY_1, LAMP_OVERLAY_2,
+		CRYSTAL_ITEM, TINTED_CRYSTAL_GLASS, CRYSTAL_GLASS, CRYSTAL_BRICKS, LAMP_OVERLAY_1, LAMP_OVERLAY_2, CHIME,
 		RAW_ITEM, INGOT_ITEM, DUST_ITEM, NUGGET_ITEM, PLATE_ITEM, GEAR_ITEM, GEM_ITEM, SHARD_ITEM, CLAY_ITEM,
-		NAIL_ITEM, RING_ITEM, DOOR_ITEM_METAL, DOOR_ITEM_WOOD,
+		ROD_ITEM, WIRE_ITEM, COIL_ITEM, RIVET_ITEM, BOLT_ITEM, NAIL_ITEM, RING_ITEM, DOOR_ITEM_METAL, DOOR_ITEM_WOOD,
 		PICK_HEAD, PICK_STICK, AXE_HEAD, AXE_STICK, SWORD_BLADE, SWORD_HANDLE,
 		SHOVEL_HEAD, SHOVEL_STICK, HOE_HEAD, HOE_STICK,
+		SHEARS_BASE, SHEARS_METAL, SPEAR_HEAD, SPEAR_HANDLE, SPEAR_HEAD_IN_HAND, SPEAR_HANDLE_IN_HAND,
 		BRICKS, POLISHED, TILES, MOSAIC, PILLAR_SIDE, PILLAR_TOP,
 		COBBLESTONE, CHISELED, STONE_BRICKS, POLISHED_RANDOM;
 

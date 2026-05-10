@@ -49,6 +49,15 @@ public final class MaterialAssetBuilders {
     public static final Identifier SHARD_SHARED_ID = RAAMaterials.id("material_shard");
     public static final Identifier GEAR_SHARED_ID = RAAMaterials.id("material_gear");
     public static final Identifier GEM_SHARED_ID = RAAMaterials.id("material_gem");
+    public static final Identifier CRYSTAL_SHARED_ID = RAAMaterials.id("material_crystal");
+    public static final Identifier BALL_SHARED_ID = RAAMaterials.id("material_ball");
+    public static final Identifier ROD_SHARED_ID = RAAMaterials.id("material_rod");
+    public static final Identifier WIRE_SHARED_ID = RAAMaterials.id("material_wire");
+    public static final Identifier COIL_SHARED_ID = RAAMaterials.id("material_coil");
+    public static final Identifier RIVET_SHARED_ID = RAAMaterials.id("material_rivet");
+    public static final Identifier BOLT_SHARED_ID = RAAMaterials.id("material_bolt");
+    public static final Identifier NAIL_SHARED_ID = RAAMaterials.id("material_nail");
+    public static final Identifier RING_SHARED_ID = RAAMaterials.id("material_ring");
 
     public static final Identifier SHOVEL_SHARED_ID = RAAMaterials.id("material_shovel");
     public static final Identifier HOE_SHARED_ID = RAAMaterials.id("material_hoe");
@@ -140,14 +149,17 @@ public final class MaterialAssetBuilders {
             // block textures
             requireTex(failures, idx, id, forms, Form.ORE,           "oreVein",          assets.blockTextures().oreVein());
             requireTex(failures, idx, id, forms, Form.RAW_BLOCK,     "rawBlock",         assets.blockTextures().rawBlock());
-            requireTex(failures, idx, id, forms, Form.TINTED_GLASS,  "tintedGlass",      assets.blockTextures().tintedGlass());
+            requireTex(failures, idx, id, forms, Form.TINTED_GLASS,  "tintedGlass",      assets.crystalTextures().tintedGlass());
             requireTex(failures, idx, id, forms, Form.SHINGLES,      "shingles",         assets.blockTextures().shingles());
             requireTex(failures, idx, id, forms, Form.PLATE_BLOCK,   "plateBlock",       assets.blockTextures().plateBlock());
-            requireTex(failures, idx, id, forms, Form.CRYSTAL_BRICKS,"crystalBricks",    assets.itemTextures().crystalBricks());
-            requireTex(failures, idx, id, forms, Form.GLASS,         "crystalGlass",     assets.itemTextures().crystalGlass());
-            requireTex(failures, idx, id, forms, Form.COBBLED,       "cobblestone",      assets.toolStoneTextures().cobblestone());
-            requireTex(failures, idx, id, forms, Form.BRICKS,        "bricks",           assets.toolStoneTextures().bricks());
-            requireTex(failures, idx, id, forms, Form.POLISHED,      "polished",         assets.toolStoneTextures().polished());
+            requireTex(failures, idx, id, forms, Form.CRYSTAL_BRICKS,"crystalBricks",    assets.crystalTextures().crystalBricks());
+            requireTex(failures, idx, id, forms, Form.GLASS,         "crystalGlass",     assets.crystalTextures().crystalGlass());
+            requireTex(failures, idx, id, forms, Form.COBBLED,       "cobblestone",      assets.blockTextures().cobblestone());
+            requireTex(failures, idx, id, forms, Form.BRICKS,        "bricks",           assets.blockTextures().bricks());
+            requireTex(failures, idx, id, forms, Form.POLISHED,      "polished",         assets.blockTextures().polished());
+            requireTex(failures, idx, id, forms, Form.SANDSTONE,     "sandstoneSide",    assets.sandstoneTextures().sandstoneSide());
+            requireTex(failures, idx, id, forms, Form.CUT,           "cutSandstoneSide", assets.sandstoneTextures().cutSandstoneSide());
+            requireTex(failures, idx, id, forms, Form.SMOOTH,        "sandstoneTop",     assets.sandstoneTextures().sandstoneTop());
 
             // item textures
             requireTex(failures, idx, id, forms, Form.INGOT,  "ingot",  assets.itemTextures().ingot());
@@ -158,21 +170,51 @@ public final class MaterialAssetBuilders {
             requireTex(failures, idx, id, forms, Form.SHARD,  "shard",  assets.itemTextures().shard());
             requireTex(failures, idx, id, forms, Form.GEAR,   "gear",   assets.itemTextures().gear());
             requireTex(failures, idx, id, forms, Form.GEM,    "gem",    assets.itemTextures().gem());
+            requireTex(failures, idx, id, forms, Form.BALL,   "ball",   assets.itemTextures().ball());
+            requireTex(failures, idx, id, forms, Form.ROD,    "rod",    assets.itemTextures().rod());
+            requireTex(failures, idx, id, forms, Form.WIRE,   "wire",   assets.itemTextures().wire());
+            requireTex(failures, idx, id, forms, Form.COIL,   "coil",   assets.itemTextures().coil());
+            requireTex(failures, idx, id, forms, Form.RIVET,  "rivet",  assets.itemTextures().rivet());
+            requireTex(failures, idx, id, forms, Form.BOLT,   "bolt",   assets.itemTextures().bolt());
+            requireTex(failures, idx, id, forms, Form.NAIL,   "nail",   assets.itemTextures().nail());
+            requireTex(failures, idx, id, forms, Form.RING,   "ring",   assets.itemTextures().ring());
 
-            // tool textures (SPEAR reuses SWORD layers)
-            requireTex(failures, idx, id, forms, Form.PICKAXE, "toolPickaxeHead",  assets.itemTextures().toolPickaxeHead());
-            requireTex(failures, idx, id, forms, Form.PICKAXE, "toolPickaxeStick", assets.itemTextures().toolPickaxeStick());
-            requireTex(failures, idx, id, forms, Form.AXE,     "toolAxeHead",      assets.toolStoneTextures().toolAxeHead());
-            requireTex(failures, idx, id, forms, Form.AXE,     "toolAxeStick",     assets.toolStoneTextures().toolAxeStick());
-            requireTex(failures, idx, id, forms, Form.SHOVEL,  "toolShovelHead",   assets.toolStoneTextures().toolShovelHead());
-            requireTex(failures, idx, id, forms, Form.SHOVEL,  "toolShovelStick",  assets.toolStoneTextures().toolShovelStick());
-            requireTex(failures, idx, id, forms, Form.HOE,     "toolHoeHead",      assets.toolStoneTextures().toolHoeHead());
-            requireTex(failures, idx, id, forms, Form.HOE,     "toolHoeStick",     assets.toolStoneTextures().toolHoeStick());
-            boolean needsSwordTex = forms.contains(Form.SWORD) || forms.contains(Form.SPEAR);
-            if (needsSwordTex && assets.toolStoneTextures().toolSwordBlade().isEmpty())
-                failures.add("  " + id + " [" + idx + "] SWORD/SPEAR missing toolSwordBlade");
-            if (needsSwordTex && assets.toolStoneTextures().toolSwordHandle().isEmpty())
-                failures.add("  " + id + " [" + idx + "] SWORD/SPEAR missing toolSwordHandle");
+            // crystal and glow textures
+            requireTex(failures, idx, id, forms, Form.BUDDING,      "budding",      assets.crystalTextures().budding());
+            requireTex(failures, idx, id, forms, Form.BUD_SMALL,    "budSmall",     assets.crystalTextures().budSmall());
+            requireTex(failures, idx, id, forms, Form.BUD_MEDIUM,   "budMedium",    assets.crystalTextures().budMedium());
+            requireTex(failures, idx, id, forms, Form.BUD_LARGE,    "budLarge",     assets.crystalTextures().budLarge());
+            requireTex(failures, idx, id, forms, Form.CLUSTER,      "cluster",      assets.crystalTextures().cluster());
+            requireTex(failures, idx, id, forms, Form.CRYSTAL,      "crystalItem",  assets.crystalTextures().crystalItem());
+            requireTex(failures, idx, id, forms, Form.BASALT_LAMP,  "lampBasalt",   assets.crystalTextures().lampBasalt());
+            requireTex(failures, idx, id, forms, Form.CALCITE_LAMP, "lampCalcite",  assets.crystalTextures().lampCalcite());
+            requireTex(failures, idx, id, forms, Form.LAMP,         "lampCalcite",  assets.crystalTextures().lampCalcite());
+
+            // tool textures
+            requireTex(failures, idx, id, forms, Form.PICKAXE, "pickaxeHead",  assets.toolTextures().pickaxeHead());
+            requireTex(failures, idx, id, forms, Form.PICKAXE, "pickaxeStick", assets.toolTextures().pickaxeStick());
+            requireTex(failures, idx, id, forms, Form.AXE,     "axeHead",      assets.toolTextures().axeHead());
+            requireTex(failures, idx, id, forms, Form.AXE,     "axeStick",     assets.toolTextures().axeStick());
+            requireTex(failures, idx, id, forms, Form.SHOVEL,  "shovelHead",   assets.toolTextures().shovelHead());
+            requireTex(failures, idx, id, forms, Form.SHOVEL,  "shovelStick",  assets.toolTextures().shovelStick());
+            requireTex(failures, idx, id, forms, Form.HOE,     "hoeHead",      assets.toolTextures().hoeHead());
+            requireTex(failures, idx, id, forms, Form.HOE,     "hoeStick",     assets.toolTextures().hoeStick());
+            if (forms.contains(Form.SWORD) && assets.toolTextures().swordBlade().isEmpty())
+                failures.add("  " + id + " [" + idx + "] SWORD missing swordBlade");
+            if (forms.contains(Form.SWORD) && assets.toolTextures().swordHandle().isEmpty())
+                failures.add("  " + id + " [" + idx + "] SWORD missing swordHandle");
+            requireTex(failures, idx, id, forms, Form.SPEAR, "spearHead",         assets.toolTextures().spearHead());
+            requireTex(failures, idx, id, forms, Form.SPEAR, "spearHandle",       assets.toolTextures().spearHandle());
+            requireTex(failures, idx, id, forms, Form.SPEAR, "spearHeadInHand",   assets.toolTextures().spearHeadInHand());
+            requireTex(failures, idx, id, forms, Form.SPEAR, "spearHandleInHand", assets.toolTextures().spearHandleInHand());
+
+            // decor textures
+            requireTex(failures, idx, id, forms, Form.CHAIN,      "chain",      assets.decorTextures().chain());
+            requireTex(failures, idx, id, forms, Form.LANTERN,    "lantern",    assets.decorTextures().lantern());
+            requireTex(failures, idx, id, forms, Form.DOOR,       "doorBottom", assets.decorTextures().doorBottom());
+            requireTex(failures, idx, id, forms, Form.TRAPDOOR,   "trapdoor",   assets.decorTextures().trapdoor());
+            requireTex(failures, idx, id, forms, Form.FENCE,      "fence",      assets.decorTextures().fence());
+            requireTex(failures, idx, id, forms, Form.FENCE_GATE, "fenceGate",  assets.decorTextures().fenceGate());
         }
 
         if (!failures.isEmpty()) {
@@ -229,7 +271,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.CRYSTAL_BRICKS),
                 RAAMaterials.id("material_crystal_bricks"),
                 "block/material_crystal_bricks/",
-                idx -> textures(ctx.materials().get(idx)).itemTextures().crystalBricks()
+                idx -> textures(ctx.materials().get(idx)).crystalTextures().crystalBricks()
                         .orElseThrow(() -> new IllegalStateException("Missing crystalBricks texture for material at index " + idx))
         ));
 
@@ -237,7 +279,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.GLASS),
                 RAAMaterials.id("material_glass"),
                 "block/material_glass/",
-                idx -> textures(ctx.materials().get(idx)).itemTextures().crystalGlass()
+                idx -> textures(ctx.materials().get(idx)).crystalTextures().crystalGlass()
                         .orElseThrow(() -> new IllegalStateException("Missing crystalGlass texture for material at index " + idx))
         ));
 
@@ -245,7 +287,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.TINTED_GLASS),
                 RAAMaterials.id("material_tinted_glass"),
                 "block/material_tinted_glass/",
-                idx -> textures(ctx.materials().get(idx)).blockTextures().tintedGlass()
+                idx -> textures(ctx.materials().get(idx)).crystalTextures().tintedGlass()
                         .orElseThrow(() -> new IllegalStateException("Missing tintedGlass texture for material at index " + idx))
         ));
 
@@ -273,7 +315,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.COBBLED),
                 RAAMaterials.id("material_cobbled"),
                 "block/material_cobbled/",
-                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().cobblestone()
+                idx -> textures(ctx.materials().get(idx)).blockTextures().cobblestone()
                         .orElseThrow(() -> new IllegalStateException("Missing cobblestone texture for material at index " + idx))
         ));
 
@@ -281,7 +323,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.BRICKS),
                 RAAMaterials.id("material_bricks"),
                 "block/material_bricks/",
-                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().bricks()
+                idx -> textures(ctx.materials().get(idx)).blockTextures().bricks()
                         .orElseThrow(() -> new IllegalStateException("Missing bricks texture for material at index " + idx))
         ));
 
@@ -289,7 +331,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.POLISHED),
                 RAAMaterials.id("material_polished"),
                 "block/material_polished/",
-                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().polished()
+                idx -> textures(ctx.materials().get(idx)).blockTextures().polished()
                         .orElseThrow(() -> new IllegalStateException("Missing polished texture for material at index " + idx))
         ));
 
@@ -297,7 +339,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.SANDSTONE),
                 RAAMaterials.id("material_sandstone"),
                 "block/material_sandstone/",
-                idx -> textures(ctx.materials().get(idx)).blockTextures().sandstoneSide()
+                idx -> textures(ctx.materials().get(idx)).sandstoneTextures().sandstoneSide()
                         .orElse(RAAMaterials.id("storage_blocks/sand_" + oneIndexed(idx, 3)))
         ));
 
@@ -305,7 +347,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.CUT),
                 RAAMaterials.id("material_cut"),
                 "block/material_cut/",
-                idx -> textures(ctx.materials().get(idx)).blockTextures().cutSandstoneSide()
+                idx -> textures(ctx.materials().get(idx)).sandstoneTextures().cutSandstoneSide()
                         .orElse(RAAMaterials.id("storage_blocks/sand_" + oneIndexed(idx, 3)))
         ));
 
@@ -313,7 +355,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.SMOOTH),
                 RAAMaterials.id("material_smooth"),
                 "block/material_smooth/",
-                idx -> textures(ctx.materials().get(idx)).blockTextures().sandstoneTop()
+                idx -> textures(ctx.materials().get(idx)).sandstoneTextures().sandstoneTop()
                         .orElse(RAAMaterials.id("storage_blocks/sand_" + oneIndexed(idx, 3)))
         ));
 
@@ -321,7 +363,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.CHISELED),
                 RAAMaterials.id("material_chiseled"),
                 "block/material_chiseled/",
-                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().chiseled()
+                idx -> textures(ctx.materials().get(idx)).blockTextures().chiseled()
                         .orElse(RAAMaterials.id("stone/stone_chiseled_" + oneIndexed(idx, 4)))
         ));
 
@@ -357,7 +399,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.MOSSY),
                 RAAMaterials.id("material_mossy"),
                 "block/material_mossy/",
-                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().bricks()
+                idx -> textures(ctx.materials().get(idx)).blockTextures().bricks()
                         .orElse(RAAMaterials.id("stone/stone_bricks_" + oneIndexed(idx, 24)))
         ));
 
@@ -365,7 +407,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.CRACKED),
                 RAAMaterials.id("material_cracked"),
                 "block/material_cracked/",
-                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().cobblestone()
+                idx -> textures(ctx.materials().get(idx)).blockTextures().cobblestone()
                         .orElse(RAAMaterials.id("stone/stone_cobbled_" + oneIndexed(idx, 7)))
         ));
 
@@ -383,7 +425,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.BASALT_LAMP),
                 RAAMaterials.id("material_basalt_lamp"),
                 "block/material_basalt_lamp/",
-                idx -> textures(ctx.materials().get(idx)).itemTextures().lampBasalt()
+                idx -> textures(ctx.materials().get(idx)).crystalTextures().lampBasalt()
                         .orElse(RAAMaterials.id("crystal/basalt_lamp"))
         ));
 
@@ -391,7 +433,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.CALCITE_LAMP),
                 RAAMaterials.id("material_calcite_lamp"),
                 "block/material_calcite_lamp/",
-                idx -> textures(ctx.materials().get(idx)).itemTextures().lampCalcite()
+                idx -> textures(ctx.materials().get(idx)).crystalTextures().lampCalcite()
                         .orElse(RAAMaterials.id("crystal/calcite_lamp"))
         ));
 
@@ -399,7 +441,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.LAMP),
                 RAAMaterials.id("material_lamp"),
                 "block/material_lamp/",
-                idx -> textures(ctx.materials().get(idx)).itemTextures().lampCalcite()
+                idx -> textures(ctx.materials().get(idx)).crystalTextures().lampCalcite()
                         .orElse(pickBlockTexture(ctx.materials().get(idx), idx))
         ));
 
@@ -417,7 +459,7 @@ public final class MaterialAssetBuilders {
                 RAAMaterials.id("material_crystal_cluster"),
                 Form.CLUSTER,
                 "block/material_crystal_cluster/",
-                idx -> textures(ctx.materials().get(idx)).blockTextures().cluster()
+                idx -> textures(ctx.materials().get(idx)).crystalTextures().cluster()
                         .orElse(RAAMaterials.id("crystal/crystal_" + oneIndexed(idx, 9)))
         );
 
@@ -426,7 +468,7 @@ public final class MaterialAssetBuilders {
                 RAAMaterials.id("material_crystal_bud_small"),
                 Form.BUD_SMALL,
                 "block/material_crystal_bud_small/",
-                idx -> textures(ctx.materials().get(idx)).blockTextures().budSmall()
+                idx -> textures(ctx.materials().get(idx)).crystalTextures().budSmall()
                         .orElse(RAAMaterials.id("crystal/crystal_" + oneIndexed(idx, 9)))
         );
 
@@ -435,7 +477,7 @@ public final class MaterialAssetBuilders {
                 RAAMaterials.id("material_crystal_bud_medium"),
                 Form.BUD_MEDIUM,
                 "block/material_crystal_bud_medium/",
-                idx -> textures(ctx.materials().get(idx)).blockTextures().budMedium()
+                idx -> textures(ctx.materials().get(idx)).crystalTextures().budMedium()
                         .orElse(RAAMaterials.id("crystal/crystal_" + oneIndexed(idx, 9)))
         );
 
@@ -444,7 +486,7 @@ public final class MaterialAssetBuilders {
                 RAAMaterials.id("material_crystal_bud_large"),
                 Form.BUD_LARGE,
                 "block/material_crystal_bud_large/",
-                idx -> textures(ctx.materials().get(idx)).blockTextures().budLarge()
+                idx -> textures(ctx.materials().get(idx)).crystalTextures().budLarge()
                         .orElse(RAAMaterials.id("crystal/crystal_" + oneIndexed(idx, 9)))
         );
 
@@ -452,7 +494,7 @@ public final class MaterialAssetBuilders {
                 ctx,
                 RAAMaterials.id("material_crystal_pane"),
                 "block/material_crystal_pane/",
-                idx -> textures(ctx.materials().get(idx)).itemTextures().crystalGlass()
+                idx -> textures(ctx.materials().get(idx)).crystalTextures().crystalGlass()
                         .orElse(RAAMaterials.id("crystal/crystal_glass"))
         );
 
@@ -535,41 +577,117 @@ public final class MaterialAssetBuilders {
                         .orElseThrow(() -> new IllegalStateException("Missing gem texture for material at index " + idx))
         ));
 
+        buildItemFamily(ctx, new ItemFamilySpec(
+                List.of(Form.CRYSTAL),
+                CRYSTAL_SHARED_ID,
+                "item/material_crystal/",
+                idx -> textures(ctx.materials().get(idx)).crystalTextures().crystalItem()
+                        .orElseThrow(() -> new IllegalStateException("Missing crystalItem texture for material at index " + idx))
+        ));
+
+        buildItemFamily(ctx, new ItemFamilySpec(
+                List.of(Form.BALL),
+                BALL_SHARED_ID,
+                "item/material_ball/",
+                idx -> textures(ctx.materials().get(idx)).itemTextures().ball()
+                        .orElseThrow(() -> new IllegalStateException("Missing ball texture for material at index " + idx))
+        ));
+
+        buildItemFamily(ctx, new ItemFamilySpec(
+                List.of(Form.ROD),
+                ROD_SHARED_ID,
+                "item/material_rod/",
+                idx -> textures(ctx.materials().get(idx)).itemTextures().rod()
+                        .orElseThrow(() -> new IllegalStateException("Missing rod texture for material at index " + idx))
+        ));
+
+        buildItemFamily(ctx, new ItemFamilySpec(
+                List.of(Form.WIRE),
+                WIRE_SHARED_ID,
+                "item/material_wire/",
+                idx -> textures(ctx.materials().get(idx)).itemTextures().wire()
+                        .orElseThrow(() -> new IllegalStateException("Missing wire texture for material at index " + idx))
+        ));
+
+        buildItemFamily(ctx, new ItemFamilySpec(
+                List.of(Form.COIL),
+                COIL_SHARED_ID,
+                "item/material_coil/",
+                idx -> textures(ctx.materials().get(idx)).itemTextures().coil()
+                        .orElseThrow(() -> new IllegalStateException("Missing coil texture for material at index " + idx))
+        ));
+
+        buildItemFamily(ctx, new ItemFamilySpec(
+                List.of(Form.RIVET),
+                RIVET_SHARED_ID,
+                "item/material_rivet/",
+                idx -> textures(ctx.materials().get(idx)).itemTextures().rivet()
+                        .orElseThrow(() -> new IllegalStateException("Missing rivet texture for material at index " + idx))
+        ));
+
+        buildItemFamily(ctx, new ItemFamilySpec(
+                List.of(Form.BOLT),
+                BOLT_SHARED_ID,
+                "item/material_bolt/",
+                idx -> textures(ctx.materials().get(idx)).itemTextures().bolt()
+                        .orElseThrow(() -> new IllegalStateException("Missing bolt texture for material at index " + idx))
+        ));
+
+        buildItemFamily(ctx, new ItemFamilySpec(
+                List.of(Form.NAIL),
+                NAIL_SHARED_ID,
+                "item/material_nail/",
+                idx -> textures(ctx.materials().get(idx)).itemTextures().nail()
+                        .orElseThrow(() -> new IllegalStateException("Missing nail texture for material at index " + idx))
+        ));
+
+        buildItemFamily(ctx, new ItemFamilySpec(
+                List.of(Form.RING),
+                RING_SHARED_ID,
+                "item/material_ring/",
+                idx -> textures(ctx.materials().get(idx)).itemTextures().ring()
+                        .orElseThrow(() -> new IllegalStateException("Missing ring texture for material at index " + idx))
+        ));
+
         buildLayeredItemFamily(ctx, Form.SHOVEL, SHOVEL_SHARED_ID, "item/material_shovel/",
-                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().toolShovelHead()
-                        .orElseThrow(() -> new IllegalStateException("Missing toolShovelHead texture for material at index " + idx)),
-                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().toolShovelStick()
-                        .orElseThrow(() -> new IllegalStateException("Missing toolShovelStick texture for material at index " + idx)));
+                idx -> textures(ctx.materials().get(idx)).toolTextures().shovelHead()
+                        .orElseThrow(() -> new IllegalStateException("Missing shovelHead texture for material at index " + idx)),
+                idx -> textures(ctx.materials().get(idx)).toolTextures().shovelStick()
+                        .orElseThrow(() -> new IllegalStateException("Missing shovelStick texture for material at index " + idx)));
 
         buildLayeredItemFamily(ctx, Form.HOE, HOE_SHARED_ID, "item/material_hoe/",
-                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().toolHoeHead()
-                        .orElseThrow(() -> new IllegalStateException("Missing toolHoeHead texture for material at index " + idx)),
-                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().toolHoeStick()
-                        .orElseThrow(() -> new IllegalStateException("Missing toolHoeStick texture for material at index " + idx)));
+                idx -> textures(ctx.materials().get(idx)).toolTextures().hoeHead()
+                        .orElseThrow(() -> new IllegalStateException("Missing hoeHead texture for material at index " + idx)),
+                idx -> textures(ctx.materials().get(idx)).toolTextures().hoeStick()
+                        .orElseThrow(() -> new IllegalStateException("Missing hoeStick texture for material at index " + idx)));
 
         buildLayeredItemFamily(ctx, Form.SWORD, SWORD_SHARED_ID, "item/material_sword/",
-                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().toolSwordBlade()
-                        .orElseThrow(() -> new IllegalStateException("Missing toolSwordBlade texture for material at index " + idx)),
-                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().toolSwordHandle()
-                        .orElseThrow(() -> new IllegalStateException("Missing toolSwordHandle texture for material at index " + idx)));
+                idx -> textures(ctx.materials().get(idx)).toolTextures().swordBlade()
+                        .orElseThrow(() -> new IllegalStateException("Missing swordBlade texture for material at index " + idx)),
+                idx -> textures(ctx.materials().get(idx)).toolTextures().swordHandle()
+                        .orElseThrow(() -> new IllegalStateException("Missing swordHandle texture for material at index " + idx)));
 
         buildLayeredItemFamily(ctx, Form.PICKAXE, PICKAXE_SHARED_ID, "item/material_pickaxe/",
-                idx -> textures(ctx.materials().get(idx)).itemTextures().toolPickaxeHead()
-                        .orElseThrow(() -> new IllegalStateException("Missing toolPickaxeHead texture for material at index " + idx)),
-                idx -> textures(ctx.materials().get(idx)).itemTextures().toolPickaxeStick()
-                        .orElseThrow(() -> new IllegalStateException("Missing toolPickaxeStick texture for material at index " + idx)));
+                idx -> textures(ctx.materials().get(idx)).toolTextures().pickaxeHead()
+                        .orElseThrow(() -> new IllegalStateException("Missing pickaxeHead texture for material at index " + idx)),
+                idx -> textures(ctx.materials().get(idx)).toolTextures().pickaxeStick()
+                        .orElseThrow(() -> new IllegalStateException("Missing pickaxeStick texture for material at index " + idx)));
 
         buildLayeredItemFamily(ctx, Form.AXE, AXE_SHARED_ID, "item/material_axe/",
-                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().toolAxeHead()
-                        .orElseThrow(() -> new IllegalStateException("Missing toolAxeHead texture for material at index " + idx)),
-                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().toolAxeStick()
-                        .orElseThrow(() -> new IllegalStateException("Missing toolAxeStick texture for material at index " + idx)));
+                idx -> textures(ctx.materials().get(idx)).toolTextures().axeHead()
+                        .orElseThrow(() -> new IllegalStateException("Missing axeHead texture for material at index " + idx)),
+                idx -> textures(ctx.materials().get(idx)).toolTextures().axeStick()
+                        .orElseThrow(() -> new IllegalStateException("Missing axeStick texture for material at index " + idx)));
 
         buildSpearItemFamily(ctx, SPEAR_SHARED_ID, "item/material_spear/",
-                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().toolSwordBlade()
-                        .orElseThrow(() -> new IllegalStateException("Missing toolSwordBlade (spear) texture for material at index " + idx)),
-                idx -> textures(ctx.materials().get(idx)).toolStoneTextures().toolSwordHandle()
-                        .orElseThrow(() -> new IllegalStateException("Missing toolSwordHandle (spear) texture for material at index " + idx)));
+                idx -> textures(ctx.materials().get(idx)).toolTextures().spearHead()
+                        .orElseThrow(() -> new IllegalStateException("Missing spearHead texture for material at index " + idx)),
+                idx -> textures(ctx.materials().get(idx)).toolTextures().spearHandle()
+                        .orElseThrow(() -> new IllegalStateException("Missing spearHandle texture for material at index " + idx)),
+                idx -> textures(ctx.materials().get(idx)).toolTextures().spearHeadInHand()
+                        .orElseThrow(() -> new IllegalStateException("Missing spearHeadInHand texture for material at index " + idx)),
+                idx -> textures(ctx.materials().get(idx)).toolTextures().spearHandleInHand()
+                        .orElseThrow(() -> new IllegalStateException("Missing spearHandleInHand texture for material at index " + idx)));
     }
 
     private static void buildBlockFamily(MaterialAssetContext ctx, BlockFamilySpec spec) {
@@ -714,8 +832,10 @@ public final class MaterialAssetBuilders {
             MaterialAssetContext ctx,
             Identifier itemId,
             String modelPrefix,
-            MaterialTexturePickers.TexPicker layer0,
-            MaterialTexturePickers.TexPicker layer1
+            MaterialTexturePickers.TexPicker inventoryHead,
+            MaterialTexturePickers.TexPicker inventoryHandle,
+            MaterialTexturePickers.TexPicker inHandHead,
+            MaterialTexturePickers.TexPicker inHandHandle
     ) {
         var guiSelect = JItemModel.select().property(MAT_COMP);
         var inHandSelect = JItemModel.select().property(MAT_COMP);
@@ -727,13 +847,13 @@ public final class MaterialAssetBuilders {
 
             var guiModel = JModel.model("minecraft:item/generated")
                     .textures(JModel.textures()
-                            .var("layer0", itemTexture(layer0.pick(idx)))
-                            .var("layer1", itemTexture(layer1.pick(idx)))
+                            .var("layer0", itemTexture(inventoryHandle.pick(idx)))
+                            .var("layer1", itemTexture(inventoryHead.pick(idx)))
                     );
             var inHandModel = JModel.model("minecraft:item/spear_in_hand")
                     .textures(JModel.textures()
-                            .var("layer0", itemTexture(layer0.pick(idx)))
-                            .var("layer1", itemTexture(layer1.pick(idx)))
+                            .var("layer0", itemTexture(inHandHandle.pick(idx)))
+                            .var("layer1", itemTexture(inHandHead.pick(idx)))
                     );
 
             ctx.pack().addModel(guiModel, modelId);
@@ -1529,7 +1649,7 @@ public final class MaterialAssetBuilders {
     private static String itemTexture(Identifier id) {
         String path = stripPng(id.getPath());
 
-        if (!path.startsWith("item/")) {
+        if (!path.startsWith("item/") && !path.startsWith("block/")) {
             path = "item/" + path;
         }
 

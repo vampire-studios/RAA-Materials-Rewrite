@@ -1,4 +1,4 @@
-package net.vampirestudios.raaMaterials.material;
+package net.vampirestudios.raaMaterials.material.textureSets;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

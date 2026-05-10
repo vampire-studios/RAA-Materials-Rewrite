@@ -1,4 +1,4 @@
-package net.vampirestudios.raaMaterials.material;
+package net.vampirestudios.raaMaterials.material.textureSets;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -11,15 +11,6 @@ import net.vampirestudios.raaMaterials.StreamCodecExpanded;
 import java.util.Optional;
 
 public record ItemTextureSet(
-		Optional<Identifier> crystalGlass,
-		Optional<Identifier> crystalBricks,
-
-		// ---- Blocky utilities ----
-		Optional<Identifier> lampBasalt,
-		Optional<Identifier> lampCalcite,
-//            Optional<Identifier> chime,
-
-		// ---- Items (forms) ----
 		Optional<Identifier> raw,
 		Optional<Identifier> ingot,
 		Optional<Identifier> dust,
@@ -29,18 +20,15 @@ public record ItemTextureSet(
 		Optional<Identifier> gem,
 		Optional<Identifier> shard,
 		Optional<Identifier> ball,
-
-		// ---- Tools ----
-		Optional<Identifier> toolPickaxeHead,
-		Optional<Identifier> toolPickaxeStick
+		Optional<Identifier> rod,
+		Optional<Identifier> wire,
+		Optional<Identifier> coil,
+		Optional<Identifier> rivet,
+		Optional<Identifier> bolt,
+		Optional<Identifier> nail,
+		Optional<Identifier> ring
 ) {
 	public static final Codec<ItemTextureSet> CODEC = RecordCodecBuilder.create(i -> i.group(
-			Identifier.CODEC.optionalFieldOf("crystal_glass").forGetter(ItemTextureSet::crystalGlass),
-			Identifier.CODEC.optionalFieldOf("crystal_bricks").forGetter(ItemTextureSet::crystalBricks),
-
-			Identifier.CODEC.optionalFieldOf("lamp_basalt").forGetter(ItemTextureSet::lampBasalt),
-			Identifier.CODEC.optionalFieldOf("lamp_calcite").forGetter(ItemTextureSet::lampCalcite),
-
 			Identifier.CODEC.optionalFieldOf("raw").forGetter(ItemTextureSet::raw),
 			Identifier.CODEC.optionalFieldOf("ingot").forGetter(ItemTextureSet::ingot),
 			Identifier.CODEC.optionalFieldOf("dust").forGetter(ItemTextureSet::dust),
@@ -50,15 +38,15 @@ public record ItemTextureSet(
 			Identifier.CODEC.optionalFieldOf("gem").forGetter(ItemTextureSet::gem),
 			Identifier.CODEC.optionalFieldOf("shard").forGetter(ItemTextureSet::shard),
 			Identifier.CODEC.optionalFieldOf("ball").forGetter(ItemTextureSet::ball),
-
-			Identifier.CODEC.optionalFieldOf("tool_pickaxe_head").forGetter(ItemTextureSet::toolPickaxeHead),
-			Identifier.CODEC.optionalFieldOf("tool_pickaxe_stick").forGetter(ItemTextureSet::toolPickaxeStick)
+			Identifier.CODEC.optionalFieldOf("rod").forGetter(ItemTextureSet::rod),
+			Identifier.CODEC.optionalFieldOf("wire").forGetter(ItemTextureSet::wire),
+			Identifier.CODEC.optionalFieldOf("coil").forGetter(ItemTextureSet::coil),
+			Identifier.CODEC.optionalFieldOf("rivet").forGetter(ItemTextureSet::rivet),
+			Identifier.CODEC.optionalFieldOf("bolt").forGetter(ItemTextureSet::bolt),
+			Identifier.CODEC.optionalFieldOf("nail").forGetter(ItemTextureSet::nail),
+			Identifier.CODEC.optionalFieldOf("ring").forGetter(ItemTextureSet::ring)
 	).apply(i, ItemTextureSet::new));
 	public static final StreamCodec<ByteBuf, ItemTextureSet> STREAM_CODEC = StreamCodecExpanded.composite(
-			ByteBufCodecs.optional(Identifier.STREAM_CODEC), ItemTextureSet::crystalGlass,
-			ByteBufCodecs.optional(Identifier.STREAM_CODEC), ItemTextureSet::crystalBricks,
-			ByteBufCodecs.optional(Identifier.STREAM_CODEC), ItemTextureSet::lampBasalt,
-			ByteBufCodecs.optional(Identifier.STREAM_CODEC), ItemTextureSet::lampCalcite,
 			ByteBufCodecs.optional(Identifier.STREAM_CODEC), ItemTextureSet::raw,
 			ByteBufCodecs.optional(Identifier.STREAM_CODEC), ItemTextureSet::ingot,
 			ByteBufCodecs.optional(Identifier.STREAM_CODEC), ItemTextureSet::dust,
@@ -68,8 +56,13 @@ public record ItemTextureSet(
 			ByteBufCodecs.optional(Identifier.STREAM_CODEC), ItemTextureSet::gem,
 			ByteBufCodecs.optional(Identifier.STREAM_CODEC), ItemTextureSet::shard,
 			ByteBufCodecs.optional(Identifier.STREAM_CODEC), ItemTextureSet::ball,
-			ByteBufCodecs.optional(Identifier.STREAM_CODEC), ItemTextureSet::toolPickaxeHead,
-			ByteBufCodecs.optional(Identifier.STREAM_CODEC), ItemTextureSet::toolPickaxeStick,
+			ByteBufCodecs.optional(Identifier.STREAM_CODEC), ItemTextureSet::rod,
+			ByteBufCodecs.optional(Identifier.STREAM_CODEC), ItemTextureSet::wire,
+			ByteBufCodecs.optional(Identifier.STREAM_CODEC), ItemTextureSet::coil,
+			ByteBufCodecs.optional(Identifier.STREAM_CODEC), ItemTextureSet::rivet,
+			ByteBufCodecs.optional(Identifier.STREAM_CODEC), ItemTextureSet::bolt,
+			ByteBufCodecs.optional(Identifier.STREAM_CODEC), ItemTextureSet::nail,
+			ByteBufCodecs.optional(Identifier.STREAM_CODEC), ItemTextureSet::ring,
 			ItemTextureSet::new
 	);
 }
