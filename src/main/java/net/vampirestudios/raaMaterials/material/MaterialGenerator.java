@@ -71,24 +71,45 @@ public final class MaterialGenerator {
 			Optional<ToolMaterialSpec> toolSpec = toolSpecFor(kind, tier, rng);
 
 			FormDependencies.validate(name, forms);
+			RAAConfig.BlockStats blockStats = cfg.blockStats();
+			float resistance = blastFor(kind, tier) * multiplier(blockStats.blastMul(), kind);
+			float efficiency = effFor(kind, tier) * multiplier(blockStats.effMul(), kind);
 
 			list.add(new MaterialDef(
 					name,
 					kind,
 					color,
 					hardnessFor(kind, tier),
-					blastFor(kind, tier),
-					effFor(kind, tier),
+					resistance,
+					efficiency,
 					tier,
 					forms,
 					spawn,
-					toolSpec,
+					toolSpec.map(spec -> applyEfficiencyMultiplier(spec, multiplier(blockStats.effMul(), kind))),
 					mix(worldSeed, name.id()),
 					host
 			));
 		}
 
 		return new MaterialSet(list);
+	}
+
+	private static float multiplier(Map<MaterialKind, Float> multipliers, MaterialKind kind) {
+		return Math.max(0.0f, multipliers.getOrDefault(kind, 1.0f));
+	}
+
+	private static ToolMaterialSpec applyEfficiencyMultiplier(ToolMaterialSpec spec, float multiplier) {
+		if (multiplier == 1.0f) {
+			return spec;
+		}
+		return new ToolMaterialSpec(
+				spec.durability(),
+				spec.speed() * multiplier,
+				spec.attackDamageBonus(),
+				spec.enchantmentValue(),
+				spec.incorrectBlocksForDropsTag(),
+				spec.repairItemsTag()
+		);
 	}
 
 	private static MaterialDef.NameInformation generateUniqueName(

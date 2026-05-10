@@ -2,7 +2,6 @@
 package net.vampirestudios.raaMaterials;
 
 import com.mojang.serialization.Codec;
-import dev.lukebemish.codecextras.structured.Structure;
 import net.minecraft.util.StringRepresentable;
 
 import java.util.Locale;
@@ -15,7 +14,6 @@ public enum FormGroup implements StringRepresentable {
 	CRYSTAL_SET, CRYSTAL_LAMPS; // cluster, crystal bricks/glass/pane/rod, lamps
 
 	public static final Codec<FormGroup> CODEC = StringRepresentable.fromEnum(FormGroup::values);
-	public static final Structure<FormGroup> STRUCTURE = Structure.stringRepresentable(FormGroup::values, FormGroup::getSerializedName);
 
 	@Override
 	public String getSerializedName() {

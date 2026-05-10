@@ -2,7 +2,6 @@
 package net.vampirestudios.raaMaterials.material;
 
 import com.mojang.serialization.Codec;
-import dev.lukebemish.codecextras.structured.Structure;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -29,7 +28,6 @@ public enum MaterialKind implements StringRepresentable {
 	WOOD;
 
 	public static final Codec<MaterialKind> CODEC = StringRepresentable.fromEnum(MaterialKind::values);
-	public static final Structure<MaterialKind> STRUCTURE = Structure.stringRepresentable(MaterialKind::values, MaterialKind::getSerializedName);
 	private static final IntFunction<MaterialKind> BY_ID = ByIdMap.continuous(MaterialKind::ordinal, values(), ByIdMap.OutOfBoundsStrategy.ZERO);
 	public static final StreamCodec<ByteBuf, MaterialKind> STREAM_CODEC = ByteBufCodecs.idMapper(BY_ID, MaterialKind::ordinal);
 

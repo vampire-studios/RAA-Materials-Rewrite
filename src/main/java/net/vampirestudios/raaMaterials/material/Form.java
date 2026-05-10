@@ -1,7 +1,6 @@
 package net.vampirestudios.raaMaterials.material;
 
 import com.mojang.serialization.Codec;
-import dev.lukebemish.codecextras.structured.Structure;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -140,7 +139,6 @@ public enum Form implements StringRepresentable {
 	SAPLING(FormCategory.WOOD, FormCategory.NATURAL);
 
 	public static final Codec<Form> CODEC = StringRepresentable.fromEnum(Form::values);
-	public static final Structure<Form> STRUCTURE = Structure.stringRepresentable(Form::values, Form::getSerializedName);
 	private static final IntFunction<Form> BY_ID = ByIdMap.continuous(Form::ordinal, values(), ByIdMap.OutOfBoundsStrategy.ZERO);
 	public static final StreamCodec<ByteBuf, Form> STREAM_CODEC = ByteBufCodecs.idMapper(BY_ID, Form::ordinal);
 

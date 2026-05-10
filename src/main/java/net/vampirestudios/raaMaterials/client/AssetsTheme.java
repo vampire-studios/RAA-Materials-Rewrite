@@ -1,14 +1,13 @@
 package net.vampirestudios.raaMaterials.client;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.StringRepresentable;
 import net.vampirestudios.raaMaterials.material.*;
 
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.random.RandomGenerator;
-
-import static net.minecraft.resources.Identifier.withDefaultNamespace;
-import static net.vampirestudios.raaMaterials.RAAMaterials.id;
 
 public final class AssetsTheme {
 	private final Map<Slot, List<Identifier>> global = new EnumMap<>(Slot.class);
@@ -18,22 +17,6 @@ public final class AssetsTheme {
 	private final Map<MaterialKind, Map<Form, List<Identifier>>> perKindForm = new EnumMap<>(MaterialKind.class);
 
 	private AssetsTheme() {
-		// Initialize fallbacks
-		initializeFallbacks();
-	}
-
-	private void initializeFallbacks() {
-		fallbacks.put(Slot.SANDSTONE_TOP, withDefaultNamespace("block/sandstone_top"));
-		fallbacks.put(Slot.SANDSTONE_SIDE, withDefaultNamespace("block/sandstone"));
-		fallbacks.put(Slot.SANDSTONE_BOTTOM, withDefaultNamespace("block/sandstone_bottom"));
-		fallbacks.put(Slot.SANDSTONE_CUT, withDefaultNamespace("block/cut_sandstone"));
-		fallbacks.put(Slot.SANDSTONE_CHISELED, withDefaultNamespace("block/chiseled_sandstone"));
-		fallbacks.put(Slot.CRYSTAL_BUD_S, withDefaultNamespace("block/small_amethyst_bud"));
-		fallbacks.put(Slot.CRYSTAL_BUD_M, withDefaultNamespace("block/medium_amethyst_bud"));
-		fallbacks.put(Slot.CRYSTAL_BUD_L, withDefaultNamespace("block/large_amethyst_bud"));
-		fallbacks.put(Slot.TINTED_CRYSTAL_GLASS, id("crystal/tinted_glass_1"));
-		fallbacks.put(Slot.CLAY_ITEM, withDefaultNamespace("item/clay_ball"));
-		fallbacks.put(Slot.GEAR_ITEM, id("gears/gear_1"));
 	}
 
 	// ---------- Builder ----------
@@ -77,15 +60,6 @@ public final class AssetsTheme {
 		return pickForm(k, f, new Random(seed));
 	}
 
-	// ---------- Helper methods for texture generation ----------
-	private static int wrapIndex(long seed, int max) {
-		return (int) (Math.abs(seed) % max);
-	}
-
-	private static Identifier numbered(String base, Random rnd, int max) {
-		return id(base + (rnd.nextInt(max) + 1));
-	}
-
 	private static Identifier pairedDoorTopTexture(Identifier bottomTexture) {
 		String path = bottomTexture.getPath();
 		if (path.endsWith("_bottom")) {
@@ -103,51 +77,51 @@ public final class AssetsTheme {
 
 		// Ore vein: metals vs gems
 		Optional<Identifier> oreVein = switch (k) {
-			case METAL, ALLOY, OTHER -> Optional.of(numbered("ores/metals/ore_", rnd, 40));
-			case GEM -> Optional.of(numbered("ores/gems/ore_", rnd, 33));
-			default -> Optional.of(withDefaultNamespace("block/stone"));
+			case METAL, ALLOY, OTHER -> pick(k, Slot.ORE_VEIN_METAL, rnd);
+			case GEM -> pick(k, Slot.ORE_VEIN_GEM, rnd);
+			default -> pick(k, Slot.STONE_DEFAULT, rnd);
 		};
 
 		// Storage block textures by kind
 		Optional<Identifier> storageBlock = switch (k) {
-			case METAL, ALLOY, OTHER -> Optional.of(numbered("storage_blocks/metals/metal_", rnd, 23));
-			case GEM -> Optional.of(numbered("storage_blocks/gems/gem_", rnd, 16));
-			case CRYSTAL -> Optional.of(numbered("crystal/crystal_block_", rnd, 5));
-			default -> Optional.of(withDefaultNamespace("block/stone"));
+			case METAL, ALLOY, OTHER -> pick(k, Slot.STORAGE_METAL, rnd);
+			case GEM -> pick(k, Slot.STORAGE_GEM, rnd);
+			case CRYSTAL -> pick(k, Slot.STORAGE_CRYSTAL, rnd);
+			default -> pick(k, Slot.STORAGE_BLOCK, rnd).or(() -> pick(k, Slot.STONE_DEFAULT, rnd));
 		};
 
 		// Raw block (metals-like)
 		Optional<Identifier> rawBlock = switch (k) {
-			case METAL, GEM, OTHER -> Optional.of(numbered("storage_blocks/metals/raw_", rnd, 15));
+			case METAL, GEM, OTHER -> pick(k, Slot.RAW_BLOCK, rnd);
 			default -> Optional.empty();
 		};
 
 		// Metal decor
-		Optional<Identifier> plateBlock = Optional.of(id("metal/metal_plate"));
-		Optional<Identifier> shingles = Optional.of(id("metal/metal_shingles"));
+		Optional<Identifier> plateBlock = pick(k, Slot.PLATE_SHEET, rnd);
+		Optional<Identifier> shingles = pick(k, Slot.SHINGLES_SHEET, rnd);
 
 		// Sandstone family (vanilla parity)
-		Optional<Identifier> sandstoneTop = Optional.of(withDefaultNamespace("block/sandstone_top"));
-		Optional<Identifier> sandstoneSide = Optional.of(withDefaultNamespace("block/sandstone"));
-		Optional<Identifier> sandstoneBottom = Optional.of(withDefaultNamespace("block/sandstone_bottom"));
-		Optional<Identifier> cut = Optional.of(withDefaultNamespace("block/cut_sandstone"));
+		Optional<Identifier> sandstoneTop = pick(k, Slot.SANDSTONE_TOP, rnd);
+		Optional<Identifier> sandstoneSide = pick(k, Slot.SANDSTONE_SIDE, rnd);
+		Optional<Identifier> sandstoneBottom = pick(k, Slot.SANDSTONE_BOTTOM, rnd);
+		Optional<Identifier> cut = pick(k, Slot.SANDSTONE_CUT, rnd);
 		Optional<Identifier> chiseled = switch (k) {
-			case STONE -> Optional.of(numbered("stone/stone_chiseled_", rnd, 4));
-			case SAND -> Optional.of(withDefaultNamespace("block/chiseled_sandstone"));
+			case STONE -> pick(k, Slot.CHISELED, rnd);
+			case SAND -> pick(k, Slot.SANDSTONE_CHISELED, rnd);
 			default -> Optional.empty();
 		};
 
 		// Budding & buds (crystal-like)
 		Optional<Identifier> budding = (k == MaterialKind.CRYSTAL) ?
-				Optional.of(id("crystal/budding_crystal_block_1")) : Optional.empty();
-		Optional<Identifier> budSmall = Optional.of(withDefaultNamespace("block/small_amethyst_bud"));
-		Optional<Identifier> budMedium = Optional.of(withDefaultNamespace("block/medium_amethyst_bud"));
-		Optional<Identifier> budLarge = Optional.of(withDefaultNamespace("block/large_amethyst_bud"));
+				pick(k, Slot.CRYSTAL_BUDDING, rnd) : Optional.empty();
+		Optional<Identifier> budSmall = pick(k, Slot.CRYSTAL_BUD_S, rnd);
+		Optional<Identifier> budMedium = pick(k, Slot.CRYSTAL_BUD_M, rnd);
+		Optional<Identifier> budLarge = pick(k, Slot.CRYSTAL_BUD_L, rnd);
 
 		// Cluster + tinted glass overlay
 		Optional<Identifier> cluster = (k == MaterialKind.CRYSTAL) ?
-				Optional.of(numbered("crystal/crystal_", rnd, 9)) : Optional.empty();
-		Optional<Identifier> tintedGlass = Optional.of(id("crystal/tinted_glass_1"));
+				pick(k, Slot.CRYSTAL_CLUSTER, rnd) : Optional.empty();
+		Optional<Identifier> tintedGlass = pick(k, Slot.TINTED_CRYSTAL_GLASS, rnd);
 
 		return new TextureDef1(
 				oreVein, storageBlock, rawBlock, plateBlock, shingles,
@@ -157,24 +131,25 @@ public final class AssetsTheme {
 	}
 
 	private TextureDef2 buildTextureDef2(MaterialDef m, Random rnd) {
-		Optional<Identifier> crystalGlass = Optional.of(id("crystal/crystal_glass"));
-		Optional<Identifier> crystalBricks = Optional.of(id("crystal/crystal_bricks"));
-		Optional<Identifier> lampOverlay1 = Optional.of(id("crystal/lamp_overlay1"));
-		Optional<Identifier> lampOverlay2 = Optional.of(id("crystal/lamp_overlay2"));
+		var k = m.kind();
+		Optional<Identifier> crystalGlass = pick(k, Slot.CRYSTAL_GLASS, rnd);
+		Optional<Identifier> crystalBricks = pick(k, Slot.CRYSTAL_BRICKS, rnd);
+		Optional<Identifier> lampOverlay1 = pick(k, Slot.LAMP_OVERLAY_1, rnd);
+		Optional<Identifier> lampOverlay2 = pick(k, Slot.LAMP_OVERLAY_2, rnd);
 
-		Optional<Identifier> raw = Optional.of(numbered("raw/raw_", rnd, 18));
-		Optional<Identifier> ingot = Optional.of(numbered("ingots/ingot_", rnd, 29));
-		Optional<Identifier> dust = Optional.of(numbered("dusts/dust_", rnd, 5));
-		Optional<Identifier> nugget = Optional.of(numbered("nuggets/nugget_", rnd, 10));
-		Optional<Identifier> plate = Optional.of(numbered("plates/plate_", rnd, 3));
-		Optional<Identifier> gear = Optional.of(id("gears/gear_1"));
-		Optional<Identifier> gem = Optional.of(numbered("gems/gem_", rnd, 33));
-		Optional<Identifier> shard = Optional.of(numbered("crystal_items/shard_", rnd, 7));
-		Optional<Identifier> clayBall = Optional.of(withDefaultNamespace("item/clay_ball"));
+		Optional<Identifier> raw = pick(k, Slot.RAW_ITEM, rnd);
+		Optional<Identifier> ingot = pick(k, Slot.INGOT_ITEM, rnd);
+		Optional<Identifier> dust = pick(k, Slot.DUST_ITEM, rnd);
+		Optional<Identifier> nugget = pick(k, Slot.NUGGET_ITEM, rnd);
+		Optional<Identifier> plate = pick(k, Slot.PLATE_ITEM, rnd);
+		Optional<Identifier> gear = pick(k, Slot.GEAR_ITEM, rnd);
+		Optional<Identifier> gem = pick(k, Slot.GEM_ITEM, rnd);
+		Optional<Identifier> shard = pick(k, Slot.SHARD_ITEM, rnd);
+		Optional<Identifier> clayBall = pick(k, Slot.CLAY_ITEM, rnd);
 
 		// Tool parts
-		Optional<Identifier> pickHead = Optional.of(numbered("tools/pickaxe/pickaxe_", rnd, 11));
-		Optional<Identifier> pickHandle = Optional.of(numbered("tools/pickaxe/stick_", rnd, 10));
+		Optional<Identifier> pickHead = pick(k, Slot.PICK_HEAD, rnd);
+		Optional<Identifier> pickHandle = pick(k, Slot.PICK_STICK, rnd);
 
 		return new TextureDef2(
 				crystalGlass, crystalBricks, lampOverlay1, lampOverlay2,
@@ -184,20 +159,21 @@ public final class AssetsTheme {
 	}
 
 	private TextureDef3 buildTextureDef3(MaterialDef m, Random rnd) {
-		Optional<Identifier> axeHead = Optional.of(numbered("tools/axe/axe_head_", rnd, 12));
-		Optional<Identifier> axeHandle = Optional.of(numbered("tools/axe/axe_stick_", rnd, 9));
-		Optional<Identifier> swordBlade = Optional.of(numbered("tools/sword/blade_", rnd, 13));
-		Optional<Identifier> swordHandle = Optional.of(numbered("tools/sword/handle_", rnd, 11));
-		Optional<Identifier> shovelHead = Optional.of(numbered("tools/shovel/shovel_head_", rnd, 11));
-		Optional<Identifier> shovelHandle = Optional.of(numbered("tools/shovel/shovel_stick_", rnd, 11));
-		Optional<Identifier> hoeHead = Optional.of(numbered("tools/hoe/hoe_head_", rnd, 9));
-		Optional<Identifier> hoeHandle = Optional.of(numbered("tools/hoe/hoe_stick_", rnd, 9));
-		Optional<Identifier> cobblestone = Optional.of(numbered("stone/stone_cobbled_", rnd, 13));
-		Optional<Identifier> chiseled = Optional.of(numbered("stone/stone_chiseled_", rnd, 4));
-		Optional<Identifier> bricks = Optional.of(numbered("stone/stone_bricks_", rnd, 24));
-		Optional<Identifier> polished = Optional.of(numbered("stone/stone_frame_", rnd, 9));
-		Optional<Identifier> nail = Optional.of(id("nail"));
-		Optional<Identifier> ring = Optional.of(id("ring"));
+		var k = m.kind();
+		Optional<Identifier> axeHead = pick(k, Slot.AXE_HEAD, rnd);
+		Optional<Identifier> axeHandle = pick(k, Slot.AXE_STICK, rnd);
+		Optional<Identifier> swordBlade = pick(k, Slot.SWORD_BLADE, rnd);
+		Optional<Identifier> swordHandle = pick(k, Slot.SWORD_HANDLE, rnd);
+		Optional<Identifier> shovelHead = pick(k, Slot.SHOVEL_HEAD, rnd);
+		Optional<Identifier> shovelHandle = pick(k, Slot.SHOVEL_STICK, rnd);
+		Optional<Identifier> hoeHead = pick(k, Slot.HOE_HEAD, rnd);
+		Optional<Identifier> hoeHandle = pick(k, Slot.HOE_STICK, rnd);
+		Optional<Identifier> cobblestone = pick(k, Slot.COBBLESTONE, rnd);
+		Optional<Identifier> chiseled = pick(k, Slot.CHISELED, rnd);
+		Optional<Identifier> bricks = pick(k, Slot.STONE_BRICKS, rnd);
+		Optional<Identifier> polished = pick(k, Slot.POLISHED_RANDOM, rnd);
+		Optional<Identifier> nail = pick(k, Slot.NAIL_ITEM, rnd);
+		Optional<Identifier> ring = pick(k, Slot.RING_ITEM, rnd);
 
 		return new TextureDef3(
 				axeHead, axeHandle, swordBlade, swordHandle,
@@ -208,18 +184,19 @@ public final class AssetsTheme {
 	}
 
 	private TextureDef4 buildTextureDef4(MaterialDef m, Random rnd) {
-		Optional<Identifier> chain = pickForm(m.kind(), Form.CHAIN, rnd);
-		Optional<Identifier> lantern = pickForm(m.kind(), Form.LANTERN, rnd);
-		Optional<Identifier> doorItem = switch (m.kind()) {
-			case METAL, ALLOY -> Optional.of(withDefaultNamespace("item/iron_door"));
-			case WOOD -> Optional.of(withDefaultNamespace("item/oak_door"));
+		var k = m.kind();
+		Optional<Identifier> chain = pickForm(k, Form.CHAIN, rnd);
+		Optional<Identifier> lantern = pickForm(k, Form.LANTERN, rnd);
+		Optional<Identifier> doorItem = switch (k) {
+			case METAL, ALLOY -> pick(k, Slot.DOOR_ITEM_METAL, rnd);
+			case WOOD -> pick(k, Slot.DOOR_ITEM_WOOD, rnd);
 			default -> Optional.empty();
 		};
-		Optional<Identifier> doorBottom = pickForm(m.kind(), Form.DOOR, rnd);
+		Optional<Identifier> doorBottom = pickForm(k, Form.DOOR, rnd);
 		Optional<Identifier> doorTop = doorBottom.map(AssetsTheme::pairedDoorTopTexture);
-		Optional<Identifier> trapdoor = pickForm(m.kind(), Form.TRAPDOOR, rnd);
-		Optional<Identifier> fence = pickForm(m.kind(), Form.FENCE, rnd);
-		Optional<Identifier> fenceGate = pickForm(m.kind(), Form.FENCE_GATE, rnd);
+		Optional<Identifier> trapdoor = pickForm(k, Form.TRAPDOOR, rnd);
+		Optional<Identifier> fence = pickForm(k, Form.FENCE, rnd);
+		Optional<Identifier> fenceGate = pickForm(k, Form.FENCE_GATE, rnd);
 
 		return new TextureDef4(chain, lantern, doorItem, doorBottom, doorTop, trapdoor, fence, fenceGate);
 	}
@@ -238,83 +215,31 @@ public final class AssetsTheme {
 	}
 
 	public static AssetsTheme defaultTheme() {
-		return AssetsTheme.theme()
-				// Role sheets (global)
-				.fallback(Slot.PLATE_SHEET, id("metal/metal_plate"))
-				.fallback(Slot.SHINGLES_SHEET, id("metal/metal_shingles"))
-				.fallback(Slot.TINTED_CRYSTAL_GLASS, id("crystal/tinted_glass_1"))
-
-				// Material kind storage blocks
-				.kind(MaterialKind.METAL, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/iron_block")))
-				.kind(MaterialKind.ALLOY, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/copper_block")))
-				.kind(MaterialKind.GEM, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/diamond_block")))
-				.kind(MaterialKind.CRYSTAL, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/amethyst_block")))
-				.kind(MaterialKind.STONE, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/stone")))
-				.kind(MaterialKind.SAND, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/sandstone")))
-				.kind(MaterialKind.GRAVEL, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/gravel")))
-				.kind(MaterialKind.CLAY, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/clay")))
-				.kind(MaterialKind.MUD, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/packed_mud")))
-				.kind(MaterialKind.SOIL, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/dirt")))
-				.kind(MaterialKind.SALT, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/calcite")))
-				.kind(MaterialKind.VOLCANIC, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/basalt_top")))
-				.kind(MaterialKind.WOOD, k -> k.set(Slot.STORAGE_BLOCK, withDefaultNamespace("block/oak_planks")))
-
-				// Sandstone set
-				.fallback(Slot.SANDSTONE_TOP, withDefaultNamespace("block/sandstone_top"))
-				.fallback(Slot.SANDSTONE_SIDE, withDefaultNamespace("block/sandstone"))
-				.fallback(Slot.SANDSTONE_BOTTOM, withDefaultNamespace("block/sandstone_bottom"))
-				.fallback(Slot.SANDSTONE_CUT, withDefaultNamespace("block/cut_sandstone"))
-				.fallback(Slot.SANDSTONE_CHISELED, withDefaultNamespace("block/chiseled_sandstone"))
-
-				// Crystal buds
-				.fallback(Slot.CRYSTAL_BUD_S, withDefaultNamespace("block/small_amethyst_bud"))
-				.fallback(Slot.CRYSTAL_BUD_M, withDefaultNamespace("block/medium_amethyst_bud"))
-				.fallback(Slot.CRYSTAL_BUD_L, withDefaultNamespace("block/large_amethyst_bud"))
-
-				// Per-form defaults
-				.set(Slot.BRICKS, withDefaultNamespace("block/stone_bricks"))
-				.set(Slot.POLISHED, withDefaultNamespace("block/smooth_stone"))
-				.set(Slot.TILES, withDefaultNamespace("block/quartz_block_top"))
-				.set(Slot.MOSAIC, withDefaultNamespace("block/bamboo_mosaic"))
-				.set(Slot.PILLAR_SIDE, withDefaultNamespace("block/quartz_block_side"))
-				.set(Slot.PILLAR_TOP, withDefaultNamespace("block/quartz_block_top"))
-				.choose(Form.CHAIN, List.of(id("metal/chain_1"), id("metal/chain_2")))
-				.set(Form.LANTERN, withDefaultNamespace("block/lantern"))
-				.set(Form.DOOR, withDefaultNamespace("block/oak_door_bottom"))
-				.set(Form.TRAPDOOR, withDefaultNamespace("block/oak_trapdoor"))
-				.set(Form.FENCE, withDefaultNamespace("block/oak_planks"))
-				.set(Form.FENCE_GATE, withDefaultNamespace("block/oak_planks"))
-				.kindForm(MaterialKind.METAL, k -> k
-						.set(Form.DOOR, withDefaultNamespace("block/iron_door_bottom"))
-						.set(Form.TRAPDOOR, withDefaultNamespace("block/iron_trapdoor")))
-				.kindForm(MaterialKind.ALLOY, k -> k
-						.set(Form.DOOR, withDefaultNamespace("block/iron_door_bottom"))
-						.set(Form.TRAPDOOR, withDefaultNamespace("block/iron_trapdoor")))
-
-				// Item icons
-				.fallback(Slot.CLAY_ITEM, withDefaultNamespace("item/clay_ball"))
-				.set(Slot.GEAR_ITEM, id("gears/gear_1"))
-
-				.build();
+		return AssetsThemeConfig.theme();
 	}
 
 	// ----- Slots -----
-	public enum Slot {
-		// Block textures
-		ORE_VEIN_METAL, ORE_VEIN_GEM, STORAGE_BLOCK, RAW_BLOCK,
+	public enum Slot implements StringRepresentable {
+		ORE_VEIN_METAL, ORE_VEIN_GEM,
+		STORAGE_BLOCK, STORAGE_METAL, STORAGE_GEM, STORAGE_CRYSTAL, STONE_DEFAULT,
+		RAW_BLOCK,
 		PLATE_SHEET, SHINGLES_SHEET,
 		SANDSTONE_TOP, SANDSTONE_SIDE, SANDSTONE_BOTTOM, SANDSTONE_CUT, SANDSTONE_CHISELED,
-		CRYSTAL_BUDDING, CRYSTAL_BUD_S, CRYSTAL_BUD_M, CRYSTAL_BUD_L, CRYSTAL_BLOCK, TINTED_CRYSTAL_GLASS,
-
-		// Item textures
+		CRYSTAL_BUDDING, CRYSTAL_BUD_S, CRYSTAL_BUD_M, CRYSTAL_BUD_L, CRYSTAL_BLOCK, CRYSTAL_CLUSTER,
+		TINTED_CRYSTAL_GLASS, CRYSTAL_GLASS, CRYSTAL_BRICKS, LAMP_OVERLAY_1, LAMP_OVERLAY_2,
 		RAW_ITEM, INGOT_ITEM, DUST_ITEM, NUGGET_ITEM, PLATE_ITEM, GEAR_ITEM, GEM_ITEM, SHARD_ITEM, CLAY_ITEM,
-
-		// Tool part textures
+		NAIL_ITEM, RING_ITEM, DOOR_ITEM_METAL, DOOR_ITEM_WOOD,
 		PICK_HEAD, PICK_STICK, AXE_HEAD, AXE_STICK, SWORD_BLADE, SWORD_HANDLE,
 		SHOVEL_HEAD, SHOVEL_STICK, HOE_HEAD, HOE_STICK,
+		BRICKS, POLISHED, TILES, MOSAIC, PILLAR_SIDE, PILLAR_TOP,
+		COBBLESTONE, CHISELED, STONE_BRICKS, POLISHED_RANDOM;
 
-		// Form textures
-		BRICKS, POLISHED, TILES, MOSAIC, PILLAR_SIDE, PILLAR_TOP
+		public static final Codec<Slot> CODEC = StringRepresentable.fromEnum(Slot::values);
+
+		@Override
+		public String getSerializedName() {
+			return name().toLowerCase(Locale.ROOT);
+		}
 	}
 
 	// ----- Builder classes -----

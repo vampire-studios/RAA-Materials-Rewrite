@@ -6,6 +6,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.vampirestudios.raaMaterials.RAAConfig;
 import net.vampirestudios.raaMaterials.material.Form;
 import net.vampirestudios.raaMaterials.material.Forms;
 import net.vampirestudios.raaMaterials.material.MaterialDef;
@@ -34,16 +35,20 @@ final class ParametricBlockStats {
 		}
 
 		Form form = Forms.fromDescriptionId(block.getDescriptionId());
-		float hardness = material.get().hardness() * formMultiplier(form, material.get().kind());
-		return Math.clamp(hardness, minimumHardness(form), maximumHardness(form, material.get().kind()));
+		MaterialDef def = material.get();
+		float hardness = def.hardness() * configMultiplier(def.kind()) * formMultiplier(form, def.kind());
+		return Math.clamp(hardness, minimumHardness(form), maximumHardness(form, def.kind()));
+	}
+
+	private static float configMultiplier(MaterialKind kind) {
+		return Math.max(0.0f, RAAConfig.active().blockStats().hardnessMul().getOrDefault(kind, 1.0f));
 	}
 
 	private static float formMultiplier(Form form, MaterialKind kind) {
 		return switch (form) {
 			case GLASS, TINTED_GLASS, PANE -> 0.08f;
 			case CLUSTER -> 0.35f;
-			case BUDDING, BUD_SMALL, BUD_MEDIUM, BUD_LARGE -> 0.25f;
-			case BUTTON, PRESSURE_PLATE -> 0.25f;
+			case BUDDING, BUD_SMALL, BUD_MEDIUM, BUD_LARGE, BUTTON, PRESSURE_PLATE -> 0.25f;
 			case BARS, GRATE -> kind == MaterialKind.METAL || kind == MaterialKind.ALLOY ? 0.85f : 0.55f;
 			case DOOR, TRAPDOOR, FENCE, FENCE_GATE -> kind == MaterialKind.METAL || kind == MaterialKind.ALLOY ? 0.75f : 0.55f;
 			case CHAIN -> 0.45f;
@@ -51,7 +56,6 @@ final class ParametricBlockStats {
 			case SHINGLES, PLATE_BLOCK -> 0.85f;
 			case RAW_BLOCK -> 1.1f;
 			case BRICKS, TILES, PILLAR, MOSAIC -> 1.05f;
-			case POLISHED, CHISELED, SMOOTH, CUT -> 1.0f;
 			case COBBLED, MOSSY -> 0.9f;
 			case CRACKED -> 0.75f;
 			case CERAMIC -> 0.8f;
@@ -64,8 +68,7 @@ final class ParametricBlockStats {
 	private static float minimumHardness(Form form) {
 		return switch (form) {
 			case GLASS, TINTED_GLASS, PANE -> 0.3f;
-			case BUTTON, PRESSURE_PLATE, CHAIN, LANTERN -> 0.5f;
-			case BUDDING, BUD_SMALL, BUD_MEDIUM, BUD_LARGE -> 0.5f;
+			case BUTTON, PRESSURE_PLATE, CHAIN, LANTERN, BUDDING, BUD_SMALL, BUD_MEDIUM, BUD_LARGE -> 0.5f;
 			case CLUSTER -> 0.8f;
 			default -> 0.4f;
 		};
@@ -74,9 +77,8 @@ final class ParametricBlockStats {
 	private static float maximumHardness(Form form, MaterialKind kind) {
 		return switch (form) {
 			case GLASS, TINTED_GLASS, PANE -> 0.6f;
-			case BUTTON, PRESSURE_PLATE, CHAIN, LANTERN -> 1.5f;
+			case BUTTON, PRESSURE_PLATE, CHAIN, LANTERN, CLUSTER, BUDDING, BUD_SMALL, BUD_MEDIUM, BUD_LARGE -> 1.5f;
 			case DOOR, TRAPDOOR, FENCE, FENCE_GATE, LAMP -> kind == MaterialKind.METAL || kind == MaterialKind.ALLOY ? 5.0f : 3.0f;
-			case CLUSTER, BUDDING, BUD_SMALL, BUD_MEDIUM, BUD_LARGE -> 1.5f;
 			case SLAB, STAIRS, WALL -> kind == MaterialKind.METAL || kind == MaterialKind.ALLOY ? 7.0f : 4.0f;
 			default -> kind == MaterialKind.METAL || kind == MaterialKind.ALLOY ? 8.0f : 6.0f;
 		};

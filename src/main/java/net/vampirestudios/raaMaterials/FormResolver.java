@@ -6,24 +6,8 @@ import java.util.List;
 import static net.vampirestudios.raaMaterials.material.Form.*;
 
 public final class FormResolver {
-    // Define each group's implied forms once.
     public static List<Form> formsFor(FormGroup g) {
-        return switch (g) {
-            case TOOLS -> List.of(PICKAXE, AXE, SWORD, SHOVEL, HOE);
-            case ORE_CHAIN -> List.of(ORE, RAW, RAW_BLOCK);
-            case METAL_DECOR -> List.of(PLATE_BLOCK, SHINGLES, PILLAR, TILES, MOSAIC);
-            case STONE_DECOR -> List.of(BRICKS, PILLAR, TILES, MOSAIC, MOSSY, CRACKED, COBBLED, CHISELED, POLISHED,
-                                        SLAB, STAIRS, WALL, CUT, SMOOTH);
-            case SAND_SET -> List.of(SANDSTONE, SLAB, STAIRS, WALL, CHISELED);
-            case GRAVEL_SET -> List.of(POLISHED, SLAB, STAIRS, WALL);
-            case CLAY_SET -> List.of(BLOCK, BALL, CERAMIC);
-            case MUD_SET -> List.of(DRIED, BRICKS, SLAB, STAIRS, WALL);
-            case SOIL_SET -> List.of(BLOCK, PACKED_SOIL);
-            case SALT_SET -> List.of(BLOCK, DUST);
-            case VOLCANIC_SET -> List.of(BLOCK, BRICKS, PILLAR, COBBLED, POLISHED, MOSSY, BUTTON, PRESSURE_PLATE);
-            case CRYSTAL_SET -> List.of(CLUSTER, CRYSTAL, SHARD, DUST, CRYSTAL_BRICKS, GLASS, TINTED_GLASS, PANE, ROD_BLOCK);
-            case CRYSTAL_LAMPS -> List.of(CALCITE_LAMP, BASALT_LAMP, CHIME);
-        };
+        return FormGroupConfig.active().getOrDefault(g, FormGroupConfig.defaults().getOrDefault(g, List.of()));
     }
 
     /** Compute final allowed forms for a kind given defaults + config KindPolicy. */

@@ -4,14 +4,11 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.lukebemish.codecextras.config.ConfigType;
-import dev.lukebemish.codecextras.structured.Annotation;
-import dev.lukebemish.codecextras.structured.IdentityInterpreter;
-import dev.lukebemish.codecextras.structured.Structure;
 import net.minecraft.util.GsonHelper;
 import net.vampirestudios.raaMaterials.material.Form;
 import net.vampirestudios.raaMaterials.material.MaterialGenerator;
 import net.vampirestudios.raaMaterials.material.MaterialKind;
+import net.vampirestudios.raaMaterials.material.SpawnInfo;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,6 +27,7 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
                         Map<String, List<String>> replaceables,
                         net.vampirestudios.raaMaterials.RAAConfig.NameGen nameGen,
                         Map<MaterialKind, KindPolicy> formControls, int toolChancePercent,
+                        Map<MaterialKind, SpawnProfile> spawnProfiles,
                         MaterialGenerator.Profile defaultProfile) {
     // ----- Records / Beans -----
     public record TierWeights(int stone, int iron, int diamond, int netherite) {
@@ -39,15 +37,6 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
                 Codec.INT.fieldOf("diamond").forGetter(TierWeights::diamond),
                 Codec.INT.fieldOf("netherite").forGetter(TierWeights::netherite)
         ).apply(i, TierWeights::new));
-        public static final Structure<TierWeights> STRUCTURE = Structure.record(builder -> {
-            var a = builder.add("stone", Structure.INT, TierWeights::stone);
-            var b = builder.add("iron", Structure.INT, TierWeights::iron);
-            var c = builder.add("diamond", Structure.INT, TierWeights::diamond);
-            var d = builder.add("netherite", Structure.INT, TierWeights::netherite);
-            return container -> new TierWeights(
-                    a.apply(container), b.apply(container), c.apply(container), d.apply(container)
-            );
-        });
 
         public TierWeights() {
             this(40, 40, 15, 5);
@@ -60,14 +49,6 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
                 Codec.INT.fieldOf("geode").forGetter(ModeWeights::geode),
                 Codec.INT.fieldOf("cluster").forGetter(ModeWeights::cluster)
         ).apply(i, ModeWeights::new));
-        public static final Structure<ModeWeights> STRUCTURE = Structure.record(builder -> {
-            var a = builder.add("ore", Structure.INT, ModeWeights::ore);
-            var b = builder.add("geode", Structure.INT, ModeWeights::geode);
-            var c = builder.add("cluster", Structure.INT, ModeWeights::cluster);
-            return container -> new ModeWeights(
-                    a.apply(container), b.apply(container), c.apply(container)
-            );
-        });
 
         public ModeWeights() {
             this(70, 15, 15);
@@ -80,14 +61,6 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
                 Codec.INT.fieldOf("mid").forGetter(DepthBand::mid),
                 Codec.INT.fieldOf("deep").forGetter(DepthBand::deep)
         ).apply(i, DepthBand::new));
-        public static final Structure<DepthBand> STRUCTURE = Structure.record(builder -> {
-            var a = builder.add("shallow", Structure.INT, DepthBand::shallow);
-            var b = builder.add("mid", Structure.INT, DepthBand::mid);
-            var c = builder.add("deep", Structure.INT, DepthBand::deep);
-            return container -> new DepthBand(
-                    a.apply(container), b.apply(container), c.apply(container)
-            );
-        });
 
         public DepthBand() {
             this(30, 40, 30);
@@ -101,15 +74,6 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
                 Codec.INT.fieldOf("peakMin").forGetter(YRange::peakMin),
                 Codec.INT.fieldOf("peakMax").forGetter(YRange::peakMax)
         ).apply(i, YRange::new));
-        public static final Structure<YRange> STRUCTURE = Structure.record(builder -> {
-            var a = builder.add("minY", Structure.INT, YRange::minY);
-            var b = builder.add("maxY", Structure.INT, YRange::maxY);
-            var c = builder.add("peakMin", Structure.INT, YRange::peakMin);
-            var d = builder.add("peakMax", Structure.INT, YRange::peakMax);
-            return container -> new YRange(
-                    a.apply(container), b.apply(container), c.apply(container), d.apply(container)
-            );
-        });
     }
 
     public record NameGen(boolean useColorPrefixes, boolean useBiomeBias, boolean useReplaceableBias,
@@ -121,21 +85,79 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
                 Codec.INT.fieldOf("hashLen").forGetter(NameGen::hashLen),
                 Codec.STRING.listOf().fieldOf("banned").forGetter(NameGen::banned)
         ).apply(i, NameGen::new));
-        public static final Structure<NameGen> STRUCTURE = Structure.record(builder -> {
-            var a = builder.add("useColorPrefixes", Structure.BOOL, NameGen::useColorPrefixes);
-            var b = builder.add("useBiomeBias", Structure.BOOL, NameGen::useBiomeBias);
-            var c = builder.add("useReplaceableBias", Structure.BOOL, NameGen::useReplaceableBias);
-            var d = builder.add("hashLen", Structure.INT, NameGen::hashLen);
-            var e = builder.add("banned", Structure.STRING.listOf(), NameGen::banned);
-            return container -> new NameGen(
-                    a.apply(container), b.apply(container), c.apply(container), d.apply(container),
-                    e.apply(container)
-            );
-        });
 
         public NameGen() {
             this(true, true, true, 4, List.of("obsidian", "pumice"));
         }
+    }
+
+    public record IntRange(int min, int max) {
+        public static final Codec<IntRange> CODEC = RecordCodecBuilder.create(i -> i.group(
+                Codec.INT.fieldOf("min").forGetter(IntRange::min),
+                Codec.INT.fieldOf("max").forGetter(IntRange::max)
+        ).apply(i, IntRange::new));
+
+        public int pick(Random rng) {
+            int low = Math.min(min, max);
+            int high = Math.max(min, max);
+            return rng.nextInt(low, high + 1);
+        }
+    }
+
+    public record SpawnProfile(
+            IntRange attempts,
+            float successChance,
+            int veinMin, int veinMax,
+            SpawnInfo.VeinShape shape,
+            int minY, int maxY,
+            IntRange center,
+            IntRange spread,
+            SpawnInfo.NoiseGate regionGate,
+            SpawnInfo.NoiseGate pocketGate,
+            float mustTouchAirChance,
+            float nearWaterChance,
+            float nearLavaChance
+    ) {
+        private static final Codec<Float> CHANCE_CODEC = Codec.floatRange(0.0f, 1.0f);
+
+        public static final Codec<SpawnProfile> CODEC = RecordCodecBuilder.create(i -> i.group(
+                IntRange.CODEC.fieldOf("attempts").forGetter(SpawnProfile::attempts),
+                CHANCE_CODEC.fieldOf("successChance").forGetter(SpawnProfile::successChance),
+                Codec.intRange(0, 256).fieldOf("veinMin").forGetter(SpawnProfile::veinMin),
+                Codec.intRange(0, 256).fieldOf("veinMax").forGetter(SpawnProfile::veinMax),
+                SpawnInfo.VeinShape.CODEC.fieldOf("shape").forGetter(SpawnProfile::shape),
+                Codec.INT.fieldOf("minY").forGetter(SpawnProfile::minY),
+                Codec.INT.fieldOf("maxY").forGetter(SpawnProfile::maxY),
+                IntRange.CODEC.fieldOf("center").forGetter(SpawnProfile::center),
+                IntRange.CODEC.fieldOf("spread").forGetter(SpawnProfile::spread),
+                SpawnInfo.NoiseGate.CODEC.fieldOf("regionGate").forGetter(SpawnProfile::regionGate),
+                SpawnInfo.NoiseGate.CODEC.fieldOf("pocketGate").forGetter(SpawnProfile::pocketGate),
+                CHANCE_CODEC.fieldOf("mustTouchAirChance").forGetter(SpawnProfile::mustTouchAirChance),
+                CHANCE_CODEC.fieldOf("nearWaterChance").forGetter(SpawnProfile::nearWaterChance),
+                CHANCE_CODEC.fieldOf("nearLavaChance").forGetter(SpawnProfile::nearLavaChance)
+        ).apply(i, SpawnProfile::new));
+
+        public SpawnInfo pick(Random rng) {
+            return new SpawnInfo(
+                    attempts.pick(rng),
+                    successChance,
+                    Math.min(veinMin, veinMax),
+                    Math.max(veinMin, veinMax),
+                    shape,
+                    new SpawnInfo.YDistribution(
+                            Math.min(minY, maxY),
+                            Math.max(minY, maxY),
+                            center.pick(rng),
+                            spread.pick(rng)
+                    ),
+                    regionGate,
+                    pocketGate,
+                    rng.nextFloat() < mustTouchAirChance,
+                    rng.nextFloat() < nearWaterChance,
+                    rng.nextFloat() < nearLavaChance
+            );
+        }
+
     }
 
     // ----- CODECs for maps -----
@@ -149,17 +171,8 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
             Codec.unboundedMap(MaterialKind.CODEC, DepthBand.CODEC);
     private static final Codec<Map<MaterialKind, KindPolicy>> POLICY_MAP_CODEC =
             Codec.unboundedMap(MaterialKind.CODEC, KindPolicy.CODEC);
-
-    private static final Structure<Map<MaterialKind, Integer>> KIND_WEIGHTS_STRUCTURE =
-            Structure.unboundedMap(MaterialKind.STRUCTURE, Structure.INT).flatXmap(RAAConfig::validateWeights, RAAConfig::validateWeights);
-    private static final Structure<Map<MaterialKind, ModeWeights>> MODE_MAP_STRUCTURE =
-            Structure.unboundedMap(MaterialKind.STRUCTURE, ModeWeights.STRUCTURE);
-    private static final Structure<Map<MaterialKind, Float>> FLOAT_MUL_STRUCTURE =
-            Structure.unboundedMap(MaterialKind.STRUCTURE, Structure.FLOAT);
-    private static final Structure<Map<MaterialKind, DepthBand>> DEPTH_STRUCTURE =
-            Structure.unboundedMap(MaterialKind.STRUCTURE, DepthBand.STRUCTURE);
-    private static final Structure<Map<MaterialKind, KindPolicy>> POLICY_MAP_STRUCTURE =
-            Structure.unboundedMap(MaterialKind.STRUCTURE, KindPolicy.STRUCTURE);
+    private static final Codec<Map<MaterialKind, SpawnProfile>> SPAWN_PROFILE_MAP_CODEC =
+            Codec.unboundedMap(MaterialKind.CODEC, SpawnProfile.CODEC);
 
     public record BlockStats(Map<MaterialKind, Float> hardnessMul, Map<MaterialKind, Float> blastMul, Map<MaterialKind, Float> effMul) {
         public static final Codec<BlockStats> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -167,14 +180,6 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
                 FLOAT_MUL_CODEC.fieldOf("blastMul").forGetter(BlockStats::blastMul),
                 FLOAT_MUL_CODEC.fieldOf("effMul").forGetter(BlockStats::effMul)
         ).apply(i, BlockStats::new));
-        public static final Structure<BlockStats> STRUCTURE = Structure.record(builder -> {
-            var a = builder.add("hardnessMul", FLOAT_MUL_STRUCTURE, BlockStats::hardnessMul);
-            var b = builder.add("blastMul", FLOAT_MUL_STRUCTURE, BlockStats::blastMul);
-            var c = builder.add("effMul", FLOAT_MUL_STRUCTURE, BlockStats::effMul);
-            return container -> new BlockStats(
-                    a.apply(container), b.apply(container), c.apply(container)
-            );
-        });
     }
 
     // ----- Main config schema -----
@@ -199,45 +204,9 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
             POLICY_MAP_CODEC.fieldOf("formControls").forGetter(c -> c.formControls),
 
             Codec.INT.fieldOf("toolChancePercent").forGetter(c -> c.toolChancePercent),
+            SPAWN_PROFILE_MAP_CODEC.optionalFieldOf("spawnProfiles", defaultSpawnProfiles()).forGetter(c -> c.spawnProfiles),
             MaterialGenerator.Profile.CODEC.fieldOf("defaultProfile").forGetter(RAAConfig::defaultProfile)
     ).apply(i, RAAConfig::new));
-
-    public static final Structure<RAAConfig> STRUCTURE = Structure.record(builder -> {
-        var materialsMin = builder.add("materialsMin", Structure.INT.annotate(Annotation.DESCRIPTION, "Describes the field!").annotate(Annotation.TITLE, "Field A"), RAAConfig::materialsMin);
-        var materialsMax = builder.add("materialsMax", Structure.INT.annotate(Annotation.DESCRIPTION, "Describes the field!").annotate(Annotation.TITLE, "Field A"), RAAConfig::materialsMax);
-        var kindWeights = builder.add("kindWeights", KIND_WEIGHTS_STRUCTURE.annotate(Annotation.DESCRIPTION, "This is a test"), RAAConfig::kindWeights);
-        var tiers = builder.add("tiers", TierWeights.STRUCTURE, RAAConfig::tiers);
-        var spawnMode = builder.add("spawnMode", MODE_MAP_STRUCTURE, RAAConfig::spawnMode);
-        var blockStats = builder.add("blockStats", BlockStats.STRUCTURE, RAAConfig::blockStats);
-        var depthWeights = builder.add("depthWeights", DEPTH_STRUCTURE, RAAConfig::depthWeights);
-        var shallowRange = builder.add("shallowRange", Structure.unboundedMap(Structure.STRING, YRange.STRUCTURE), RAAConfig::shallowRange);
-        var midRange = builder.add("midRange", Structure.unboundedMap(Structure.STRING, YRange.STRUCTURE), RAAConfig::midRange);
-        var deepRange = builder.add("deepRange", Structure.unboundedMap(Structure.STRING, YRange.STRUCTURE), RAAConfig::deepRange);
-        var replacables = builder.add("replacables", Structure.unboundedMap(Structure.STRING, Structure.STRING.listOf()), RAAConfig::replaceables);
-        var nameGen = builder.add("nameGen", NameGen.STRUCTURE, RAAConfig::nameGen);
-        var formControl = builder.add("formControls", POLICY_MAP_STRUCTURE, RAAConfig::formControls);
-        var toolChancePercent = builder.add("toolChancePercent", Structure.INT, RAAConfig::toolChancePercent);
-        var defaultProfile = builder.add("defaultProfile", Structure.INT, RAAConfig::toolChancePercent);
-        return container -> new RAAConfig(
-                materialsMin.apply(container), materialsMax.apply(container), kindWeights.apply(container),
-                tiers.apply(container), spawnMode.apply(container), blockStats.apply(container),
-                depthWeights.apply(container), shallowRange.apply(container), midRange.apply(container),
-                deepRange.apply(container), replacables.apply(container), nameGen.apply(container),
-                formControl.apply(container), toolChancePercent.apply(container)
-        );
-    });
-
-    public static final ConfigType<RAAConfig> CONFIG = new ConfigType<>() {
-        @Override
-        public Codec<RAAConfig> codec() {
-            return RAAConfig.CODEC;
-        }
-
-        @Override
-        public RAAConfig defaultConfig() {
-            return IdentityInterpreter.INSTANCE.interpret(RAAConfig.STRUCTURE).getOrThrow();
-        }
-    };
 
     // ----- Defaults (ported from your old config; volcanic rarer) -----
     public static RAAConfig defaults() {
@@ -270,7 +239,55 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
                 new NameGen(),
                 defaultPolicies(),
                 100,
+                defaultSpawnProfiles(),
                 MaterialGenerator.Profile.FANTASY_HEAVY
+        );
+    }
+
+    public static Map<MaterialKind, SpawnProfile> defaultSpawnProfiles() {
+        var map = new EnumMap<MaterialKind, SpawnProfile>(MaterialKind.class);
+        var oreBlobRegion = new SpawnInfo.NoiseGate(0.002f, 0.0f);
+        var oreBlobPocket = new SpawnInfo.NoiseGate(0.02f, 0.2f);
+        var diskRegion = new SpawnInfo.NoiseGate(0.003f, -0.2f);
+        var diskPocket = new SpawnInfo.NoiseGate(0.025f, 0.0f);
+
+        map.put(METAL, profile(8, 17, 0.75f, 8, 24, SpawnInfo.VeinShape.ORE_BLOB, -64, 96, -20, 29, 18, 31, oreBlobRegion, oreBlobPocket, 0.0f, 0.0f, 0.0f));
+        map.put(ALLOY, profile(8, 17, 0.75f, 8, 24, SpawnInfo.VeinShape.ORE_BLOB, -64, 96, -20, 29, 18, 31, oreBlobRegion, oreBlobPocket, 0.0f, 0.0f, 0.0f));
+        map.put(GEM, profile(1, 3, 0.5f, 2, 6, SpawnInfo.VeinShape.ORE_STRING, -64, 32, -55, -21, 6, 13, new SpawnInfo.NoiseGate(0.0015f, 0.4f), new SpawnInfo.NoiseGate(0.03f, 0.5f), 0.4f, 0.0f, 0.25f));
+        map.put(CRYSTAL, profile(4, 9, 0.8f, 3, 14, SpawnInfo.VeinShape.CRYSTAL_CLUSTER, -32, 160, 10, 49, 20, 44, new SpawnInfo.NoiseGate(0.002f, 0.15f), new SpawnInfo.NoiseGate(0.04f, 0.35f), 1.0f, 0.5f, 0.0f));
+        map.put(GRAVEL, profile(1, 3, 0.75f, 7, 15, SpawnInfo.VeinShape.ORE_DISK, 45, 160, 58, 89, 16, 31, diskRegion, diskPocket, 0.0f, 0.5f, 0.0f));
+        map.put(MUD, profile(1, 2, 0.75f, 6, 13, SpawnInfo.VeinShape.ORE_DISK, 45, 120, 58, 77, 12, 23, new SpawnInfo.NoiseGate(0.003f, -0.1f), new SpawnInfo.NoiseGate(0.025f, 0.05f), 0.0f, 1.0f, 0.0f));
+        map.put(CLAY, profile(1, 2, 0.75f, 6, 12, SpawnInfo.VeinShape.ORE_DISK, 45, 120, 56, 75, 12, 23, new SpawnInfo.NoiseGate(0.003f, -0.1f), new SpawnInfo.NoiseGate(0.025f, 0.05f), 0.0f, 0.6f, 0.0f));
+        map.put(SAND, profile(1, 3, 0.75f, 7, 16, SpawnInfo.VeinShape.ORE_DISK, 45, 160, 58, 89, 16, 31, diskRegion, diskPocket, 0.0f, 0.0f, 0.0f));
+        map.put(SOIL, profile(1, 2, 0.75f, 6, 13, SpawnInfo.VeinShape.ORE_DISK, 45, 160, 60, 89, 16, 31, diskRegion, diskPocket, 0.0f, 0.0f, 0.0f));
+        map.put(SALT, profile(2, 4, 0.7f, 6, 14, SpawnInfo.VeinShape.ORE_DISK, -32, 160, 40, 71, 24, 47, new SpawnInfo.NoiseGate(0.002f, 0.1f), new SpawnInfo.NoiseGate(0.025f, 0.15f), 0.0f, 0.0f, 0.0f));
+        map.put(VOLCANIC, profile(2, 3, 0.75f, 7, 15, SpawnInfo.VeinShape.ORE_DISK, -64, 96, -20, 39, 24, 47, new SpawnInfo.NoiseGate(0.002f, 0.0f), new SpawnInfo.NoiseGate(0.025f, 0.1f), 0.0f, 0.0f, 0.0f));
+        map.put(STONE, profile(2, 4, 0.85f, 8, 17, SpawnInfo.VeinShape.ORE_DISK, -64, 128, -20, 54, 28, 55, new SpawnInfo.NoiseGate(0.002f, -0.1f), new SpawnInfo.NoiseGate(0.02f, 0.1f), 0.0f, 0.0f, 0.0f));
+        map.put(OTHER, profile(6, 13, 0.85f, 8, 20, SpawnInfo.VeinShape.ORE_BLOB, -64, 96, -10, 39, 18, 39, new SpawnInfo.NoiseGate(0.002f, -0.1f), new SpawnInfo.NoiseGate(0.02f, 0.1f), 0.0f, 0.0f, 0.0f));
+        map.put(WOOD, map.get(OTHER));
+        return Collections.unmodifiableMap(map);
+    }
+
+    private static SpawnProfile profile(int attemptsMin, int attemptsMax, float successChance, int veinMin, int veinMax,
+                                        SpawnInfo.VeinShape shape, int minY, int maxY, int centerMin, int centerMax,
+                                        int spreadMin, int spreadMax, SpawnInfo.NoiseGate regionGate,
+                                        SpawnInfo.NoiseGate pocketGate, float mustTouchAirChance,
+                                        float nearWaterChance, float nearLavaChance) {
+        return new SpawnProfile(
+                new IntRange(attemptsMin, attemptsMax),
+                successChance,
+                veinMin,
+                veinMax,
+                shape,
+                minY,
+                maxY,
+                new IntRange(centerMin, centerMax),
+                new IntRange(spreadMin, spreadMax),
+                regionGate,
+                pocketGate,
+                mustTouchAirChance,
+                nearWaterChance,
+                nearLavaChance
         );
     }
 
@@ -369,6 +386,7 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
                      NameGen nameGen,
                      Map<MaterialKind, KindPolicy> formControls,
                      int toolChancePercent,
+                     Map<MaterialKind, SpawnProfile> spawnProfiles,
                      MaterialGenerator.Profile defaultProfile) {
 
         this.materialsMin = materialsMin;
@@ -385,6 +403,7 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
         this.replaceables = replaceables;
         this.nameGen = nameGen;
         this.toolChancePercent = toolChancePercent;
+        this.spawnProfiles = wrapEnumMap(spawnProfiles);
         this.defaultProfile = defaultProfile;
     }
 
@@ -395,7 +414,8 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
     }
 
     public static void init(Path gameDir) {
-        CONFIG_PATH = gameDir.resolve("config/raa_materials.json");
+        CONFIG_PATH = gameDir.resolve("config/raa_materials/config.json");
+        FormGroupConfig.init(gameDir);
         try {
             if (Files.notExists(CONFIG_PATH)) save(defaults());
         } catch (IOException ignored) {
@@ -434,6 +454,15 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
         Files.createDirectories(CONFIG_PATH.getParent());
         var gson = new com.google.gson.GsonBuilder().setPrettyPrinting().create();
         Files.writeString(CONFIG_PATH, gson.toJson(json));
+    }
+
+    public static void replaceAndSave(RAAConfig cfg) {
+        ACTIVE.set(cfg);
+        try {
+            save(cfg);
+        } catch (IOException e) {
+            log("[Config] Failed to save: " + e.getMessage());
+        }
     }
 
     private static void log(String s) {

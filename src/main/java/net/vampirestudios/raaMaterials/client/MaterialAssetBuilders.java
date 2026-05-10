@@ -23,10 +23,9 @@ import net.vampirestudios.raaMaterials.material.MaterialDef;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import static net.vampirestudios.raaMaterials.client.MaterialTexturePickers.oneIndexed;
-import static net.vampirestudios.raaMaterials.client.MaterialTexturePickers.pickBlockTexture;
-import static net.vampirestudios.raaMaterials.client.MaterialTexturePickers.textures;
+import static net.vampirestudios.raaMaterials.client.MaterialTexturePickers.*;
 
 public final class MaterialAssetBuilders {
     private static final JPropertyComponent MAT_COMP = JPropertyComponent.component("raa_materials:material");
@@ -1316,15 +1315,16 @@ public final class MaterialAssetBuilders {
 
     private static Identifier pickDecorTexture(Form form, MaterialDef def, int idx) {
         var decor = textures(def).textures4();
-        return switch (form) {
+        Optional<Identifier> texture = switch (form) {
             case CHAIN -> decor.chain();
             case LANTERN -> decor.lantern();
             case DOOR -> decor.doorBottom();
             case TRAPDOOR -> decor.trapdoor();
             case FENCE -> decor.fence();
             case FENCE_GATE -> decor.fenceGate();
-            default -> java.util.Optional.<Identifier>empty();
-        }.orElseGet(() -> pickFormTexture(form, def, idx));
+            default -> Optional.empty();
+        };
+        return texture.orElseGet(() -> pickFormTexture(form, def, idx));
     }
 
     private static Identifier pairedDoorTopTexture(Identifier bottomTexture) {
