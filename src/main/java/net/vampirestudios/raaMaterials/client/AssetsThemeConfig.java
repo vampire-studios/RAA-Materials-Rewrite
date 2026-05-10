@@ -111,14 +111,14 @@ public final class AssetsThemeConfig {
 		global.put(AssetsTheme.Slot.CRYSTAL_CLUSTER, numbered("crystal/crystal_", 9));
 		global.put(AssetsTheme.Slot.CRYSTAL_ITEM, numbered("crystal_items/shard_", 7));
 		global.put(AssetsTheme.Slot.RAW_ITEM, numbered("raw/raw_", 18));
-		global.put(AssetsTheme.Slot.INGOT_ITEM, numbered("ingots/ingot_", 29));
+		global.put(AssetsTheme.Slot.INGOT_ITEM, numbered("ingots/ingot_", 31));
 		global.put(AssetsTheme.Slot.DUST_ITEM, numbered("dusts/dust_", 5));
 		global.put(AssetsTheme.Slot.NUGGET_ITEM, numbered("nuggets/nugget_", 10));
 		global.put(AssetsTheme.Slot.PLATE_ITEM, numbered("plates/plate_", 3));
 		global.put(AssetsTheme.Slot.GEM_ITEM, numbered("gems/gem_", 33));
 		global.put(AssetsTheme.Slot.SHARD_ITEM, numbered("crystal_items/shard_", 7));
-		global.put(AssetsTheme.Slot.PICK_HEAD, numbered("tools/pickaxe/pickaxe_", 11));
-		global.put(AssetsTheme.Slot.PICK_STICK, numbered("tools/pickaxe/stick_", 10));
+		global.put(AssetsTheme.Slot.PICK_HEAD, numbered("tools/pickaxe/pickaxe_", 12));
+		global.put(AssetsTheme.Slot.PICK_STICK, numbered("tools/pickaxe/stick_", 12));
 		global.put(AssetsTheme.Slot.AXE_HEAD, numbered("tools/axe/axe_head_", 12));
 		global.put(AssetsTheme.Slot.AXE_STICK, numbered("tools/axe/axe_stick_", 9));
 		global.put(AssetsTheme.Slot.SWORD_BLADE, numbered("tools/sword/blade_", 13));
