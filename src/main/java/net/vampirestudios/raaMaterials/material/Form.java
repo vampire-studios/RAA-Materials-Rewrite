@@ -30,6 +30,7 @@ public enum Form implements StringRepresentable {
 	SHARD(FormCategory.CRAFTING_PART),
 	CRYSTAL(FormCategory.CRAFTING_PART, FormCategory.CRYSTAL),
 	CLUSTER(FormCategory.NATURAL, FormCategory.CRYSTAL),
+	SPIKE(FormCategory.NATURAL),
 
 	BUDDING(FormCategory.NATURAL, FormCategory.CRYSTAL),
 	BUD_SMALL(FormCategory.NATURAL, FormCategory.CRYSTAL),
@@ -74,6 +75,8 @@ public enum Form implements StringRepresentable {
 	BOOTS(FormCategory.ARMOR),
 	HORSE_ARMOR(FormCategory.ARMOR),
 	WOLF_ARMOR(FormCategory.ARMOR),
+
+	NAUTILUS_ARMOR(FormCategory.ARMOR),
 
 	CROWN(FormCategory.ARMOR, FormCategory.LEGENDARY),
 	CLOAK(FormCategory.ARMOR, FormCategory.LEGENDARY),

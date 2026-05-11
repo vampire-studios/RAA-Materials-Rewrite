@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
 import net.vampirestudios.raaMaterials.material.*;
+import net.vampirestudios.raaMaterials.material.MaterialKind;
 import net.vampirestudios.raaMaterials.net.NetworkInit;
 import net.vampirestudios.raaMaterials.net.ServerSend;
 import net.vampirestudios.raaMaterials.recipe.ParametricRecipes;
@@ -40,6 +41,8 @@ public class RAAMaterials implements ModInitializer {
 		RRPGen.init();
 		WorldgenInit.init();
 
+		ServerLifecycleEvents.SERVER_STOPPED.register(server -> MaterialRegistry.clear());
+
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			var overworld = server.overworld();
 
@@ -57,11 +60,17 @@ public class RAAMaterials implements ModInitializer {
 
 			var a = overworld.getAttachedOrCreate(MaterialAttachments.LEGENDARIES);
 			if (a.byForm().isEmpty()) {
+				// Only materials with tool textures are viable legendary weapon carriers
 				var mats = MaterialRegistry
-						.all(overworld).stream().map(m -> m.nameInformation().id()).toList();
+						.all(overworld).stream()
+						.filter(m -> m.kind() == MaterialKind.METAL
+								|| m.kind() == MaterialKind.ALLOY
+								|| m.kind() == MaterialKind.GEM)
+						.map(m -> m.nameInformation().id())
+						.toList();
 
 				var uniqueForms = java.util.List.of(
-						Form.BATTLE_AXE, Form.WAR_HAMMER, Form.SPEAR, Form.SICKLE, Form.DAGGER, Form.HAMMER,
+						Form.BATTLE_AXE, Form.WAR_HAMMER, Form.SICKLE, Form.DAGGER, Form.HAMMER,
 						Form.SCYTHE, Form.SHIELD, Form.BOW, Form.CROSSBOW, Form.STAFF, Form.WAND, Form.CROWN,
 						Form.CLOAK, Form.AMULET, Form.ORB, Form.MUSIC_DISC
 				);

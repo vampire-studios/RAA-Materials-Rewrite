@@ -76,6 +76,7 @@ public final class MaterialGenerator {
 			RAAConfig.BlockStats blockStats = cfg.blockStats();
 			float resistance = blastFor(kind, tier) * multiplier(blockStats.blastMul(), kind);
 			float efficiency = effFor(kind, tier) * multiplier(blockStats.effMul(), kind);
+			SpikeGrowthLiquid spikeGrowth = spikeGrowthFor(kind, rng);
 
 			list.add(new MaterialDef(
 					name,
@@ -89,7 +90,8 @@ public final class MaterialGenerator {
 					spawn,
 					toolSpec.map(spec -> applyEfficiencyMultiplier(spec, multiplier(blockStats.effMul(), kind))),
 					mix(worldSeed, name.id()),
-					host
+					host,
+					spikeGrowth
 			));
 		}
 
@@ -146,6 +148,15 @@ public final class MaterialGenerator {
 		usedDisplayNames.add(fallback.displayName().toLowerCase(Locale.ROOT));
 		usedIds.add(fallback.id().toString());
 		return fallback;
+	}
+
+	private static SpikeGrowthLiquid spikeGrowthFor(MaterialKind kind, Random rng) {
+		var fc = RAAConfig.active().formChances();
+		return switch (kind) {
+			case STONE    -> rng.nextFloat() < fc.stoneSpikeGrowthChance()    ? SpikeGrowthLiquid.WATER : SpikeGrowthLiquid.NONE;
+			case VOLCANIC -> rng.nextFloat() < fc.volcanicSpikeGrowthChance() ? SpikeGrowthLiquid.LAVA  : SpikeGrowthLiquid.NONE;
+			default -> SpikeGrowthLiquid.NONE;
+		};
 	}
 
 	private static Optional<ToolMaterialSpec> toolSpecFor(MaterialKind kind, HarvestTier tier, Random rng) {
@@ -207,8 +218,8 @@ public final class MaterialGenerator {
 			PICKAXE, AXE, SWORD, SHOVEL, HOE, SPEAR
 	);
 
-	private static final List<Form> ARMOR_SET = List.of(
-			HELMET, CHESTPLATE, LEGGINGS, BOOTS
+	private static final List<Form> MOUNT_ARMOR = List.of(
+			HORSE_ARMOR, WOLF_ARMOR, NAUTILUS_ARMOR
 	);
 
 	private static final List<Form> METAL_PARTS = List.of(
@@ -245,8 +256,7 @@ public final class MaterialGenerator {
 
 	private static final List<Form> WOOD_BUILDING = List.of(
 			SLAB, STAIRS, FENCE, FENCE_GATE,
-			DOOR, TRAPDOOR, BUTTON, PRESSURE_PLATE,
-			SIGN, HANGING_SIGN, LADDER
+			DOOR, TRAPDOOR, BUTTON, PRESSURE_PLATE
 	);
 
 	private static @NotNull List<Form> getForms(MaterialKind kind, Random rng) {
@@ -257,7 +267,7 @@ public final class MaterialGenerator {
 					METAL_DECOR_BLOCKS,
 					METAL_INTERACTIVE_BLOCKS,
 					STANDARD_EQUIPMENT_SET,
-					ARMOR_SET
+					MOUNT_ARMOR
 			);
 
 			case ALLOY -> join(
@@ -265,7 +275,7 @@ public final class MaterialGenerator {
 					METAL_DECOR_BLOCKS,
 					METAL_INTERACTIVE_BLOCKS,
 					STANDARD_EQUIPMENT_SET,
-					ARMOR_SET
+					MOUNT_ARMOR
 			);
 
 			case GEM -> join(
@@ -279,18 +289,22 @@ public final class MaterialGenerator {
 					GLASS, TINTED_GLASS, PANE,
 					CRYSTAL_BRICKS, MOSAIC,
 					CALCITE_LAMP, BASALT_LAMP, LAMP,
-					CHIME, ROD_BLOCK
+					ROD_BLOCK
 			);
 
-			case STONE -> join(
-					List.of(
-							BLOCK, CHISELED, POLISHED, BRICKS, PILLAR, TILES,
-							MOSAIC, MOSSY, CRACKED, COBBLED
-					),
-					BLOCK_SHAPES,
-					BASIC_INTERACTIVE_BLOCKS,
-					List.of(LAMP)
-			);
+			case STONE -> {
+				var stoneForms = new ArrayList<>(join(
+						List.of(
+								BLOCK, CHISELED, POLISHED, BRICKS, PILLAR, TILES,
+								MOSAIC, MOSSY, CRACKED, COBBLED
+						),
+						BLOCK_SHAPES,
+						BASIC_INTERACTIVE_BLOCKS,
+						List.of(LAMP)
+				));
+				if (rng.nextFloat() < RAAConfig.active().formChances().stoneSpikeChance()) stoneForms.add(SPIKE);
+				yield List.copyOf(stoneForms);
+			}
 
 			case SAND -> sandForms(rng);
 
@@ -316,11 +330,15 @@ public final class MaterialGenerator {
 					BLOCK, DUST, LAMP
 			);
 
-			case VOLCANIC -> join(
-					List.of(BLOCK, COBBLED, POLISHED, BRICKS, PILLAR, MOSSY),
-					BASIC_INTERACTIVE_BLOCKS,
-					List.of(LAMP)
-			);
+			case VOLCANIC -> {
+				var volcanicForms = new ArrayList<>(join(
+						List.of(BLOCK, COBBLED, POLISHED, BRICKS, PILLAR, MOSSY),
+						BASIC_INTERACTIVE_BLOCKS,
+						List.of(LAMP)
+				));
+				if (rng.nextFloat() < RAAConfig.active().formChances().volcanicSpikeChance()) volcanicForms.add(SPIKE);
+				yield List.copyOf(volcanicForms);
+			}
 
 			case WOOD -> join(
 					WOOD_NATURAL,
@@ -333,10 +351,11 @@ public final class MaterialGenerator {
 	}
 
 	private static @NotNull List<Form> sandForms(Random rng) {
+		var fc = RAAConfig.active().formChances();
 		var forms = new ArrayList<>(List.of(BLOCK, SANDSTONE, CUT, CHISELED, SMOOTH, SLAB, STAIRS, WALL));
-		if (rng.nextFloat() < 0.45f) {
+		if (rng.nextFloat() < fc.sandGlassChance()) {
 			forms.add(GLASS);
-			if (rng.nextFloat() < 0.25f) {
+			if (rng.nextFloat() < fc.sandTintedGlassChance()) {
 				forms.add(TINTED_GLASS);
 			}
 		}

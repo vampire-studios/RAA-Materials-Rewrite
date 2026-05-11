@@ -20,6 +20,28 @@ import static net.minecraft.resources.Identifier.withDefaultNamespace;
 import static net.vampirestudios.raaMaterials.RAAMaterials.id;
 
 public final class AssetsThemeConfig {
+	// Texture pool sizes — single source of truth.
+	// Update these when adding or removing texture files; all other code reads from here.
+	public static final int METAL_BLOCK_COUNT    = 23;
+	public static final int GEM_BLOCK_COUNT      = 16;
+	public static final int CRYSTAL_BLOCK_COUNT  = 5;
+	public static final int CRYSTAL_CLUSTER_COUNT = 9;
+	public static final int STONE_BASE_COUNT     = 25;
+	public static final int SAND_BLOCK_COUNT     = 3;
+	public static final int STONE_COBBLED_COUNT  = 7;
+	public static final int STONE_CHISELED_COUNT = 5;
+	public static final int STONE_BRICKS_COUNT   = 28;
+	public static final int STONE_TILES_COUNT    = 8;
+	public static final int STONE_FRAME_COUNT    = 13;
+
+	// Legendary weapon / mount-armor texture pools.
+	// Set to 0 initially — dedicated files aren't shipped yet.
+	// Add real PNGs and bump the count when ready.
+	public static final int HAMMER_HEAD_COUNT    = 0;
+	public static final int HAMMER_HANDLE_COUNT  = 0;
+	public static final int DAGGER_BLADE_COUNT   = 0;
+	public static final int DAGGER_HANDLE_COUNT  = 0;
+	public static final int MOUNT_ARMOR_COUNT    = 0;
 	private static final Codec<Map<AssetsTheme.Slot, List<Identifier>>> SLOT_MAP_CODEC =
 			Codec.unboundedMap(AssetsTheme.Slot.CODEC, Identifier.CODEC.listOf());
 	private static final Codec<Map<MaterialKind, Map<AssetsTheme.Slot, List<Identifier>>>> KIND_SLOT_MAP_CODEC =
@@ -104,13 +126,13 @@ public final class AssetsThemeConfig {
 
 		global.put(AssetsTheme.Slot.ORE_VEIN_METAL, numbered("ores/metals/ore_", 40));
 		global.put(AssetsTheme.Slot.ORE_VEIN_GEM, numbered("ores/gems/ore_", 33));
-		global.put(AssetsTheme.Slot.STORAGE_METAL, numbered("storage_blocks/metals/metal_", 23));
-		global.put(AssetsTheme.Slot.STORAGE_GEM, numbered("storage_blocks/gems/gem_", 16));
-		global.put(AssetsTheme.Slot.STORAGE_CRYSTAL, numbered("crystal/crystal_block_", 5));
-		global.put(AssetsTheme.Slot.RAW_BLOCK, numbered("storage_blocks/metals/raw_", 15));
-		global.put(AssetsTheme.Slot.CRYSTAL_CLUSTER, numbered("crystal/crystal_", 9));
+		global.put(AssetsTheme.Slot.STORAGE_METAL, numbered("storage_blocks/metals/metal_", METAL_BLOCK_COUNT));
+		global.put(AssetsTheme.Slot.STORAGE_GEM, numbered("storage_blocks/gems/gem_", GEM_BLOCK_COUNT));
+		global.put(AssetsTheme.Slot.STORAGE_CRYSTAL, numbered("crystal/crystal_block_", CRYSTAL_BLOCK_COUNT));
+		global.put(AssetsTheme.Slot.RAW_BLOCK, numbered("storage_blocks/metals/raw_", 25));
+		global.put(AssetsTheme.Slot.CRYSTAL_CLUSTER, numbered("crystal/crystal_", CRYSTAL_CLUSTER_COUNT));
 		global.put(AssetsTheme.Slot.CRYSTAL_ITEM, numbered("crystal_items/shard_", 7));
-		global.put(AssetsTheme.Slot.RAW_ITEM, numbered("raw/raw_", 18));
+		global.put(AssetsTheme.Slot.RAW_ITEM, numbered("raw/raw_", 20));
 		global.put(AssetsTheme.Slot.INGOT_ITEM, numbered("ingots/ingot_", 31));
 		global.put(AssetsTheme.Slot.DUST_ITEM, numbered("dusts/dust_", 5));
 		global.put(AssetsTheme.Slot.NUGGET_ITEM, numbered("nuggets/nugget_", 10));
@@ -119,21 +141,22 @@ public final class AssetsThemeConfig {
 		global.put(AssetsTheme.Slot.SHARD_ITEM, numbered("crystal_items/shard_", 7));
 		global.put(AssetsTheme.Slot.PICK_HEAD, numbered("tools/pickaxe/pickaxe_", 12));
 		global.put(AssetsTheme.Slot.PICK_STICK, numbered("tools/pickaxe/stick_", 12));
-		global.put(AssetsTheme.Slot.AXE_HEAD, numbered("tools/axe/axe_head_", 12));
-		global.put(AssetsTheme.Slot.AXE_STICK, numbered("tools/axe/axe_stick_", 9));
-		global.put(AssetsTheme.Slot.SWORD_BLADE, numbered("tools/sword/blade_", 13));
-		global.put(AssetsTheme.Slot.SWORD_HANDLE, numbered("tools/sword/handle_", 11));
-		global.put(AssetsTheme.Slot.SHOVEL_HEAD, numbered("tools/shovel/shovel_head_", 11));
-		global.put(AssetsTheme.Slot.SHOVEL_STICK, numbered("tools/shovel/shovel_stick_", 11));
-		global.put(AssetsTheme.Slot.HOE_HEAD, numbered("tools/hoe/hoe_head_", 9));
-		global.put(AssetsTheme.Slot.HOE_STICK, numbered("tools/hoe/hoe_stick_", 9));
+		global.put(AssetsTheme.Slot.AXE_HEAD, numbered("tools/axe/axe_head_", 13));
+		global.put(AssetsTheme.Slot.AXE_STICK, numbered("tools/axe/axe_stick_", 10));
+		global.put(AssetsTheme.Slot.SWORD_BLADE, numbered("tools/sword/blade_", 14));
+		global.put(AssetsTheme.Slot.SWORD_HANDLE, numbered("tools/sword/handle_", 12));
+		global.put(AssetsTheme.Slot.SHOVEL_HEAD, numbered("tools/shovel/shovel_head_", 12));
+		global.put(AssetsTheme.Slot.SHOVEL_STICK, numbered("tools/shovel/shovel_stick_", 12));
+		global.put(AssetsTheme.Slot.HOE_HEAD, numbered("tools/hoe/hoe_head_", 10));
+		global.put(AssetsTheme.Slot.HOE_STICK, numbered("tools/hoe/hoe_stick_", 10));
 		global.put(AssetsTheme.Slot.SHEARS_BASE, List.of(id("tools/shears_base")));
 		global.put(AssetsTheme.Slot.SHEARS_METAL, List.of(id("tools/shears_metal")));
 		putMissingSpearDefaults(global);
-		global.put(AssetsTheme.Slot.COBBLESTONE, numbered("stone/stone_cobbled_", 13));
-		global.put(AssetsTheme.Slot.CHISELED, numbered("stone/stone_chiseled_", 4));
-		global.put(AssetsTheme.Slot.STONE_BRICKS, numbered("stone/stone_bricks_", 24));
-		global.put(AssetsTheme.Slot.POLISHED_RANDOM, numbered("stone/stone_frame_", 9));
+		global.put(AssetsTheme.Slot.COBBLESTONE, numbered("stone/stone_cobbled_", STONE_COBBLED_COUNT));
+		global.put(AssetsTheme.Slot.CHISELED, numbered("stone/stone_chiseled_", STONE_CHISELED_COUNT));
+		global.put(AssetsTheme.Slot.STONE_BRICKS, numbered("stone/stone_bricks_", STONE_BRICKS_COUNT));
+		global.put(AssetsTheme.Slot.TILES, numbered("stone/stone_tiles_", STONE_TILES_COUNT));
+		global.put(AssetsTheme.Slot.POLISHED_RANDOM, numbered("stone/stone_frame_", STONE_FRAME_COUNT));
 
 		fallbacks.put(AssetsTheme.Slot.PLATE_SHEET, List.of(id("metal/metal_plate")));
 		fallbacks.put(AssetsTheme.Slot.SHINGLES_SHEET, List.of(id("metal/metal_shingles")));
@@ -164,6 +187,15 @@ public final class AssetsThemeConfig {
 		fallbacks.put(AssetsTheme.Slot.DOOR_ITEM_METAL, List.of(id("decor/metal_door")));
 		fallbacks.put(AssetsTheme.Slot.DOOR_ITEM_WOOD, List.of(id("decor/door")));
 		fallbacks.put(AssetsTheme.Slot.STONE_DEFAULT, List.of(withDefaultNamespace("block/stone")));
+		// Legendary weapon fallbacks — reuse nearest existing tool texture
+		fallbacks.put(AssetsTheme.Slot.HAMMER_HEAD,        List.of(id("tools/axe/axe_head_1")));
+		fallbacks.put(AssetsTheme.Slot.HAMMER_HANDLE,      List.of(id("tools/axe/axe_stick_1")));
+		fallbacks.put(AssetsTheme.Slot.DAGGER_BLADE,       List.of(id("tools/sword/blade_1")));
+		fallbacks.put(AssetsTheme.Slot.DAGGER_HANDLE,      List.of(id("tools/sword/handle_1")));
+		// Mount armor fallbacks — reuse plate texture
+		fallbacks.put(AssetsTheme.Slot.HORSE_ARMOR_ITEM,   List.of(id("plates/plate_1")));
+		fallbacks.put(AssetsTheme.Slot.WOLF_ARMOR_ITEM,    List.of(id("plates/plate_1")));
+		fallbacks.put(AssetsTheme.Slot.NAUTILUS_ARMOR_ITEM, List.of(id("plates/plate_1")));
 
 		perKind.put(MaterialKind.METAL, Map.of(AssetsTheme.Slot.STORAGE_BLOCK, List.of(withDefaultNamespace("block/iron_block"))));
 		perKind.put(MaterialKind.ALLOY, Map.of(AssetsTheme.Slot.STORAGE_BLOCK, List.of(withDefaultNamespace("block/copper_block"))));
@@ -185,14 +217,17 @@ public final class AssetsThemeConfig {
 		globalForm.put(Form.TRAPDOOR, List.of(id("decor/trapdoor")));
 		globalForm.put(Form.FENCE, List.of(id("decor/planks")));
 		globalForm.put(Form.FENCE_GATE, List.of(id("decor/planks")));
-		perKindForm.put(MaterialKind.METAL, Map.of(
-				Form.DOOR, List.of(id("decor/metal_door_bottom")),
-				Form.TRAPDOOR, List.of(id("decor/trapdoor"))
-		));
-		perKindForm.put(MaterialKind.ALLOY, Map.of(
-				Form.DOOR, List.of(id("decor/metal_door_bottom")),
-				Form.TRAPDOOR, List.of(id("decor/trapdoor"))
-		));
+		var metalForms = new EnumMap<Form, List<Identifier>>(Form.class);
+		metalForms.put(Form.DOOR, List.of(id("decor/metal_door_bottom")));
+		metalForms.put(Form.TRAPDOOR, List.of(id("decor/metal_trapdoor")));
+		perKindForm.put(MaterialKind.METAL, metalForms);
+
+		var alloyForms = new EnumMap<Form, List<Identifier>>(Form.class);
+		alloyForms.put(Form.DOOR, List.of(id("decor/metal_door_bottom")));
+		alloyForms.put(Form.TRAPDOOR, List.of(id("decor/metal_trapdoor")));
+		perKindForm.put(MaterialKind.ALLOY, alloyForms);
+
+		putMissingSpikeDefaults(perKindForm);
 
 		return new Data(global, fallbacks, perKind, globalForm, perKindForm);
 	}
@@ -218,6 +253,14 @@ public final class AssetsThemeConfig {
 			perKindForm.put(kind, copy);
 		});
 
+		replaceIfEquals(global, AssetsTheme.Slot.SPEAR_HEAD,
+				List.of(id("tools/spear/head")), numbered("tools/spear/head_", 2));
+		replaceIfEquals(global, AssetsTheme.Slot.SPEAR_HANDLE,
+				List.of(id("tools/spear/handle")), numbered("tools/spear/handle_", 2));
+		replaceIfEquals(global, AssetsTheme.Slot.SPEAR_HEAD_IN_HAND,
+				List.of(id("tools/spear/head_in_hand")), numbered("tools/spear/head_in_hand_", 2));
+		replaceIfEquals(global, AssetsTheme.Slot.SPEAR_HANDLE_IN_HAND,
+				List.of(id("tools/spear/handle_in_hand")), numbered("tools/spear/handle_in_hand_", 2));
 		putMissingSpearDefaults(global);
 
 		replaceIfEquals(fallbacks, AssetsTheme.Slot.DOOR_ITEM_METAL,
@@ -242,6 +285,7 @@ public final class AssetsThemeConfig {
 
 		migrateMetalDecor(perKindForm, MaterialKind.METAL);
 		migrateMetalDecor(perKindForm, MaterialKind.ALLOY);
+		putMissingSpikeDefaults(perKindForm);
 
 		return new Data(global, fallbacks, perKind, globalForm, perKindForm);
 	}
@@ -249,6 +293,18 @@ public final class AssetsThemeConfig {
 	private static <K> void replaceIfEquals(Map<K, List<Identifier>> map, K key, List<Identifier> oldValue, List<Identifier> newValue) {
 		if (oldValue.equals(map.get(key))) {
 			map.put(key, newValue);
+		}
+	}
+
+	private static void putMissingSpikeDefaults(Map<MaterialKind, Map<Form, List<Identifier>>> perKindForm) {
+		List<Identifier> spikeVariants = List.of(
+				id("block/stone/spikes/1/spike"),
+				id("block/stone/spikes/2/spike"),
+				id("block/stone/spikes/3/spike")
+		);
+		for (MaterialKind kind : List.of(MaterialKind.STONE, MaterialKind.VOLCANIC)) {
+			perKindForm.computeIfAbsent(kind, k -> new EnumMap<>(Form.class))
+					   .putIfAbsent(Form.SPIKE, spikeVariants);
 		}
 	}
 
@@ -266,7 +322,7 @@ public final class AssetsThemeConfig {
 		replaceIfEquals(forms, Form.DOOR,
 				List.of(id("decor/door_bottom")), List.of(id("decor/metal_door_bottom")));
 		replaceIfEquals(forms, Form.TRAPDOOR,
-				List.of(withDefaultNamespace("block/iron_trapdoor")), List.of(id("decor/trapdoor")));
+				List.of(id("decor/trapdoor")), List.of(withDefaultNamespace("block/iron_trapdoor")));
 	}
 
 	private static List<Identifier> numbered(String base, int max) {

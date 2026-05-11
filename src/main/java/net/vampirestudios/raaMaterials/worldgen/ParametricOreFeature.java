@@ -2,6 +2,7 @@ package net.vampirestudios.raaMaterials.worldgen;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
@@ -11,6 +12,7 @@ import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.properties.DripstoneThickness;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
@@ -20,7 +22,10 @@ import net.minecraft.world.level.levelgen.feature.configurations.DiskConfigurati
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.vampirestudios.raaMaterials.RAAConfig;
 import net.vampirestudios.raaMaterials.content.ParametricBlock;
+import net.vampirestudios.raaMaterials.content.ParametricCrystalClusterBlock;
+import net.vampirestudios.raaMaterials.content.ParametricSpikeBlock;
 import net.vampirestudios.raaMaterials.material.Form;
 import net.vampirestudios.raaMaterials.material.MaterialDef;
 import net.vampirestudios.raaMaterials.material.MaterialKind;
@@ -58,6 +63,23 @@ public class ParametricOreFeature extends Feature<NoneFeatureConfiguration> {
             placedAny |= placeMaterial(ctx, plan.get());
         }
 
+        // Second pass: spike columns for materials with Form.SPIKE
+        var fc = RAAConfig.active().formChances();
+        for (int matIdx = 0; matIdx < max; matIdx++) {
+            MaterialDef def = materials.get(matIdx);
+            if (!def.forms().contains(Form.SPIKE)) continue;
+
+            SpawnInfo spawn = def.spawn();
+            int attempts = Math.min(spawn.attemptsPerChunk(), 3);
+            for (int attempt = 0; attempt < attempts; attempt++) {
+                if (ctx.random().nextFloat() >= fc.spikeWorldgenChance()) continue;
+                int x = ctx.origin().getX() + ctx.random().nextInt(16);
+                int z = ctx.origin().getZ() + ctx.random().nextInt(16);
+                int y = sampleY(ctx.random(), spawn.y());
+                placedAny |= placeSpikeColumn(ctx, new BlockPos(x, y, z), def, matIdx);
+            }
+        }
+
         return placedAny;
     }
 
@@ -74,13 +96,14 @@ public class ParametricOreFeature extends Feature<NoneFeatureConfiguration> {
             }
 
             BlockPos pos = samplePosition(ctx.level(), ctx.origin(), ctx.random(), plan, spawn);
-            if (!passesEnvironmentRules(ctx.level(), pos, spawn)) {
+            if (!passesEnvironmentRules(ctx.level(), pos, spawn, plan.geode())) {
                 continue;
             }
 
-            placedAny |= plan.disk()
-                    ? placeDisk(ctx, pos, plan, spawn)
-                    : placeOre(ctx, pos, plan, spawn);
+            placedAny |= plan.geode()          ? placeGeode(ctx, pos, plan, spawn)
+                       : plan.crystalCluster() ? placeCrystalCluster(ctx, pos, plan, spawn)
+                       : plan.disk()           ? placeDisk(ctx, pos, plan, spawn)
+                       :                         placeOre(ctx, pos, plan, spawn);
         }
 
         return placedAny;
@@ -128,6 +151,54 @@ public class ParametricOreFeature extends Feature<NoneFeatureConfiguration> {
         return y >= spawn.y().minY() && y <= spawn.y().maxY();
     }
 
+    private boolean placeSpikeColumn(
+            FeaturePlaceContext<NoneFeatureConfiguration> ctx,
+            BlockPos origin,
+            MaterialDef def,
+            int matIdx
+    ) {
+        WorldGenLevel level = ctx.level();
+        RandomSource rng = ctx.random();
+
+        // Randomly hang from ceiling (DOWN) or grow from floor (UP)
+        boolean fromCeiling = rng.nextBoolean();
+        Direction searchDir = fromCeiling ? Direction.UP : Direction.DOWN;
+        Direction growDir = fromCeiling ? Direction.DOWN : Direction.UP;
+
+        // Scan up to 16 blocks to find a solid surface with air on the growth side
+        BlockPos surface = null;
+        for (int i = 0; i < 16; i++) {
+            BlockPos test = origin.relative(searchDir, i);
+            BlockPos airSide = test.relative(growDir);
+            if (level.getBlockState(test).isSolid() && level.isEmptyBlock(airSide)) {
+                surface = test;
+                break;
+            }
+        }
+        if (surface == null) return false;
+
+        int height = 1 + rng.nextInt(RAAConfig.active().formChances().spikeMaxHeight());
+        BlockState spikeBase = YBlocks.PARAM_SPIKE.defaultBlockState()
+                .setValue(ParametricBlock.MAT, matIdx)
+                .setValue(ParametricSpikeBlock.VERTICAL_DIRECTION, growDir)
+                .setValue(ParametricSpikeBlock.WATERLOGGED, false);
+
+        for (int i = 0; i < height; i++) {
+            BlockPos bp = surface.relative(growDir, i + 1);
+            if (!level.isEmptyBlock(bp)) return false;
+            DripstoneThickness thickness = spikeThickness(height, i);
+            level.setBlock(bp, spikeBase.setValue(ParametricSpikeBlock.THICKNESS, thickness), 2);
+        }
+        return true;
+    }
+
+    private static DripstoneThickness spikeThickness(int height, int index) {
+        if (index == height - 1) return DripstoneThickness.TIP;
+        if (index == 0 && height > 1) return DripstoneThickness.BASE;
+        if (index == height - 2) return DripstoneThickness.FRUSTUM;
+        return DripstoneThickness.MIDDLE;
+    }
+
     private boolean placeOre(
             FeaturePlaceContext<NoneFeatureConfiguration> ctx,
             BlockPos pos,
@@ -158,6 +229,122 @@ public class ParametricOreFeature extends Feature<NoneFeatureConfiguration> {
         );
 
         return Feature.DISK.place(config, ctx.level(), ctx.chunkGenerator(), ctx.random(), pos);
+    }
+
+    // Geode: hollow sphere with smooth basalt shell → calcite ring → crystal block inner wall → air cavity.
+    // Radius is rolled per-spawn from [veinMin, veinMax], giving natural size variation.
+    private boolean placeGeode(
+            FeaturePlaceContext<NoneFeatureConfiguration> ctx,
+            BlockPos center,
+            GenerationPlan plan,
+            SpawnInfo spawn
+    ) {
+        RandomSource rng = ctx.random();
+        WorldGenLevel level = ctx.level();
+
+        int radius = spawn.veinMin() + rng.nextInt(Math.max(1, spawn.veinMax() - spawn.veinMin() + 1));
+
+        // Layer boundaries from the center outward.
+        // For small geodes (radius < 6) the shell is thinner so there's still an air cavity.
+        double shellInner   = radius - (radius >= 6 ? 2.0 : 1.5);
+        double calciteInner = shellInner - 1.0;
+        double crystalInner = Math.max(0.0, calciteInner - 1.0);
+
+        BlockState crystalBlock = plan.state(); // PARAM_CRYSTAL_BLOCK with correct MAT index
+
+        // Phase 1: carve out the layered sphere, overwriting whatever is there.
+        for (var bp : BlockPos.betweenClosed(
+                center.offset(-radius, -radius, -radius),
+                center.offset(radius, radius, radius))) {
+            double dist = Math.sqrt(center.distSqr(bp));
+            if (dist > radius) continue;
+
+            BlockState target;
+            if (dist > shellInner) {
+                target = Blocks.SMOOTH_BASALT.defaultBlockState();
+            } else if (dist > calciteInner) {
+                target = Blocks.CALCITE.defaultBlockState();
+            } else if (crystalInner > 0 && dist > crystalInner) {
+                // Inner crystal wall: geodeCrystalWallChance crystal block, rest bare calcite for variety
+                target = rng.nextFloat() < RAAConfig.active().formChances().geodeCrystalWallChance() ? crystalBlock : Blocks.CALCITE.defaultBlockState();
+            } else {
+                target = Blocks.AIR.defaultBlockState();
+            }
+
+            level.setBlock(bp, target, 2);
+        }
+
+        // Phase 2: grow crystal clusters on any air block that borders the crystal/calcite wall.
+        // The cluster's FACING points away from its anchor (toward the open cavity interior).
+        BlockState clusterBase = YBlocks.PARAM_CLUSTER.defaultBlockState()
+                .setValue(ParametricBlock.MAT, plan.matIdx());
+
+        for (var bp : BlockPos.betweenClosed(
+                center.offset(-radius, -radius, -radius),
+                center.offset(radius, radius, radius))) {
+            if (!level.isEmptyBlock(bp)) continue;
+
+            for (Direction dir : Direction.values()) {
+                BlockPos wall = bp.relative(dir);
+                BlockState wallState = level.getBlockState(wall);
+                if (wallState.is(YBlocks.PARAM_CRYSTAL_BLOCK) || wallState.is(Blocks.CALCITE)) {
+                    if (rng.nextFloat() < RAAConfig.active().formChances().geodeCrystalClusterChance()) {
+                        // dir is from the air block toward the wall; the crystal grows the other way
+                        level.setBlock(bp, clusterBase
+                                .setValue(ParametricCrystalClusterBlock.FACING, dir.getOpposite()), 2);
+                    }
+                    break; // at most one cluster per air block
+                }
+            }
+        }
+
+        return true;
+    }
+
+    // Crystal cluster patch: an ore-sized blob of crystal blocks with clusters sprouting on exposed faces.
+    private boolean placeCrystalCluster(
+            FeaturePlaceContext<NoneFeatureConfiguration> ctx,
+            BlockPos center,
+            GenerationPlan plan,
+            SpawnInfo spawn
+    ) {
+        RandomSource rng = ctx.random();
+        WorldGenLevel level = ctx.level();
+
+        var config = new OreConfiguration(
+                plan.def().host().toRuleTest(),
+                plan.state(), // PARAM_CRYSTAL_BLOCK with correct MAT
+                oreSize(rng, plan, spawn),
+                0.0f
+        );
+
+        if (!Feature.ORE.place(config, level, ctx.chunkGenerator(), rng, center)) {
+            return false;
+        }
+
+        // Scan for placed crystal blocks and grow clusters on air-facing faces.
+        int scan = Math.max(spawn.veinMin(), spawn.veinMax() / 2);
+        BlockState clusterBase = YBlocks.PARAM_CLUSTER.defaultBlockState()
+                .setValue(ParametricBlock.MAT, plan.matIdx());
+
+        for (var bp : BlockPos.betweenClosed(
+                center.offset(-scan, -scan, -scan),
+                center.offset(scan, scan, scan))) {
+            BlockState bs = level.getBlockState(bp);
+            if (!bs.is(YBlocks.PARAM_CRYSTAL_BLOCK)) continue;
+            if (bs.getValue(ParametricBlock.MAT) != plan.matIdx()) continue;
+
+            for (Direction dir : Direction.values()) {
+                BlockPos neighbor = bp.relative(dir);
+                if (level.isEmptyBlock(neighbor) && rng.nextFloat() < RAAConfig.active().formChances().crystalClusterFillChance()) {
+                    // dir is from the crystal block toward the air; cluster grows that way
+                    level.setBlock(neighbor, clusterBase
+                            .setValue(ParametricCrystalClusterBlock.FACING, dir), 2);
+                }
+            }
+        }
+
+        return true;
     }
 
     private int oreSize(RandomSource rng, GenerationPlan plan, SpawnInfo spawn) {
@@ -265,8 +452,9 @@ public class ParametricOreFeature extends Feature<NoneFeatureConfiguration> {
         return BlockPredicate.matchesBlocks(BuiltInRegistries.BLOCK.getValue(target.id()));
     }
 
-    private boolean passesEnvironmentRules(WorldGenLevel level, BlockPos pos, SpawnInfo spawn) {
-        return (!spawn.mustTouchAir() || nearAir(level, pos))
+    private boolean passesEnvironmentRules(WorldGenLevel level, BlockPos pos, SpawnInfo spawn, boolean isGeode) {
+        // Geodes create their own hollow interior, so the mustTouchAir check is skipped for them.
+        return (isGeode || !spawn.mustTouchAir() || nearAir(level, pos))
                 && (!spawn.nearWater() || nearBlock(level, pos, Blocks.WATER))
                 && (!spawn.nearLava() || nearBlock(level, pos, Blocks.LAVA));
     }
@@ -322,26 +510,35 @@ public class ParametricOreFeature extends Feature<NoneFeatureConfiguration> {
     private record GenerationPlan(
             MaterialDef def,
             MaterialKind kind,
+            int matIdx,
             BlockState state,
             boolean terrainBlock,
-            boolean disk
+            boolean disk,
+            boolean geode,
+            boolean crystalCluster
     ) {
         static Optional<GenerationPlan> create(MaterialDef def, int matIdx) {
-            boolean hasOre = def.forms().contains(Form.ORE);
+            boolean hasOre         = def.forms().contains(Form.ORE);
             boolean hasTerrainBlock = def.forms().contains(Form.BLOCK) && generatesTerrainBlock(def.kind());
+            boolean hasCrystal     = def.forms().contains(Form.CLUSTER);
+            boolean isGeode        = hasCrystal && def.spawn().shape() == SpawnInfo.VeinShape.GEODE;
+            boolean isCrystalCluster = hasCrystal && def.spawn().shape() == SpawnInfo.VeinShape.CRYSTAL_CLUSTER;
 
-            if (!hasOre && !hasTerrainBlock) {
+            if (!hasOre && !hasTerrainBlock && !isGeode && !isCrystalCluster) {
                 return Optional.empty();
             }
 
-            Block block = hasOre ? YBlocks.PARAM_ORE : YBlocks.PARAM_BLOCK;
-            BlockState state = block.defaultBlockState().setValue(ParametricBlock.MAT, matIdx);
+            Block block;
+            if (hasOre)              block = YBlocks.PARAM_ORE;
+            else if (hasTerrainBlock) block = YBlocks.PARAM_BLOCK;
+            else                     block = YBlocks.PARAM_CRYSTAL_BLOCK;
 
-            boolean terrainBlock = !hasOre && hasTerrainBlock;
+            BlockState state = block.defaultBlockState().setValue(ParametricBlock.MAT, matIdx);
+            boolean terrainBlock = !hasOre && hasTerrainBlock && !isGeode && !isCrystalCluster;
             boolean disk = def.spawn().shape() == SpawnInfo.VeinShape.ORE_DISK
                     && isLooseSurfaceMaterial(def.kind());
 
-            return Optional.of(new GenerationPlan(def, def.kind(), state, terrainBlock, disk));
+            return Optional.of(new GenerationPlan(def, def.kind(), matIdx, state, terrainBlock, disk, isGeode, isCrystalCluster));
         }
     }
 }

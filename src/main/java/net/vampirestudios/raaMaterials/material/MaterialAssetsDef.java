@@ -17,7 +17,8 @@ public record MaterialAssetsDef(
 		ItemTextureSet itemTextures,
 		ToolTextureSet toolTextures,
 		DecorTextureSet decorTextures,
-		CrystalTextureSet crystalTextures
+		CrystalTextureSet crystalTextures,
+		LegendaryTextureSet legendaryTextures
 ) {
 	/* ------------ JSON codec (data-pack / disk) ------------ */
 	public static final Codec<MaterialAssetsDef> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -29,7 +30,8 @@ public record MaterialAssetsDef(
 			ItemTextureSet.CODEC.fieldOf("item_textures").forGetter(MaterialAssetsDef::itemTextures),
 			ToolTextureSet.CODEC.fieldOf("tool_textures").forGetter(MaterialAssetsDef::toolTextures),
 			DecorTextureSet.CODEC.optionalFieldOf("decor_textures", DecorTextureSet.EMPTY).forGetter(MaterialAssetsDef::decorTextures),
-			CrystalTextureSet.CODEC.optionalFieldOf("crystal_textures", CrystalTextureSet.EMPTY).forGetter(MaterialAssetsDef::crystalTextures)
+			CrystalTextureSet.CODEC.optionalFieldOf("crystal_textures", CrystalTextureSet.EMPTY).forGetter(MaterialAssetsDef::crystalTextures),
+			LegendaryTextureSet.CODEC.optionalFieldOf("legendary_textures", LegendaryTextureSet.EMPTY).forGetter(MaterialAssetsDef::legendaryTextures)
 	).apply(i, MaterialAssetsDef::new));
 
 	/* ------------ Network codec (compact) ------------ */
@@ -44,6 +46,7 @@ public record MaterialAssetsDef(
 					ToolTextureSet.STREAM_CODEC, MaterialAssetsDef::toolTextures,
 					DecorTextureSet.STREAM_CODEC, MaterialAssetsDef::decorTextures,
 					CrystalTextureSet.STREAM_CODEC, MaterialAssetsDef::crystalTextures,
+					LegendaryTextureSet.STREAM_CODEC, MaterialAssetsDef::legendaryTextures,
 					MaterialAssetsDef::new
 			);
 }

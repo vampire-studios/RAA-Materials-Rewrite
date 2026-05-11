@@ -128,6 +128,7 @@ public final class YTabs {
 								}
 								addBlock(output, def, idx, Form.RAW_BLOCK, YItems.PARAM_RAW_BLOCK_ITEM);
 								addBlock(output, def, idx, Form.CLUSTER, YItems.PARAM_CLUSTER_ITEM);
+								addBlock(output, def, idx, Form.SPIKE, YItems.PARAM_SPIKE_ITEM);
 							}
 						})
 						.build()
@@ -191,6 +192,14 @@ public final class YTabs {
 										{Form.CUT, YItems.PARAM_CUT_BLOCK_ITEM},
 										{Form.SMOOTH, YItems.PARAM_SMOOTH_BLOCK_ITEM}
 								});
+
+								// --- Polished shape variants (polished slab/stairs/wall)
+								if (hasAll(def, Form.POLISHED, Form.SLAB))
+									addBlock(output, def, idx, Form.SLAB, YItems.PARAM_POLISHED_SLAB_ITEM);
+								if (hasAll(def, Form.POLISHED, Form.STAIRS))
+									addBlock(output, def, idx, Form.STAIRS, YItems.PARAM_POLISHED_STAIRS_ITEM);
+								if (hasAll(def, Form.POLISHED, Form.WALL))
+									addBlock(output, def, idx, Form.WALL, YItems.PARAM_POLISHED_WALL_ITEM);
 
 								// Bricks base block (extend to shapes if you want)
 								addBlock(output, def, idx, Form.BRICKS, YItems.PARAM_BRICKS_BLOCK_ITEM);
@@ -277,11 +286,11 @@ public final class YTabs {
 											{Form.CERAMIC, YItems.PARAM_CERAMIC_BLOCK_ITEM}
 									});
 								}
-//								if (def.kind() == MaterialKind.SOIL) {
-//									addBlocksIf(output, def, idx, new Object[][]{
-//											{Form.PACKED_SOIL, YItems.PARAM_PACKED_SOIL_ITEM}
-//									});
-//								}
+								if (def.kind() == MaterialKind.SOIL) {
+									addBlocksIf(output, def, idx, new Object[][]{
+											{Form.PACKED_SOIL, YItems.PARAM_PACKED_SOIL_ITEM}
+									});
+								}
 
 								// Metal structural extras
 								if (isMetalLike(def)) {
@@ -301,6 +310,7 @@ public final class YTabs {
 								});
 								if (isCrystalLike(def) || hasAll(def, Form.GLASS)) {
 									addBlocksIf(output, def, idx, new Object[][]{
+											{Form.BLOCK, YItems.PARAM_CRYSTAL_BLOCK_ITEM},
 											{Form.CRYSTAL_BRICKS, YItems.PARAM_CRYSTAL_BRICKS_ITEM},
 											{Form.PANE, YItems.PARAM_CRYSTAL_PANE_ITEM},
 											{Form.GLASS, YItems.PARAM_GLASS_ITEM},
@@ -338,6 +348,10 @@ public final class YTabs {
 								addIf(output, def, Form.SHOVEL, YItems.PARAM_SHOVEL);
 								addIf(output, def, Form.HOE, YItems.PARAM_HOE);
 								addIf(output, def, Form.SPEAR, YItems.PARAM_SPEAR);
+								addIf(output, def, Form.HAMMER, YItems.PARAM_HAMMER);
+								addIf(output, def, Form.HORSE_ARMOR, YItems.PARAM_HORSE_ARMOR_ITEM);
+								addIf(output, def, Form.WOLF_ARMOR, YItems.PARAM_WOLF_ARMOR_ITEM);
+								addIf(output, def, Form.NAUTILUS_ARMOR, YItems.PARAM_NAUTILUS_ARMOR_ITEM);
 							}
 						})
 						.build()
@@ -355,7 +369,9 @@ public final class YTabs {
 							for (MaterialDef def : mats) {
 								addIf(output, def, Form.AXE, YItems.PARAM_AXE);
 								addIf(output, def, Form.SWORD, YItems.PARAM_SWORD);
+								addIf(output, def, Form.DAGGER, YItems.PARAM_DAGGER);
 								addIf(output, def, Form.SPEAR, YItems.PARAM_SPEAR);
+								addIf(output, def, Form.HAMMER, YItems.PARAM_HAMMER);
 							}
 						})
 						.build()

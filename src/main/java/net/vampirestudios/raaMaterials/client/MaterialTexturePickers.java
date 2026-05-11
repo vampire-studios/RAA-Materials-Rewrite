@@ -14,11 +14,11 @@ public final class MaterialTexturePickers {
     }
 
     public static final Map<MaterialKind, TexPicker> BLOCK_TEXTURES = Map.of(
-            MaterialKind.METAL, idx -> RAAMaterials.id("storage_blocks/metals/metal_" + oneIndexed(idx, 23)),
-            MaterialKind.CRYSTAL, idx -> RAAMaterials.id("crystal/crystal_block_" + oneIndexed(idx, 5)),
-            MaterialKind.GEM, idx -> RAAMaterials.id("storage_blocks/gems/gem_" + oneIndexed(idx, 16)),
-            MaterialKind.STONE, idx -> RAAMaterials.id("stone/a/stone_" + oneIndexed(idx, 23)),
-            MaterialKind.SAND, idx -> RAAMaterials.id("storage_blocks/sand_" + oneIndexed(idx, 3)),
+            MaterialKind.METAL, idx -> RAAMaterials.id("storage_blocks/metals/metal_" + oneIndexed(idx, AssetsThemeConfig.METAL_BLOCK_COUNT)),
+            MaterialKind.CRYSTAL, idx -> RAAMaterials.id("crystal/crystal_block_" + oneIndexed(idx, AssetsThemeConfig.CRYSTAL_BLOCK_COUNT)),
+            MaterialKind.GEM, idx -> RAAMaterials.id("storage_blocks/gems/gem_" + oneIndexed(idx, AssetsThemeConfig.GEM_BLOCK_COUNT)),
+            MaterialKind.STONE, idx -> RAAMaterials.id("stone/a/stone_" + oneIndexed(idx, AssetsThemeConfig.STONE_BASE_COUNT)),
+            MaterialKind.SAND, idx -> RAAMaterials.id("storage_blocks/sand_" + oneIndexed(idx, AssetsThemeConfig.SAND_BLOCK_COUNT)),
             MaterialKind.MUD, idx -> Identifier.withDefaultNamespace("mud"),
             MaterialKind.GRAVEL, idx -> Identifier.withDefaultNamespace("gravel"),
             MaterialKind.CLAY, idx -> Identifier.withDefaultNamespace("clay")

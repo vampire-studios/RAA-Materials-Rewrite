@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/pointed_dripstone_up_tip_merge",
+  "textures": {
+    "all": "#spike"
+  }
+}

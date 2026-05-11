@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/pointed_dripstone_down_middle",
+  "textures": {
+    "all": "#spike"
+  }
+}

@@ -181,6 +181,21 @@ public final class AssetsTheme {
 		);
 	}
 
+	private LegendaryTextureSet buildLegendaryTextureSet(MaterialDef m, Random rnd) {
+		var k = m.kind();
+		Optional<Identifier> hammerHead    = pick(k, Slot.HAMMER_HEAD,        rnd);
+		Optional<Identifier> hammerHandle  = pick(k, Slot.HAMMER_HANDLE,      rnd);
+		Optional<Identifier> daggerBlade   = pick(k, Slot.DAGGER_BLADE,       rnd);
+		Optional<Identifier> daggerHandle  = pick(k, Slot.DAGGER_HANDLE,      rnd);
+		Optional<Identifier> horseArmor    = pick(k, Slot.HORSE_ARMOR_ITEM,   rnd);
+		Optional<Identifier> wolfArmor     = pick(k, Slot.WOLF_ARMOR_ITEM,    rnd);
+		Optional<Identifier> nautilusArmor = pick(k, Slot.NAUTILUS_ARMOR_ITEM, rnd);
+		return new LegendaryTextureSet(
+				hammerHead, hammerHandle, daggerBlade, daggerHandle,
+				horseArmor, wolfArmor, nautilusArmor
+		);
+	}
+
 	private CrystalTextureSet buildCrystalTextureSet(MaterialDef m, Random rnd) {
 		var k = m.kind();
 		Optional<Identifier> budding = (k == MaterialKind.CRYSTAL) ?
@@ -233,7 +248,8 @@ public final class AssetsTheme {
 				buildItemTextureSet(m, rnd),
 				buildToolTextureSet(m, rnd),
 				buildDecorTextureSet(m, rnd),
-				buildCrystalTextureSet(m, rnd)
+				buildCrystalTextureSet(m, rnd),
+				buildLegendaryTextureSet(m, rnd)
 		);
 	}
 
@@ -255,6 +271,8 @@ public final class AssetsTheme {
 		PICK_HEAD, PICK_STICK, AXE_HEAD, AXE_STICK, SWORD_BLADE, SWORD_HANDLE,
 		SHOVEL_HEAD, SHOVEL_STICK, HOE_HEAD, HOE_STICK,
 		SHEARS_BASE, SHEARS_METAL, SPEAR_HEAD, SPEAR_HANDLE, SPEAR_HEAD_IN_HAND, SPEAR_HANDLE_IN_HAND,
+		HAMMER_HEAD, HAMMER_HANDLE, DAGGER_BLADE, DAGGER_HANDLE,
+		HORSE_ARMOR_ITEM, WOLF_ARMOR_ITEM, NAUTILUS_ARMOR_ITEM,
 		BRICKS, POLISHED, TILES, MOSAIC, PILLAR_SIDE, PILLAR_TOP,
 		COBBLESTONE, CHISELED, STONE_BRICKS, POLISHED_RANDOM;
 

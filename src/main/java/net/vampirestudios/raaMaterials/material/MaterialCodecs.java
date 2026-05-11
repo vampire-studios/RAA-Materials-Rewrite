@@ -52,7 +52,8 @@ public final class MaterialCodecs {
 			SpawnInfo.CODEC.fieldOf("spawn_info").forGetter(MaterialDef::spawn),
 			ToolMaterialSpec.CODEC.optionalFieldOf("tool_spec").forGetter(MaterialDef::toolSpec),
 			Codec.LONG.fieldOf("asset_seed").forGetter(MaterialDef::assetSeed),
-			MaterialDef.OreHost.CODEC.fieldOf("ore_host").forGetter(MaterialDef::host)
+			MaterialDef.OreHost.CODEC.fieldOf("ore_host").forGetter(MaterialDef::host),
+			SpikeGrowthLiquid.CODEC.optionalFieldOf("spike_growth", SpikeGrowthLiquid.NONE).forGetter(MaterialDef::spikeGrowth)
 	).apply(i, MaterialDef::new));
 	public static final StreamCodec<ByteBuf, MaterialDef> MATERIAL_DEF_STREAM_CODEC = StreamCodecExpanded.composite(
 			MaterialDef.NameInformation.STREAM_CODEC,
@@ -79,6 +80,8 @@ public final class MaterialCodecs {
 			MaterialDef::assetSeed,
 			MaterialDef.OreHost.STREAM_CODEC,
 			MaterialDef::host,
+			SpikeGrowthLiquid.STREAM_CODEC,
+			MaterialDef::spikeGrowth,
 			MaterialDef::new
 	);
 	public static final Codec<MaterialSet> MATERIAL_SET = RecordCodecBuilder.create(i -> i.group(

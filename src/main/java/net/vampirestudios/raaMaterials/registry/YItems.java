@@ -10,8 +10,13 @@ import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.level.block.Block;
 import net.vampirestudios.raaMaterials.RAAMaterials;
 import net.vampirestudios.raaMaterials.content.ParametricBlockItem;
+import net.vampirestudios.raaMaterials.content.ParametricDaggerItem;
+import net.vampirestudios.raaMaterials.content.ParametricHammerItem;
+import net.vampirestudios.raaMaterials.content.ParametricHorseArmorItem;
 import net.vampirestudios.raaMaterials.content.ParametricItem;
+import net.vampirestudios.raaMaterials.content.ParametricNautilusArmorItem;
 import net.vampirestudios.raaMaterials.content.ParametricToolItem;
+import net.vampirestudios.raaMaterials.content.ParametricWolfArmorItem;
 import net.vampirestudios.raaMaterials.material.Form;
 
 public final class YItems {
@@ -34,6 +39,8 @@ public final class YItems {
 	public static Item PARAM_SWORD;
 	public static Item PARAM_HOE;
 	public static Item PARAM_SPEAR;
+	public static Item PARAM_HAMMER;
+	public static Item PARAM_DAGGER;
 
 	public static Item PARAM_ORE_ITEM;
 	public static Item PARAM_BLOCK_ITEM;
@@ -71,6 +78,7 @@ public final class YItems {
 	public static Item PARAM_POLISHED_SLAB_ITEM, PARAM_POLISHED_STAIRS_ITEM, PARAM_POLISHED_WALL_ITEM;
 
 	// Crystal items
+	public static Item PARAM_CRYSTAL_BLOCK_ITEM;
 	public static Item PARAM_CRYSTAL_BRICKS_ITEM;
 	public static Item PARAM_CLUSTER_ITEM;
 	public static Item PARAM_BASALT_LAMP_ITEM;
@@ -78,6 +86,13 @@ public final class YItems {
 
 	public static Item PARAM_GLASS_ITEM;
 	public static Item PARAM_TINTED_GLASS_ITEM;
+
+	public static Item PARAM_SPIKE_ITEM;
+
+	public static Item PARAM_PACKED_SOIL_ITEM;
+	public static Item PARAM_HORSE_ARMOR_ITEM;
+	public static Item PARAM_WOLF_ARMOR_ITEM;
+	public static Item PARAM_NAUTILUS_ARMOR_ITEM;
 
 	public static void init() {
 		PARAM_INGOT = regItem("material_ingot");
@@ -104,6 +119,8 @@ public final class YItems {
 		PARAM_SWORD = regToolItem("material_sword", Form.SWORD);
 		PARAM_HOE = regToolItem("material_hoe", Form.HOE);
 		PARAM_SPEAR = regToolItem("material_spear", Form.SPEAR);
+		PARAM_HAMMER = regHammerItem("material_hammer");
+		PARAM_DAGGER = regDaggerItem("material_dagger");
 
 		PARAM_ORE_ITEM = regBlockItem("material_ore", YBlocks.PARAM_ORE);
 		PARAM_BLOCK_ITEM = regBlockItem("material_block", YBlocks.PARAM_BLOCK);
@@ -140,6 +157,7 @@ public final class YItems {
 		PARAM_POLISHED_STAIRS_ITEM = regBlockItem("material_polished_stairs", YBlocks.PARAM_POLISHED_STAIRS);
 		PARAM_POLISHED_WALL_ITEM = regBlockItem("material_polished_wall", YBlocks.PARAM_POLISHED_WALL);
 
+		PARAM_CRYSTAL_BLOCK_ITEM = regBlockItem("material_crystal_block", YBlocks.PARAM_CRYSTAL_BLOCK);
 		PARAM_CRYSTAL_BRICKS_ITEM = regBlockItem("material_crystal_bricks", YBlocks.PARAM_CRYSTAL_BRICKS);
 		PARAM_CLUSTER_ITEM = regBlockItem("material_crystal_cluster", YBlocks.PARAM_CLUSTER);
 		PARAM_BASALT_LAMP_ITEM = regBlockItem("material_basalt_lamp", YBlocks.PARAM_BASALT_LAMP);
@@ -178,6 +196,12 @@ public final class YItems {
 
 		PARAM_GLASS_ITEM = regBlockItem("material_glass", YBlocks.PARAM_GLASS);
 		PARAM_TINTED_GLASS_ITEM = regBlockItem("material_tinted_glass", YBlocks.PARAM_TINTED_GLASS);
+
+		PARAM_SPIKE_ITEM = regBlockItem("material_spike", YBlocks.PARAM_SPIKE);
+		PARAM_PACKED_SOIL_ITEM = regBlockItem("material_packed_soil", YBlocks.PARAM_PACKED_SOIL);
+		PARAM_HORSE_ARMOR_ITEM = regHorseArmorItem("material_horse_armor");
+		PARAM_WOLF_ARMOR_ITEM = regWolfArmorItem("material_wolf_armor");
+		PARAM_NAUTILUS_ARMOR_ITEM = regNautilusArmorItem("material_nautilus_armor");
 	}
 
 	private static Item regItem(String registryId) {
@@ -194,6 +218,40 @@ public final class YItems {
 		var id = RAAMaterials.id(registryId);
 		return Registry.register(BuiltInRegistries.ITEM, id,
 				new ParametricToolItem(toolProperties(form).setId(ResourceKey.create(Registries.ITEM, id)), form));
+	}
+
+	private static Item regHammerItem(String registryId) {
+		var id = RAAMaterials.id(registryId);
+		// Seed stats match applyHammer() so unassigned stacks feel right
+		var props = new Item.Properties().sword(ToolMaterial.IRON, 8.0f, -3.6f)
+				.setId(ResourceKey.create(Registries.ITEM, id));
+		return Registry.register(BuiltInRegistries.ITEM, id, new ParametricHammerItem(props));
+	}
+
+	private static Item regDaggerItem(String registryId) {
+		var id = RAAMaterials.id(registryId);
+		// Seed stats match applyDagger() so unassigned stacks feel right
+		var props = new Item.Properties().sword(ToolMaterial.IRON, 2.5f, -1.0f)
+				.setId(ResourceKey.create(Registries.ITEM, id));
+		return Registry.register(BuiltInRegistries.ITEM, id, new ParametricDaggerItem(props));
+	}
+
+	private static Item regHorseArmorItem(String registryId) {
+		var id = RAAMaterials.id(registryId);
+		var props = new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id));
+		return Registry.register(BuiltInRegistries.ITEM, id, new ParametricHorseArmorItem(props));
+	}
+
+	private static Item regWolfArmorItem(String registryId) {
+		var id = RAAMaterials.id(registryId);
+		var props = new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id));
+		return Registry.register(BuiltInRegistries.ITEM, id, new ParametricWolfArmorItem(props));
+	}
+
+	private static Item regNautilusArmorItem(String registryId) {
+		var id = RAAMaterials.id(registryId);
+		var props = new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id));
+		return Registry.register(BuiltInRegistries.ITEM, id, new ParametricNautilusArmorItem(props));
 	}
 
 	private static Item.Properties toolProperties(Form form) {

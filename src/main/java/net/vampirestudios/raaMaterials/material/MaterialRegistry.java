@@ -18,6 +18,10 @@ public final class MaterialRegistry {
 		MAP.put(dim, set);
 	}
 
+	public static void clear() {
+		MAP.clear();
+	}
+
 	public static MaterialSet get(ResourceKey<Level> dim) {
 		return MAP.get(dim);
 	}

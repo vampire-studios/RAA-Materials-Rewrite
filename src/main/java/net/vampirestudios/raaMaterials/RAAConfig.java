@@ -29,7 +29,8 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
                         Map<MaterialKind, KindPolicy> formControls, int toolChancePercent,
                         Map<MaterialKind, SpawnProfile> spawnProfiles,
                         MaterialGenerator.Profile defaultProfile,
-                        Map<MaterialKind, ColorRanges> colorRanges) {
+                        Map<MaterialKind, ColorRanges> colorRanges,
+                        FormChances formChances) {
     // ----- Records / Beans -----
     public record TierWeights(int stone, int iron, int diamond, int netherite) {
         public static final Codec<TierWeights> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -70,29 +71,29 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
 
     public record YRange(int minY, int maxY, int peakMin, int peakMax) {
         public static final Codec<YRange> CODEC = RecordCodecBuilder.create(i -> i.group(
-                Codec.INT.fieldOf("minY").forGetter(YRange::minY),
-                Codec.INT.fieldOf("maxY").forGetter(YRange::maxY),
-                Codec.INT.fieldOf("peakMin").forGetter(YRange::peakMin),
-                Codec.INT.fieldOf("peakMax").forGetter(YRange::peakMax)
+                Codec.INT.fieldOf("min_y").forGetter(YRange::minY),
+                Codec.INT.fieldOf("max_y").forGetter(YRange::maxY),
+                Codec.INT.fieldOf("peak_min").forGetter(YRange::peakMin),
+                Codec.INT.fieldOf("peak_max").forGetter(YRange::peakMax)
         ).apply(i, YRange::new));
     }
 
     public record DepthYRanges(Map<String, YRange> shallow, Map<String, YRange> mid, Map<String, YRange> deep) {
         private static final Codec<Map<String, YRange>> MAP = Codec.unboundedMap(Codec.STRING, YRange.CODEC);
         public static final Codec<DepthYRanges> CODEC = RecordCodecBuilder.create(i -> i.group(
-                MAP.fieldOf("shallowRange").forGetter(DepthYRanges::shallow),
-                MAP.fieldOf("midRange").forGetter(DepthYRanges::mid),
-                MAP.fieldOf("deepRange").forGetter(DepthYRanges::deep)
+                MAP.fieldOf("shallow").forGetter(DepthYRanges::shallow),
+                MAP.fieldOf("mid").forGetter(DepthYRanges::mid),
+                MAP.fieldOf("deep").forGetter(DepthYRanges::deep)
         ).apply(i, DepthYRanges::new));
     }
 
     public record NameGen(boolean useColorPrefixes, boolean useBiomeBias, boolean useReplaceableBias,
                           int hashLen, List<String> banned) {
         public static final Codec<NameGen> CODEC = RecordCodecBuilder.create(i -> i.group(
-                Codec.BOOL.fieldOf("useColorPrefixes").forGetter(NameGen::useColorPrefixes),
-                Codec.BOOL.fieldOf("useBiomeBias").forGetter(NameGen::useBiomeBias),
-                Codec.BOOL.fieldOf("useReplaceableBias").forGetter(NameGen::useReplaceableBias),
-                Codec.INT.fieldOf("hashLen").forGetter(NameGen::hashLen),
+                Codec.BOOL.fieldOf("use_color_prefixes").forGetter(NameGen::useColorPrefixes),
+                Codec.BOOL.fieldOf("use_biome_bias").forGetter(NameGen::useBiomeBias),
+                Codec.BOOL.fieldOf("use_replaceable_bias").forGetter(NameGen::useReplaceableBias),
+                Codec.INT.fieldOf("hash_len").forGetter(NameGen::hashLen),
                 Codec.STRING.listOf().fieldOf("banned").forGetter(NameGen::banned)
         ).apply(i, NameGen::new));
 
@@ -114,6 +115,48 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
         }
     }
 
+	/**
+     * Probabilities that control which optional forms get assigned during world generation
+     * and how spike/crystal worldgen behaves.
+     */
+    public record FormChances(
+            // Form assignment
+            float stoneSpikeChance,
+            float volcanicSpikeChance,
+            float stoneSpikeGrowthChance,
+            float volcanicSpikeGrowthChance,
+            float sandGlassChance,
+            float sandTintedGlassChance,
+            float spikeWorldgenChance,
+            int   spikeMaxHeight,
+            float crystalClusterFillChance,
+            float geodeCrystalWallChance,
+            float geodeCrystalClusterChance,
+            /** Hammer AOE mining half-extent. 0 = no AOE, 1 = 3×3, 2 = 5×5, etc. */
+            int   hammerAoeRadius
+    ) {
+        private static final Codec<Float> CHANCE = Codec.floatRange(0f, 1f);
+
+        public static final Codec<FormChances> CODEC = RecordCodecBuilder.create(i -> i.group(
+                CHANCE.optionalFieldOf("stone_spike_chance",             0.30f).forGetter(FormChances::stoneSpikeChance),
+                CHANCE.optionalFieldOf("volcanic_spike_chance",        0.30f).forGetter(FormChances::volcanicSpikeChance),
+                CHANCE.optionalFieldOf("stone_spike_growth_chance",    0.50f).forGetter(FormChances::stoneSpikeGrowthChance),
+                CHANCE.optionalFieldOf("volcanic_spike_growth_chance", 0.60f).forGetter(FormChances::volcanicSpikeGrowthChance),
+                CHANCE.optionalFieldOf("sand_glass_chance",            0.45f).forGetter(FormChances::sandGlassChance),
+                CHANCE.optionalFieldOf("sand_tinted_glass_chance",     0.25f).forGetter(FormChances::sandTintedGlassChance),
+                CHANCE.optionalFieldOf("spike_worldgen_chance",        0.25f).forGetter(FormChances::spikeWorldgenChance),
+                Codec.intRange(1, 16).optionalFieldOf("spike_max_height", 5).forGetter(FormChances::spikeMaxHeight),
+                CHANCE.optionalFieldOf("crystal_cluster_fill_chance",  0.50f).forGetter(FormChances::crystalClusterFillChance),
+                CHANCE.optionalFieldOf("geode_crystal_wall_chance",    0.80f).forGetter(FormChances::geodeCrystalWallChance),
+                CHANCE.optionalFieldOf("geode_crystal_cluster_chance", 0.40f).forGetter(FormChances::geodeCrystalClusterChance),
+                Codec.intRange(0, 4).optionalFieldOf("hammer_aoe_radius", 1).forGetter(FormChances::hammerAoeRadius)
+        ).apply(i, FormChances::new));
+
+        public static FormChances defaults() {
+            return new FormChances(0.30f, 0.30f, 0.50f, 0.60f, 0.45f, 0.25f, 0.25f, 5, 0.50f, 0.80f, 0.40f, 1);
+        }
+    }
+
     public record SpawnProfile(
             IntRange attempts,
             float successChance,
@@ -132,19 +175,19 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
 
         public static final Codec<SpawnProfile> CODEC = RecordCodecBuilder.create(i -> i.group(
                 IntRange.CODEC.fieldOf("attempts").forGetter(SpawnProfile::attempts),
-                CHANCE_CODEC.fieldOf("successChance").forGetter(SpawnProfile::successChance),
-                Codec.intRange(0, 256).fieldOf("veinMin").forGetter(SpawnProfile::veinMin),
-                Codec.intRange(0, 256).fieldOf("veinMax").forGetter(SpawnProfile::veinMax),
+                CHANCE_CODEC.fieldOf("success_chance").forGetter(SpawnProfile::successChance),
+                Codec.intRange(0, 256).fieldOf("vein_min").forGetter(SpawnProfile::veinMin),
+                Codec.intRange(0, 256).fieldOf("vein_max").forGetter(SpawnProfile::veinMax),
                 SpawnInfo.VeinShape.CODEC.fieldOf("shape").forGetter(SpawnProfile::shape),
-                Codec.INT.fieldOf("minY").forGetter(SpawnProfile::minY),
-                Codec.INT.fieldOf("maxY").forGetter(SpawnProfile::maxY),
+                Codec.INT.fieldOf("min_y").forGetter(SpawnProfile::minY),
+                Codec.INT.fieldOf("max_y").forGetter(SpawnProfile::maxY),
                 IntRange.CODEC.fieldOf("center").forGetter(SpawnProfile::center),
                 IntRange.CODEC.fieldOf("spread").forGetter(SpawnProfile::spread),
-                SpawnInfo.NoiseGate.CODEC.fieldOf("regionGate").forGetter(SpawnProfile::regionGate),
-                SpawnInfo.NoiseGate.CODEC.fieldOf("pocketGate").forGetter(SpawnProfile::pocketGate),
-                CHANCE_CODEC.fieldOf("mustTouchAirChance").forGetter(SpawnProfile::mustTouchAirChance),
-                CHANCE_CODEC.fieldOf("nearWaterChance").forGetter(SpawnProfile::nearWaterChance),
-                CHANCE_CODEC.fieldOf("nearLavaChance").forGetter(SpawnProfile::nearLavaChance)
+                SpawnInfo.NoiseGate.CODEC.fieldOf("region_gate").forGetter(SpawnProfile::regionGate),
+                SpawnInfo.NoiseGate.CODEC.fieldOf("pocket_gate").forGetter(SpawnProfile::pocketGate),
+                CHANCE_CODEC.fieldOf("must_touch_air_chance").forGetter(SpawnProfile::mustTouchAirChance),
+                CHANCE_CODEC.fieldOf("near_water_chance").forGetter(SpawnProfile::nearWaterChance),
+                CHANCE_CODEC.fieldOf("near_lava_chance").forGetter(SpawnProfile::nearLavaChance)
         ).apply(i, SpawnProfile::new));
 
         public SpawnInfo pick(Random rng) {
@@ -200,55 +243,56 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
     public record ColorRanges(float lMin, float lMax, float cMin, float cMax) {
         private static final Codec<Float> FRAC = Codec.floatRange(0f, 1f);
         public static final Codec<ColorRanges> CODEC = RecordCodecBuilder.create(i -> i.group(
-                FRAC.fieldOf("lMin").forGetter(ColorRanges::lMin),
-                FRAC.fieldOf("lMax").forGetter(ColorRanges::lMax),
-                FRAC.fieldOf("cMin").forGetter(ColorRanges::cMin),
-                FRAC.fieldOf("cMax").forGetter(ColorRanges::cMax)
+                FRAC.fieldOf("l_min").forGetter(ColorRanges::lMin),
+                FRAC.fieldOf("l_max").forGetter(ColorRanges::lMax),
+                FRAC.fieldOf("c_min").forGetter(ColorRanges::cMin),
+                FRAC.fieldOf("c_max").forGetter(ColorRanges::cMax)
         ).apply(i, ColorRanges::new));
     }
 
     public record BlockStats(Map<MaterialKind, Float> hardnessMul, Map<MaterialKind, Float> blastMul, Map<MaterialKind, Float> effMul) {
         public static final Codec<BlockStats> CODEC = RecordCodecBuilder.create(i -> i.group(
-                FLOAT_MUL_CODEC.fieldOf("hardnessMul").forGetter(BlockStats::hardnessMul),
-                FLOAT_MUL_CODEC.fieldOf("blastMul").forGetter(BlockStats::blastMul),
-                FLOAT_MUL_CODEC.fieldOf("effMul").forGetter(BlockStats::effMul)
+                FLOAT_MUL_CODEC.fieldOf("hardness_mul").forGetter(BlockStats::hardnessMul),
+                FLOAT_MUL_CODEC.fieldOf("blast_mul").forGetter(BlockStats::blastMul),
+                FLOAT_MUL_CODEC.fieldOf("eff_mul").forGetter(BlockStats::effMul)
         ).apply(i, BlockStats::new));
     }
 
     // ----- Main config schema -----
     public static final Codec<RAAConfig> CODEC = RecordCodecBuilder.create(i -> i.group(
-            Codec.INT.fieldOf("materialsMin").forGetter(c -> c.materialsMin),
-            Codec.INT.fieldOf("materialsMax").forGetter(c -> c.materialsMax),
+            Codec.INT.fieldOf("materials_min").forGetter(c -> c.materialsMin),
+            Codec.INT.fieldOf("materials_max").forGetter(c -> c.materialsMax),
             KIND_WEIGHTS_CODEC.fieldOf("kind_weights").forGetter(c -> c.kindWeights),
 
             TierWeights.CODEC.fieldOf("tiers").forGetter(c -> c.tiers),
-            MODE_MAP_CODEC.fieldOf("spawnMode").forGetter(c -> c.spawnMode),
+            MODE_MAP_CODEC.fieldOf("spawn_mode").forGetter(c -> c.spawnMode),
 
-            BlockStats.CODEC.fieldOf("blockStats").forGetter(RAAConfig::blockStats),
+            BlockStats.CODEC.fieldOf("block_stats").forGetter(RAAConfig::blockStats),
 
-            DEPTH_CODEC.fieldOf("depthWeights").forGetter(c -> c.depthWeights),
-            DepthYRanges.CODEC.fieldOf("depthRanges").forGetter(RAAConfig::depthRanges),
+            DEPTH_CODEC.fieldOf("depth_weights").forGetter(c -> c.depthWeights),
+            DepthYRanges.CODEC.fieldOf("depth_ranges").forGetter(RAAConfig::depthRanges),
 
             Codec.unboundedMap(Codec.STRING, Codec.STRING.listOf()).fieldOf("replaceables").forGetter(c -> c.replaceables),
-            NameGen.CODEC.fieldOf("nameGen").forGetter(c -> c.nameGen),
+            NameGen.CODEC.fieldOf("name_gen").forGetter(c -> c.nameGen),
 
-            POLICY_MAP_CODEC.fieldOf("formControls").forGetter(c -> c.formControls),
+            POLICY_MAP_CODEC.fieldOf("form_controls").forGetter(c -> c.formControls),
 
-            Codec.INT.fieldOf("toolChancePercent").forGetter(c -> c.toolChancePercent),
-            SPAWN_PROFILE_MAP_CODEC.optionalFieldOf("spawnProfiles", defaultSpawnProfiles()).forGetter(c -> c.spawnProfiles),
-            MaterialGenerator.Profile.CODEC.fieldOf("defaultProfile").forGetter(RAAConfig::defaultProfile),
-            COLOR_RANGES_CODEC.optionalFieldOf("colorRanges", defaultColorRanges()).forGetter(RAAConfig::colorRanges)
+            Codec.INT.fieldOf("tool_chance_percent").forGetter(c -> c.toolChancePercent),
+            SPAWN_PROFILE_MAP_CODEC.optionalFieldOf("spawn_profiles", defaultSpawnProfiles()).forGetter(c -> c.spawnProfiles),
+            MaterialGenerator.Profile.CODEC.fieldOf("default_profile").forGetter(RAAConfig::defaultProfile),
+            COLOR_RANGES_CODEC.optionalFieldOf("color_ranges", defaultColorRanges()).forGetter(RAAConfig::colorRanges),
+            FormChances.CODEC.optionalFieldOf("form_chances", FormChances.defaults()).forGetter(RAAConfig::formChances)
     ).apply(i, RAAConfig::new));
 
     // ----- Defaults (ported from your old config; volcanic rarer) -----
     public static RAAConfig defaults() {
         return new RAAConfig(
-                8, 13,
+                10, 18,
                 Map.ofEntries(
-                        entry(METAL, 25), entry(GEM, 18), entry(MaterialKind.CRYSTAL, 12),
-                        entry(MaterialKind.ALLOY, 8), entry(MaterialKind.STONE, 6), entry(MaterialKind.SAND, 4),
-                        entry(MaterialKind.GRAVEL, 3), entry(MaterialKind.CLAY, 3), entry(MaterialKind.MUD, 3),
-                        entry(MaterialKind.SALT, 2), entry(MaterialKind.VOLCANIC, 1), entry(MaterialKind.SOIL, 2)
+                        entry(METAL, 20), entry(GEM, 15), entry(MaterialKind.CRYSTAL, 10),
+                        entry(MaterialKind.ALLOY, 5), entry(MaterialKind.STONE, 12), entry(MaterialKind.SAND, 5),
+                        entry(MaterialKind.GRAVEL, 4), entry(MaterialKind.CLAY, 4), entry(MaterialKind.MUD, 3),
+                        entry(MaterialKind.SALT, 3), entry(MaterialKind.VOLCANIC, 4), entry(MaterialKind.SOIL, 3)
                 ),
                 new TierWeights(),
                 Map.of(
@@ -275,7 +319,8 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
                 100,
                 defaultSpawnProfiles(),
                 MaterialGenerator.Profile.FANTASY_HEAVY,
-                defaultColorRanges()
+                defaultColorRanges(),
+                FormChances.defaults()
         );
     }
 
@@ -309,7 +354,7 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
         map.put(METAL, profile(8, 17, 0.75f, 8, 24, SpawnInfo.VeinShape.ORE_BLOB, -64, 96, -20, 29, 18, 31, oreBlobRegion, oreBlobPocket, 0.0f, 0.0f, 0.0f));
         map.put(ALLOY, profile(8, 17, 0.75f, 8, 24, SpawnInfo.VeinShape.ORE_BLOB, -64, 96, -20, 29, 18, 31, oreBlobRegion, oreBlobPocket, 0.0f, 0.0f, 0.0f));
         map.put(GEM, profile(1, 3, 0.5f, 2, 6, SpawnInfo.VeinShape.ORE_STRING, -64, 32, -55, -21, 6, 13, new SpawnInfo.NoiseGate(0.0015f, 0.4f), new SpawnInfo.NoiseGate(0.03f, 0.5f), 0.4f, 0.0f, 0.25f));
-        map.put(CRYSTAL, profile(4, 9, 0.8f, 3, 14, SpawnInfo.VeinShape.CRYSTAL_CLUSTER, -32, 160, 10, 49, 20, 44, new SpawnInfo.NoiseGate(0.002f, 0.15f), new SpawnInfo.NoiseGate(0.04f, 0.35f), 1.0f, 0.5f, 0.0f));
+        map.put(CRYSTAL, profile(1, 1, 0.008f, 5, 15, SpawnInfo.VeinShape.GEODE, -64, 30, -55, -15, 20, 40, new SpawnInfo.NoiseGate(0.003f, 0.3f), new SpawnInfo.NoiseGate(0.04f, 0.5f), 0.0f, 0.0f, 0.0f));
         map.put(GRAVEL, profile(1, 3, 0.75f, 7, 15, SpawnInfo.VeinShape.ORE_DISK, 45, 160, 58, 89, 16, 31, diskRegion, diskPocket, 0.0f, 0.5f, 0.0f));
         map.put(MUD, profile(1, 2, 0.75f, 6, 13, SpawnInfo.VeinShape.ORE_DISK, 45, 120, 58, 77, 12, 23, new SpawnInfo.NoiseGate(0.003f, -0.1f), new SpawnInfo.NoiseGate(0.025f, 0.05f), 0.0f, 1.0f, 0.0f));
         map.put(CLAY, profile(1, 2, 0.75f, 6, 12, SpawnInfo.VeinShape.ORE_DISK, 45, 120, 56, 75, 12, 23, new SpawnInfo.NoiseGate(0.003f, -0.1f), new SpawnInfo.NoiseGate(0.025f, 0.05f), 0.0f, 0.6f, 0.0f));
@@ -441,7 +486,8 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
                      int toolChancePercent,
                      Map<MaterialKind, SpawnProfile> spawnProfiles,
                      MaterialGenerator.Profile defaultProfile,
-                     Map<MaterialKind, ColorRanges> colorRanges) {
+                     Map<MaterialKind, ColorRanges> colorRanges,
+                     FormChances formChances) {
 
         this.materialsMin = materialsMin;
         this.materialsMax = materialsMax;
@@ -458,6 +504,7 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
         this.spawnProfiles = wrapEnumMap(spawnProfiles);
         this.defaultProfile = defaultProfile;
         this.colorRanges = wrapEnumMap(colorRanges);
+        this.formChances = formChances != null ? formChances : FormChances.defaults();
     }
 
     @SuppressWarnings("unchecked")
@@ -491,9 +538,92 @@ public record RAAConfig(int materialsMin, int materialsMax, Map<MaterialKind, In
         }
     }
 
+    // Keys renamed from camelCase to snake_case; applied recursively to any JSON object
+    private static final Map<String, String> MIGRATIONS = Map.ofEntries(
+            java.util.Map.entry("materialsMin",              "materials_min"),
+            java.util.Map.entry("materialsMax",              "materials_max"),
+            java.util.Map.entry("kindWeights",               "kind_weights"),
+            java.util.Map.entry("spawnMode",                 "spawn_mode"),
+            java.util.Map.entry("blockStats",                "block_stats"),
+            java.util.Map.entry("depthWeights",              "depth_weights"),
+            java.util.Map.entry("depthRanges",               "depth_ranges"),
+            java.util.Map.entry("nameGen",                   "name_gen"),
+            java.util.Map.entry("formControls",              "form_controls"),
+            java.util.Map.entry("toolChancePercent",         "tool_chance_percent"),
+            java.util.Map.entry("spawnProfiles",             "spawn_profiles"),
+            java.util.Map.entry("defaultProfile",            "default_profile"),
+            java.util.Map.entry("colorRanges",               "color_ranges"),
+            java.util.Map.entry("formChances",               "form_chances"),
+            java.util.Map.entry("successChance",             "success_chance"),
+            java.util.Map.entry("veinMin",                   "vein_min"),
+            java.util.Map.entry("veinMax",                   "vein_max"),
+            java.util.Map.entry("minY",                      "min_y"),
+            java.util.Map.entry("maxY",                      "max_y"),
+            java.util.Map.entry("regionGate",                "region_gate"),
+            java.util.Map.entry("pocketGate",                "pocket_gate"),
+            java.util.Map.entry("mustTouchAirChance",        "must_touch_air_chance"),
+            java.util.Map.entry("nearWaterChance",           "near_water_chance"),
+            java.util.Map.entry("nearLavaChance",            "near_lava_chance"),
+            java.util.Map.entry("hardnessMul",               "hardness_mul"),
+            java.util.Map.entry("blastMul",                  "blast_mul"),
+            java.util.Map.entry("effMul",                    "eff_mul"),
+            java.util.Map.entry("lMin",                      "l_min"),
+            java.util.Map.entry("lMax",                      "l_max"),
+            java.util.Map.entry("cMin",                      "c_min"),
+            java.util.Map.entry("cMax",                      "c_max"),
+            java.util.Map.entry("useColorPrefixes",          "use_color_prefixes"),
+            java.util.Map.entry("useBiomeBias",              "use_biome_bias"),
+            java.util.Map.entry("useReplaceableBias",        "use_replaceable_bias"),
+            java.util.Map.entry("hashLen",                   "hash_len"),
+            java.util.Map.entry("stoneSpikeChance",          "stone_spike_chance"),
+            java.util.Map.entry("volcanicSpikeChance",       "volcanic_spike_chance"),
+            java.util.Map.entry("stoneSpikeGrowthChance",    "stone_spike_growth_chance"),
+            java.util.Map.entry("volcanicSpikeGrowthChance", "volcanic_spike_growth_chance"),
+            java.util.Map.entry("sandGlassChance",           "sand_glass_chance"),
+            java.util.Map.entry("sandTintedGlassChance",     "sand_tinted_glass_chance"),
+            java.util.Map.entry("spikeWorldgenChance",       "spike_worldgen_chance"),
+            java.util.Map.entry("spikeMaxHeight",            "spike_max_height"),
+            java.util.Map.entry("crystalClusterFillChance",  "crystal_cluster_fill_chance"),
+            java.util.Map.entry("geodeCrystalWallChance",    "geode_crystal_wall_chance"),
+            java.util.Map.entry("geodeCrystalClusterChance", "geode_crystal_cluster_chance")
+    );
+
+    /** Renames all camelCase keys in a JSON tree to snake_case. Returns true if any key was renamed. */
+    private static boolean migrateJson(com.google.gson.JsonElement el) {
+        if (el == null) return false;
+        if (el.isJsonArray()) {
+            boolean changed = false;
+            for (var item : el.getAsJsonArray()) changed |= migrateJson(item);
+            return changed;
+        }
+        if (!el.isJsonObject()) return false;
+
+        var obj = el.getAsJsonObject();
+        // Collect renames as (oldKey → newKey, value) triples
+        var toRename = new ArrayList<String[]>(); // [oldKey, newKey]
+        var values = new java.util.LinkedHashMap<String, com.google.gson.JsonElement>();
+        for (var entry : obj.entrySet()) {
+            migrateJson(entry.getValue()); // recurse first
+            String newKey = MIGRATIONS.getOrDefault(entry.getKey(), entry.getKey());
+            if (!newKey.equals(entry.getKey())) toRename.add(new String[]{entry.getKey(), newKey});
+            values.put(newKey, entry.getValue());
+        }
+        if (toRename.isEmpty()) return false;
+        // Rebuild the object with renamed keys
+        for (var pair : toRename) obj.remove(pair[0]);
+        for (var e : values.entrySet()) if (!obj.has(e.getKey())) obj.add(e.getKey(), e.getValue());
+        return true;
+    }
+
     public static void load() {
         try {
             var json = GsonHelper.parse(Files.newBufferedReader(CONFIG_PATH)); // lenient (allows comments)
+            boolean migrated = migrateJson(json);
+            if (migrated) {
+                log("[Config] Migrated config keys from camelCase to snake_case — re-saving");
+                var gson = new com.google.gson.GsonBuilder().setPrettyPrinting().create();
+                Files.writeString(CONFIG_PATH, gson.toJson(json));
+            }
             var res = CODEC.parse(JsonOps.INSTANCE, json);
             res.resultOrPartial(err -> log("[Config] " + err))
                     .ifPresentOrElse(ACTIVE::set, () -> log("[Config] Using defaults"));

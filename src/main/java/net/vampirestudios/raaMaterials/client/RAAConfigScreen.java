@@ -45,6 +45,7 @@ public final class RAAConfigScreen {
 				.category(spawning(draft))
 				.category(worldgen(draft))
 				.category(blockStats(draft))
+				.category(formChances(draft))
 				.category(forms(draft))
 				.category(formGroups(formGroupDraft))
 				.category(openEnded(draft))
@@ -154,6 +155,36 @@ public final class RAAConfigScreen {
 					.build());
 		}
 		return category.build();
+	}
+
+	private static ConfigCategory formChances(Draft draft) {
+		var fc = draft.formChances;
+		return ConfigCategory.createBuilder()
+				.name(text("Form chances"))
+				.group(OptionGroup.createBuilder()
+						.name(text("Spike forms"))
+						.option(floatField("Stone spike chance", 0.0F, 1.0F, () -> fc.stoneSpikeChance, v -> fc.stoneSpikeChance = v))
+						.option(floatField("Volcanic spike chance", 0.0F, 1.0F, () -> fc.volcanicSpikeChance, v -> fc.volcanicSpikeChance = v))
+						.option(floatField("Stone spike growth chance", 0.0F, 1.0F, () -> fc.stoneSpikeGrowthChance, v -> fc.stoneSpikeGrowthChance = v))
+						.option(floatField("Volcanic spike growth chance", 0.0F, 1.0F, () -> fc.volcanicSpikeGrowthChance, v -> fc.volcanicSpikeGrowthChance = v))
+						.build())
+				.group(OptionGroup.createBuilder()
+						.name(text("Sand forms"))
+						.option(floatField("Sand glass chance", 0.0F, 1.0F, () -> fc.sandGlassChance, v -> fc.sandGlassChance = v))
+						.option(floatField("Sand tinted glass chance", 0.0F, 1.0F, () -> fc.sandTintedGlassChance, v -> fc.sandTintedGlassChance = v))
+						.build())
+				.group(OptionGroup.createBuilder()
+						.name(text("Spike worldgen"))
+						.option(floatField("Spike worldgen chance", 0.0F, 1.0F, () -> fc.spikeWorldgenChance, v -> fc.spikeWorldgenChance = v))
+						.option(intField("Spike max height", 1, 16, () -> fc.spikeMaxHeight, v -> fc.spikeMaxHeight = v))
+						.build())
+				.group(OptionGroup.createBuilder()
+						.name(text("Crystal worldgen"))
+						.option(floatField("Crystal cluster fill chance", 0.0F, 1.0F, () -> fc.crystalClusterFillChance, v -> fc.crystalClusterFillChance = v))
+						.option(floatField("Geode crystal wall chance", 0.0F, 1.0F, () -> fc.geodeCrystalWallChance, v -> fc.geodeCrystalWallChance = v))
+						.option(floatField("Geode crystal cluster chance", 0.0F, 1.0F, () -> fc.geodeCrystalClusterChance, v -> fc.geodeCrystalClusterChance = v))
+						.build())
+				.build();
 	}
 
 	private static ConfigCategory forms(Draft draft) {
@@ -362,6 +393,7 @@ public final class RAAConfigScreen {
 		int toolChancePercent;
 		MaterialGenerator.Profile defaultProfile;
 		Map<MaterialKind, RAAConfig.ColorRanges> colorRanges;
+		MutableFormChances formChances;
 
 		Draft(RAAConfig config) {
 			var defaults = RAAConfig.defaults();
@@ -405,6 +437,7 @@ public final class RAAConfigScreen {
 			toolChancePercent = config.toolChancePercent();
 			defaultProfile = config.defaultProfile();
 			colorRanges = config.colorRanges();
+			formChances = new MutableFormChances(config.formChances());
 		}
 
 		MutableModeWeights mode(MaterialKind kind) {
@@ -443,7 +476,8 @@ public final class RAAConfigScreen {
 					toolChancePercent,
 					spawnProfileMap(),
 					defaultProfile,
-					colorRanges
+					colorRanges,
+					formChances.toRecord()
 			);
 		}
 
@@ -529,6 +563,48 @@ public final class RAAConfigScreen {
 
 		KindPolicy toRecord() {
 			return new KindPolicy(groupsPlus, groupsMinus, add, remove, maxShapeForms);
+		}
+	}
+
+	private static final class MutableFormChances {
+		float stoneSpikeChance;
+		float volcanicSpikeChance;
+		float stoneSpikeGrowthChance;
+		float volcanicSpikeGrowthChance;
+		float sandGlassChance;
+		float sandTintedGlassChance;
+		float spikeWorldgenChance;
+		int   spikeMaxHeight;
+		float crystalClusterFillChance;
+		float geodeCrystalWallChance;
+		float geodeCrystalClusterChance;
+		int   hammerAoeRadius;
+
+		MutableFormChances(RAAConfig.FormChances fc) {
+			stoneSpikeChance          = fc.stoneSpikeChance();
+			volcanicSpikeChance       = fc.volcanicSpikeChance();
+			stoneSpikeGrowthChance    = fc.stoneSpikeGrowthChance();
+			volcanicSpikeGrowthChance = fc.volcanicSpikeGrowthChance();
+			sandGlassChance           = fc.sandGlassChance();
+			sandTintedGlassChance     = fc.sandTintedGlassChance();
+			spikeWorldgenChance       = fc.spikeWorldgenChance();
+			spikeMaxHeight            = fc.spikeMaxHeight();
+			crystalClusterFillChance  = fc.crystalClusterFillChance();
+			geodeCrystalWallChance    = fc.geodeCrystalWallChance();
+			geodeCrystalClusterChance = fc.geodeCrystalClusterChance();
+			hammerAoeRadius           = fc.hammerAoeRadius();
+		}
+
+		RAAConfig.FormChances toRecord() {
+			return new RAAConfig.FormChances(
+					stoneSpikeChance, volcanicSpikeChance,
+					stoneSpikeGrowthChance, volcanicSpikeGrowthChance,
+					sandGlassChance, sandTintedGlassChance,
+					spikeWorldgenChance, spikeMaxHeight,
+					crystalClusterFillChance,
+					geodeCrystalWallChance, geodeCrystalClusterChance,
+					hammerAoeRadius
+			);
 		}
 	}
 

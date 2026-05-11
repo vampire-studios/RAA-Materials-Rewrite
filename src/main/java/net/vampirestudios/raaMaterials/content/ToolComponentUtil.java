@@ -125,6 +125,83 @@ public final class ToolComponentUtil {
                 .build());
     }
 
+    /**
+     * Hammer: devastating two-handed weapon + stone-breaker.
+     * <ul>
+     *   <li>Attack: very high base damage (8.0), very slow swing (−3.6)</li>
+     *   <li>Mining: pickaxe-speed on stone-category blocks</li>
+     *   <li>AOE block-breaking is handled in {@link ParametricHammerItem#mineBlock}</li>
+     * </ul>
+     */
+    public static void applyHammer(ItemStack out, ToolMaterialSpec spec) {
+        var reg = BuiltInRegistries.BLOCK;
+        var incorrectTag = TagKey.create(reg.key(), spec.incorrectBlocksForDropsTag());
+        var incorrectBlocks = reg.get(incorrectTag)
+                .orElseThrow(() -> new IllegalStateException("Missing block tag: " + incorrectTag.location()));
+        var mineBlocks = reg.get(BlockTags.MINEABLE_WITH_PICKAXE)
+                .orElseThrow(() -> new IllegalStateException("Missing block tag: " + BlockTags.MINEABLE_WITH_PICKAXE.location()));
+
+        out.set(DataComponents.TOOL, new Tool(
+                List.of(
+                        Tool.Rule.deniesDrops(incorrectBlocks),
+                        Tool.Rule.minesAndDrops(mineBlocks, spec.speed())
+                ),
+                1.0f, 1, true
+        ));
+
+        out.set(DataComponents.WEAPON, new Weapon(2));
+
+        // Very high damage, very slow — each hit is devastating
+        out.set(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.builder()
+                .add(Attributes.ATTACK_DAMAGE,
+                        new AttributeModifier(Item.BASE_ATTACK_DAMAGE_ID, 8.0f + spec.attackDamageBonus(),
+                                AttributeModifier.Operation.ADD_VALUE),
+                        EquipmentSlotGroup.MAINHAND)
+                .add(Attributes.ATTACK_SPEED,
+                        new AttributeModifier(Item.BASE_ATTACK_SPEED_ID, -3.6f,
+                                AttributeModifier.Operation.ADD_VALUE),
+                        EquipmentSlotGroup.MAINHAND)
+                .build());
+    }
+
+    /**
+     * Dagger: extremely fast, light blade.
+     * <ul>
+     *   <li>Attack: slightly below sword damage (2.5), very fast swing (−1.0)</li>
+     *   <li>On-hit effects (if any) are handled in {@link ParametricDaggerItem}</li>
+     * </ul>
+     */
+    public static void applyDagger(ItemStack out, ToolMaterialSpec spec) {
+        var reg = BuiltInRegistries.BLOCK;
+        var instantlyMines = reg.get(BlockTags.SWORD_INSTANTLY_MINES)
+                .orElseThrow(() -> new IllegalStateException("Missing block tag: " + BlockTags.SWORD_INSTANTLY_MINES.location()));
+        var efficient = reg.get(BlockTags.SWORD_EFFICIENT)
+                .orElseThrow(() -> new IllegalStateException("Missing block tag: " + BlockTags.SWORD_EFFICIENT.location()));
+
+        out.set(DataComponents.TOOL, new Tool(
+                List.of(
+                        Tool.Rule.minesAndDrops(HolderSet.direct(Blocks.COBWEB.builtInRegistryHolder()), 15.0f),
+                        Tool.Rule.overrideSpeed(instantlyMines, Float.MAX_VALUE),
+                        Tool.Rule.overrideSpeed(efficient, 1.5f)
+                ),
+                1.0f, 2, false
+        ));
+
+        out.set(DataComponents.WEAPON, new Weapon(1));
+
+        // Slightly below sword damage, much faster than any other weapon
+        out.set(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.builder()
+                .add(Attributes.ATTACK_DAMAGE,
+                        new AttributeModifier(Item.BASE_ATTACK_DAMAGE_ID, 2.5f + spec.attackDamageBonus(),
+                                AttributeModifier.Operation.ADD_VALUE),
+                        EquipmentSlotGroup.MAINHAND)
+                .add(Attributes.ATTACK_SPEED,
+                        new AttributeModifier(Item.BASE_ATTACK_SPEED_ID, -1.0f,
+                                AttributeModifier.Operation.ADD_VALUE),
+                        EquipmentSlotGroup.MAINHAND)
+                .build());
+    }
+
     public static void applyCommon(ItemStack out, ToolMaterialSpec spec) {
         out.set(DataComponents.MAX_DAMAGE, spec.durability());
         out.set(DataComponents.DAMAGE, 0);

@@ -47,6 +47,7 @@ public final class Forms {
 		put("material_crystal", Form.CRYSTAL);
 		put("material_shard", Form.SHARD);
 		put("material_crystal_cluster", Form.CLUSTER);
+		put("material_spike", Form.SPIKE);
 		put("material_budding", Form.BUDDING);
 		put("material_bud_small", Form.BUD_SMALL);
 		put("material_bud_medium", Form.BUD_MEDIUM);
@@ -142,7 +143,10 @@ public final class Forms {
 		put("material_boots", Form.BOOTS);
 		put("material_horse_armor", Form.HORSE_ARMOR);
 		put("material_wolf_armor", Form.WOLF_ARMOR);
+		put("material_nautilus_armor", Form.NAUTILUS_ARMOR);
 
+		put("material_hammer", Form.HAMMER);
+		put("material_dagger", Form.DAGGER);
 		put("material_battle_axe", Form.BATTLE_AXE);
 		put("material_war_hammer", Form.WAR_HAMMER);
 		put("material_spear", Form.SPEAR);
@@ -280,9 +284,12 @@ public final class Forms {
 		if (t.endsWith("_chestplate")) return Form.CHESTPLATE;
 		if (t.endsWith("_leggings")) return Form.LEGGINGS;
 		if (t.endsWith("_boots")) return Form.BOOTS;
+		if (t.endsWith("_nautilus_armor")) return Form.NAUTILUS_ARMOR;
 		if (t.endsWith("_horse_armor")) return Form.HORSE_ARMOR;
 		if (t.endsWith("_wolf_armor")) return Form.WOLF_ARMOR;
 
+		if (t.endsWith("_hammer")) return Form.HAMMER;
+		if (t.endsWith("_dagger")) return Form.DAGGER;
 		if (t.endsWith("_battle_axe")) return Form.BATTLE_AXE;
 		if (t.endsWith("_war_hammer")) return Form.WAR_HAMMER;
 		if (t.endsWith("_spear")) return Form.SPEAR;
@@ -293,6 +300,7 @@ public final class Forms {
 		if (t.endsWith("_orb")) return Form.ORB;
 		if (t.endsWith("_music_disc")) return Form.MUSIC_DISC;
 		if (t.endsWith("_food")) return Form.FOOD;
+		if (t.endsWith("_spike")) return Form.SPIKE;
 
 		// Default safest guess
 		return Form.BLOCK;

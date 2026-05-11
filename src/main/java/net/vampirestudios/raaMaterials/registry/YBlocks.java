@@ -75,6 +75,10 @@ public final class YBlocks {
 	public static Block PARAM_GLASS;
 	public static Block PARAM_TINTED_GLASS;
 
+	public static Block PARAM_PACKED_SOIL;
+
+	public static Block PARAM_SPIKE;
+
 	private static Block regBlock(String id, Block item) {
 		return Registry.register(BuiltInRegistries.BLOCK, RAAMaterials.id(id), item);
 	}
@@ -380,11 +384,14 @@ public final class YBlocks {
 		// -------- Crystal-specific --------
 		PARAM_CRYSTAL_PANE = regBlock("material_crystal_pane", new ParametricPaneBlock(Block.Properties.of()
 				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_crystal_pane")))
-				.strength(0.3f).noOcclusion().sound(SoundType.GLASS)));
+				.strength(0.3f).sound(SoundType.GLASS).noOcclusion()
+				.instrument(NoteBlockInstrument.HAT)
+		));
 
 		PARAM_ROD_BLOCK = regBlock("material_rod_block", new ParametricRodBlock(Block.Properties.of()
 				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_rod_block")))
-				.strength(1.0f).lightLevel(s -> 14).noOcclusion().sound(SoundType.AMETHYST)));
+				.strength(1.0f).lightLevel(s -> 14).noOcclusion().sound(SoundType.AMETHYST)
+		));
 
 		PARAM_GLASS = regBlock("material_glass", new ParametricGlassBlock(Block.Properties.of()
 				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_glass")))
@@ -398,6 +405,20 @@ public final class YBlocks {
 				.strength(0.3f)
 				.noOcclusion()
 				.sound(SoundType.GLASS)
+		));
+
+		PARAM_PACKED_SOIL = regBlock("material_packed_soil", new ParametricBlock(Block.Properties.of()
+				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_packed_soil")))
+				.strength(1.5f)
+				.sound(SoundType.GRAVEL)
+		));
+
+		PARAM_SPIKE = regBlock("material_spike", new ParametricSpikeBlock(Block.Properties.of()
+				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_spike")))
+				.strength(1.5f)
+				.sound(SoundType.DRIPSTONE_BLOCK)
+				.noOcclusion()
+				.randomTicks()
 		));
 
 	}

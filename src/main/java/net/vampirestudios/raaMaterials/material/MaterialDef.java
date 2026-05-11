@@ -33,7 +33,8 @@ public record MaterialDef(
 		SpawnInfo spawn,
 		Optional<ToolMaterialSpec> toolSpec,
 		long assetSeed,
-		OreHost host
+		OreHost host,
+		SpikeGrowthLiquid spikeGrowth
 ) {
 	public record NameInformation(Identifier id, String displayName) {
 		public static final Codec<NameInformation> CODEC = RecordCodecBuilder.create(i -> i.group(
