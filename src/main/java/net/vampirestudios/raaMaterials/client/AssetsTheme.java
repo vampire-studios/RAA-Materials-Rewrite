@@ -118,7 +118,7 @@ public final class AssetsTheme {
 		Optional<Identifier> sandstoneTop = pick(k, Slot.SANDSTONE_TOP, rnd);
 		Optional<Identifier> sandstoneSide = pick(k, Slot.SANDSTONE_SIDE, rnd);
 		Optional<Identifier> sandstoneBottom = pick(k, Slot.SANDSTONE_BOTTOM, rnd);
-		Optional<Identifier> cut = pick(k, Slot.SANDSTONE_CUT, rnd);
+		Optional<Identifier> cutSide = pick(k, Slot.SANDSTONE_CUT, rnd);
 		Optional<Identifier> chiseledSandstone = switch (k) {
 			case STONE -> pick(k, Slot.CHISELED, rnd);
 			case SAND -> pick(k, Slot.SANDSTONE_CHISELED, rnd);
@@ -126,7 +126,7 @@ public final class AssetsTheme {
 		};
 
 		return new SandstoneTextureSet(
-				sandstoneTop, sandstoneSide, sandstoneBottom, cut, chiseledSandstone
+				sandstoneTop, sandstoneSide, sandstoneBottom, cutSide, chiseledSandstone
 		);
 	}
 

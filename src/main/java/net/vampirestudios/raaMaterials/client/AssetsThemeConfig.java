@@ -161,7 +161,7 @@ public final class AssetsThemeConfig {
 		fallbacks.put(AssetsTheme.Slot.BOLT_ITEM, List.of(id("parts/bolt")));
 		fallbacks.put(AssetsTheme.Slot.NAIL_ITEM, List.of(id("nail")));
 		fallbacks.put(AssetsTheme.Slot.RING_ITEM, List.of(id("ring")));
-		fallbacks.put(AssetsTheme.Slot.DOOR_ITEM_METAL, List.of(id("decor/door")));
+		fallbacks.put(AssetsTheme.Slot.DOOR_ITEM_METAL, List.of(id("decor/metal_door")));
 		fallbacks.put(AssetsTheme.Slot.DOOR_ITEM_WOOD, List.of(id("decor/door")));
 		fallbacks.put(AssetsTheme.Slot.STONE_DEFAULT, List.of(withDefaultNamespace("block/stone")));
 
@@ -186,11 +186,11 @@ public final class AssetsThemeConfig {
 		globalForm.put(Form.FENCE, List.of(id("decor/planks")));
 		globalForm.put(Form.FENCE_GATE, List.of(id("decor/planks")));
 		perKindForm.put(MaterialKind.METAL, Map.of(
-				Form.DOOR, List.of(id("decor/door_bottom")),
+				Form.DOOR, List.of(id("decor/metal_door_bottom")),
 				Form.TRAPDOOR, List.of(id("decor/trapdoor"))
 		));
 		perKindForm.put(MaterialKind.ALLOY, Map.of(
-				Form.DOOR, List.of(id("decor/door_bottom")),
+				Form.DOOR, List.of(id("decor/metal_door_bottom")),
 				Form.TRAPDOOR, List.of(id("decor/trapdoor"))
 		));
 
@@ -222,6 +222,8 @@ public final class AssetsThemeConfig {
 
 		replaceIfEquals(fallbacks, AssetsTheme.Slot.DOOR_ITEM_METAL,
 				List.of(withDefaultNamespace("item/iron_door")), List.of(id("decor/door")));
+		replaceIfEquals(fallbacks, AssetsTheme.Slot.DOOR_ITEM_METAL,
+				List.of(id("decor/door")), List.of(id("decor/metal_door")));
 		replaceIfEquals(fallbacks, AssetsTheme.Slot.DOOR_ITEM_WOOD,
 				List.of(withDefaultNamespace("item/oak_door")), List.of(id("decor/door")));
 
@@ -251,16 +253,18 @@ public final class AssetsThemeConfig {
 	}
 
 	private static void putMissingSpearDefaults(Map<AssetsTheme.Slot, List<Identifier>> global) {
-		global.putIfAbsent(AssetsTheme.Slot.SPEAR_HEAD, List.of(id("tools/spear/head")));
-		global.putIfAbsent(AssetsTheme.Slot.SPEAR_HANDLE, List.of(id("tools/spear/handle")));
-		global.putIfAbsent(AssetsTheme.Slot.SPEAR_HEAD_IN_HAND, List.of(id("tools/spear/head_in_hand")));
-		global.putIfAbsent(AssetsTheme.Slot.SPEAR_HANDLE_IN_HAND, List.of(id("tools/spear/handle_in_hand")));
+		global.putIfAbsent(AssetsTheme.Slot.SPEAR_HEAD, numbered("tools/spear/head_", 2));
+		global.putIfAbsent(AssetsTheme.Slot.SPEAR_HANDLE, numbered("tools/spear/handle_", 2));
+		global.putIfAbsent(AssetsTheme.Slot.SPEAR_HEAD_IN_HAND, numbered("tools/spear/head_in_hand_", 2));
+		global.putIfAbsent(AssetsTheme.Slot.SPEAR_HANDLE_IN_HAND, numbered("tools/spear/handle_in_hand_", 2));
 	}
 
 	private static void migrateMetalDecor(Map<MaterialKind, Map<Form, List<Identifier>>> perKindForm, MaterialKind kind) {
 		var forms = perKindForm.computeIfAbsent(kind, ignored -> new EnumMap<>(Form.class));
 		replaceIfEquals(forms, Form.DOOR,
 				List.of(withDefaultNamespace("block/iron_door_bottom")), List.of(id("decor/door_bottom")));
+		replaceIfEquals(forms, Form.DOOR,
+				List.of(id("decor/door_bottom")), List.of(id("decor/metal_door_bottom")));
 		replaceIfEquals(forms, Form.TRAPDOOR,
 				List.of(withDefaultNamespace("block/iron_trapdoor")), List.of(id("decor/trapdoor")));
 	}

@@ -82,7 +82,13 @@ public final class Forms {
 
 		// ---- Redstone-ish / doors / fences
 		put("material_button", Form.BUTTON);
+		put("material_button_stone", Form.BUTTON);
+		put("material_button_metal", Form.BUTTON);
+		put("material_button_wood", Form.BUTTON);
 		put("material_pressure_plate", Form.PRESSURE_PLATE);
+		put("material_pressure_plate_stone", Form.PRESSURE_PLATE);
+		put("material_pressure_plate_metal", Form.PRESSURE_PLATE);
+		put("material_pressure_plate_wood", Form.PRESSURE_PLATE);
 		put("material_door", Form.DOOR);
 		put("material_door_metal", Form.DOOR);
 		put("material_door_wood", Form.DOOR);
@@ -218,7 +224,9 @@ public final class Forms {
 		if (t.endsWith("_rod")) return Form.ROD_BLOCK;
 
 		// Redstone-ish / doors / fences
+		if (t.endsWith("_button_stone") || t.endsWith("_button_metal") || t.endsWith("_button_wood")) return Form.BUTTON;
 		if (t.endsWith("_button")) return Form.BUTTON;
+		if (t.endsWith("_pressure_plate_stone") || t.endsWith("_pressure_plate_metal") || t.endsWith("_pressure_plate_wood")) return Form.PRESSURE_PLATE;
 		if (t.endsWith("_pressure_plate")) return Form.PRESSURE_PLATE;
 		if (t.endsWith("_door")) return Form.DOOR;
 		if (t.endsWith("_trapdoor")) return Form.TRAPDOOR;

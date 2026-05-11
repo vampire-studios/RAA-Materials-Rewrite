@@ -437,10 +437,22 @@ public class ARRPGenerationHelper {
     }
 
     public static void generateColumnBlockModel(RuntimeResourcePack clientResourcePackBuilder, Identifier name, Identifier endTexture, Identifier sideTexture) {
-        clientResourcePackBuilder.addModel(model("block/cube_column").textures(textures()
-                .var("end", blockTexture(endTexture))
-                .var("side", blockTexture(sideTexture))
-        ), name);
+        var model = JModel.model("minecraft:block/block")
+                .textures(JModel.textures()
+                        .var("end", blockTexture(endTexture))
+                        .var("side", blockTexture(sideTexture)))
+                .element(JModel.element()
+                        .bounds(0, 0, 0, 16, 16, 16)
+                        .faces(JModel.faces()
+                                .down(JModel.face("end").uv(0, 0, 16, 16).cullface(Direction.DOWN).tintIndex(0))
+                                .up(JModel.face("end").uv(0, 0, 16, 16).cullface(Direction.UP).tintIndex(0))
+                                .north(JModel.face("side").uv(0, 0, 16, 16).cullface(Direction.NORTH).tintIndex(0))
+                                .south(JModel.face("side").uv(0, 0, 16, 16).cullface(Direction.SOUTH).tintIndex(0))
+                                .west(JModel.face("side").uv(0, 0, 16, 16).cullface(Direction.WEST).tintIndex(0))
+                                .east(JModel.face("side").uv(0, 0, 16, 16).cullface(Direction.EAST).tintIndex(0))
+                        )
+                );
+        clientResourcePackBuilder.addModel(model, name);
     }
 
     public static void generateModel(RuntimeResourcePack clientResourcePackBuilder, Identifier name, Identifier parent, Map<String, Identifier> textures) {

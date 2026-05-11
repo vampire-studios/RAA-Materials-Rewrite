@@ -6,6 +6,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
@@ -307,7 +308,10 @@ public final class YBlocks {
 
 		PARAM_GRATE = regBlock("material_grate", new ParametricGrateBlock(Block.Properties.of()
 				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_grate")))
-				.strength(4.0f).sound(SoundType.METAL).noOcclusion()));
+				.strength(4.0f).sound(SoundType.METAL).noOcclusion()
+				.isValidSpawn(Blocks::never)
+				.isRedstoneConductor(Blocks::never)
+				.isSuffocating(Blocks::never)));
 
 		PARAM_BUTTON_STONE = regBlock("material_button_stone", new ParametricButtonBlock(BlockSetType.STONE, 20, buttonProperties("material_button_stone")));
 		PARAM_BUTTON_METAL = regBlock("material_button_metal", new ParametricButtonBlock(BlockSetType.IRON, 20, buttonProperties("material_button_metal")));
