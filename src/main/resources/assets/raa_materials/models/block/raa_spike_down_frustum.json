@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/pointed_dripstone_down_frustum",
   "textures": {
-    "all": "#spike"
+    "cross": "#spike"
   }
 }

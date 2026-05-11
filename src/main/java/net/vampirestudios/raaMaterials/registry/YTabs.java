@@ -302,25 +302,25 @@ public final class YTabs {
 									});
 								}
 
-								// Crystal / decor & lighting (moved from DECOR)
-								addBlocksIf(output, def, idx, new Object[][]{
-										{Form.CALCITE_LAMP, YItems.PARAM_CALCITE_LAMP_ITEM},
-										{Form.BASALT_LAMP, YItems.PARAM_BASALT_LAMP_ITEM},
-										{Form.LAMP, YItems.PARAM_LAMP_ITEM}
-								});
-								if (isCrystalLike(def) || hasAll(def, Form.GLASS)) {
+								// Crystal-specific blocks (crystal kind only — crystal block, pane, bricks, rod)
+								if (isCrystalLike(def)) {
 									addBlocksIf(output, def, idx, new Object[][]{
 											{Form.BLOCK, YItems.PARAM_CRYSTAL_BLOCK_ITEM},
 											{Form.CRYSTAL_BRICKS, YItems.PARAM_CRYSTAL_BRICKS_ITEM},
 											{Form.PANE, YItems.PARAM_CRYSTAL_PANE_ITEM},
-											{Form.GLASS, YItems.PARAM_GLASS_ITEM},
-											{Form.TINTED_GLASS, YItems.PARAM_TINTED_GLASS_ITEM},
 											{Form.ROD_BLOCK, YItems.PARAM_ROD_BLOCK_ITEM},
 //											{Form.BUDDING, YItems.PARAM_BUDDING_BLOCK_ITEM},
 //											{Form.BUD_SMALL, YItems.PARAM_BUD_SMALL_ITEM},
 //											{Form.BUD_MEDIUM, YItems.PARAM_BUD_MEDIUM_ITEM},
 //											{Form.BUD_LARGE, YItems.PARAM_BUD_LARGE_ITEM},
 											// {Form.CHIME, YItems.PARAM_CHIME_ITEM}, // enable if you have it
+									});
+								}
+								// Glass blocks (crystal AND any other kind that got glass, e.g. sand)
+								if (isCrystalLike(def) || hasAll(def, Form.GLASS)) {
+									addBlocksIf(output, def, idx, new Object[][]{
+											{Form.GLASS, YItems.PARAM_GLASS_ITEM},
+											{Form.TINTED_GLASS, YItems.PARAM_TINTED_GLASS_ITEM},
 									});
 								}
 

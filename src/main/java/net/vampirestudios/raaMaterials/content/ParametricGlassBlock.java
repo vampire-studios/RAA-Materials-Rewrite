@@ -21,7 +21,7 @@ public class ParametricGlassBlock extends ParametricBlock {
 
 	@Override
 	protected int getLightDampening(BlockState state) {
-		return 15;
+		return 0;
 	}
 
 

@@ -32,13 +32,21 @@ public final class AssetsThemeConfig {
 	public static final int STONE_CHISELED_COUNT = 5;
 	public static final int STONE_BRICKS_COUNT   = 28;
 	public static final int STONE_TILES_COUNT    = 8;
-	public static final int STONE_FRAME_COUNT    = 13;
+	public static final int STONE_FRAME_COUNT    = 15;
+
+	// Metal decor texture pools.
+	public static final int METAL_BARS_COUNT     = 5;
+	public static final int METAL_BRICKS_COUNT   = 2;
+	public static final int METAL_CHAINS_COUNT   = 2;
+	public static final int METAL_DOOR_COUNT     = 3;
+	public static final int METAL_TRAPDOOR_COUNT = 3;
+
+	// Crystal lamp overlay variants.
+	public static final int LAMP_OVERLAY_COUNT   = 4;
 
 	// Legendary weapon / mount-armor texture pools.
-	// Set to 0 initially — dedicated files aren't shipped yet.
-	// Add real PNGs and bump the count when ready.
-	public static final int HAMMER_HEAD_COUNT    = 0;
-	public static final int HAMMER_HANDLE_COUNT  = 0;
+	public static final int HAMMER_HEAD_COUNT    = 1;
+	public static final int HAMMER_HANDLE_COUNT  = 1;
 	public static final int DAGGER_BLADE_COUNT   = 0;
 	public static final int DAGGER_HANDLE_COUNT  = 0;
 	public static final int MOUNT_ARMOR_COUNT    = 0;
@@ -157,6 +165,7 @@ public final class AssetsThemeConfig {
 		global.put(AssetsTheme.Slot.STONE_BRICKS, numbered("stone/stone_bricks_", STONE_BRICKS_COUNT));
 		global.put(AssetsTheme.Slot.TILES, numbered("stone/stone_tiles_", STONE_TILES_COUNT));
 		global.put(AssetsTheme.Slot.POLISHED_RANDOM, numbered("stone/stone_frame_", STONE_FRAME_COUNT));
+		global.put(AssetsTheme.Slot.LAMP_OVERLAY_1, numbered("crystal/lamp_overlay", LAMP_OVERLAY_COUNT));
 
 		fallbacks.put(AssetsTheme.Slot.PLATE_SHEET, List.of(id("metal/metal_plate")));
 		fallbacks.put(AssetsTheme.Slot.SHINGLES_SHEET, List.of(id("metal/metal_shingles")));
@@ -172,7 +181,7 @@ public final class AssetsThemeConfig {
 		fallbacks.put(AssetsTheme.Slot.TINTED_CRYSTAL_GLASS, List.of(id("crystal/tinted_glass_1")));
 		fallbacks.put(AssetsTheme.Slot.CRYSTAL_GLASS, List.of(id("crystal/crystal_glass")));
 		fallbacks.put(AssetsTheme.Slot.CRYSTAL_BRICKS, List.of(id("crystal/crystal_bricks")));
-		fallbacks.put(AssetsTheme.Slot.LAMP_OVERLAY_1, List.of(id("crystal/lamp_overlay1")));
+		// LAMP_OVERLAY_1 is now a global pool (all 4 variants) — no fallback entry needed.
 		fallbacks.put(AssetsTheme.Slot.LAMP_OVERLAY_2, List.of(id("crystal/lamp_overlay2")));
 		fallbacks.put(AssetsTheme.Slot.CHIME, List.of(id("crystal/lamp_overlay3")));
 		fallbacks.put(AssetsTheme.Slot.CLAY_ITEM, List.of(withDefaultNamespace("item/clay_ball")));
@@ -187,18 +196,29 @@ public final class AssetsThemeConfig {
 		fallbacks.put(AssetsTheme.Slot.DOOR_ITEM_METAL, List.of(id("decor/metal_door")));
 		fallbacks.put(AssetsTheme.Slot.DOOR_ITEM_WOOD, List.of(id("decor/door")));
 		fallbacks.put(AssetsTheme.Slot.STONE_DEFAULT, List.of(withDefaultNamespace("block/stone")));
-		// Legendary weapon fallbacks — reuse nearest existing tool texture
-		fallbacks.put(AssetsTheme.Slot.HAMMER_HEAD,        List.of(id("tools/axe/axe_head_1")));
-		fallbacks.put(AssetsTheme.Slot.HAMMER_HANDLE,      List.of(id("tools/axe/axe_stick_1")));
+		// Legendary weapon fallbacks
+		fallbacks.put(AssetsTheme.Slot.HAMMER_HEAD,        List.of(id("tools/hammer_head")));
+		fallbacks.put(AssetsTheme.Slot.HAMMER_HANDLE,      List.of(id("tools/hammer_stick")));
 		fallbacks.put(AssetsTheme.Slot.DAGGER_BLADE,       List.of(id("tools/sword/blade_1")));
 		fallbacks.put(AssetsTheme.Slot.DAGGER_HANDLE,      List.of(id("tools/sword/handle_1")));
-		// Mount armor fallbacks — reuse plate texture
-		fallbacks.put(AssetsTheme.Slot.HORSE_ARMOR_ITEM,   List.of(id("plates/plate_1")));
+		// Mount armor fallbacks
+		fallbacks.put(AssetsTheme.Slot.HORSE_ARMOR_ITEM,   List.of(id("armor/horse_armor_base")));
 		fallbacks.put(AssetsTheme.Slot.WOLF_ARMOR_ITEM,    List.of(id("plates/plate_1")));
 		fallbacks.put(AssetsTheme.Slot.NAUTILUS_ARMOR_ITEM, List.of(id("plates/plate_1")));
 
-		perKind.put(MaterialKind.METAL, Map.of(AssetsTheme.Slot.STORAGE_BLOCK, List.of(withDefaultNamespace("block/iron_block"))));
-		perKind.put(MaterialKind.ALLOY, Map.of(AssetsTheme.Slot.STORAGE_BLOCK, List.of(withDefaultNamespace("block/copper_block"))));
+		var metalSlots = new EnumMap<AssetsTheme.Slot, List<Identifier>>(AssetsTheme.Slot.class);
+		metalSlots.put(AssetsTheme.Slot.STORAGE_BLOCK, List.of(withDefaultNamespace("block/iron_block")));
+		metalSlots.put(AssetsTheme.Slot.STONE_BRICKS,  numbered("metal/metal_bricks_", METAL_BRICKS_COUNT));
+		metalSlots.put(AssetsTheme.Slot.PILLAR_SIDE,   List.of(id("metal/metal_pillar_side")));
+		metalSlots.put(AssetsTheme.Slot.PILLAR_TOP,    List.of(id("metal/metal_pillar_top")));
+		perKind.put(MaterialKind.METAL, metalSlots);
+
+		var alloySlots = new EnumMap<AssetsTheme.Slot, List<Identifier>>(AssetsTheme.Slot.class);
+		alloySlots.put(AssetsTheme.Slot.STORAGE_BLOCK, List.of(withDefaultNamespace("block/copper_block")));
+		alloySlots.put(AssetsTheme.Slot.STONE_BRICKS,  numbered("metal/metal_bricks_", METAL_BRICKS_COUNT));
+		alloySlots.put(AssetsTheme.Slot.PILLAR_SIDE,   List.of(id("metal/metal_pillar_side")));
+		alloySlots.put(AssetsTheme.Slot.PILLAR_TOP,    List.of(id("metal/metal_pillar_top")));
+		perKind.put(MaterialKind.ALLOY, alloySlots);
 		perKind.put(MaterialKind.GEM, Map.of(AssetsTheme.Slot.STORAGE_BLOCK, List.of(withDefaultNamespace("block/diamond_block"))));
 		perKind.put(MaterialKind.CRYSTAL, Map.of(AssetsTheme.Slot.STORAGE_BLOCK, List.of(withDefaultNamespace("block/amethyst_block"))));
 		perKind.put(MaterialKind.STONE, Map.of(AssetsTheme.Slot.STORAGE_BLOCK, List.of(withDefaultNamespace("block/stone"))));
@@ -218,13 +238,19 @@ public final class AssetsThemeConfig {
 		globalForm.put(Form.FENCE, List.of(id("decor/planks")));
 		globalForm.put(Form.FENCE_GATE, List.of(id("decor/planks")));
 		var metalForms = new EnumMap<Form, List<Identifier>>(Form.class);
-		metalForms.put(Form.DOOR, List.of(id("decor/metal_door_bottom")));
-		metalForms.put(Form.TRAPDOOR, List.of(id("decor/metal_trapdoor")));
+		metalForms.put(Form.BARS,     numbered("metal/metal_bars_", METAL_BARS_COUNT));
+		metalForms.put(Form.GRATE,    List.of(id("metal/grate")));
+		metalForms.put(Form.CHAIN,    numbered("metal/metal_chains_", METAL_CHAINS_COUNT));
+		metalForms.put(Form.DOOR,     numbered("decor/metal_door_bottom_", METAL_DOOR_COUNT));
+		metalForms.put(Form.TRAPDOOR, numbered("decor/metal_trapdoor_", METAL_TRAPDOOR_COUNT));
 		perKindForm.put(MaterialKind.METAL, metalForms);
 
 		var alloyForms = new EnumMap<Form, List<Identifier>>(Form.class);
-		alloyForms.put(Form.DOOR, List.of(id("decor/metal_door_bottom")));
-		alloyForms.put(Form.TRAPDOOR, List.of(id("decor/metal_trapdoor")));
+		alloyForms.put(Form.BARS,     numbered("metal/metal_bars_", METAL_BARS_COUNT));
+		alloyForms.put(Form.GRATE,    List.of(id("metal/grate")));
+		alloyForms.put(Form.CHAIN,    numbered("metal/metal_chains_", METAL_CHAINS_COUNT));
+		alloyForms.put(Form.DOOR,     numbered("decor/metal_door_bottom_", METAL_DOOR_COUNT));
+		alloyForms.put(Form.TRAPDOOR, numbered("decor/metal_trapdoor_", METAL_TRAPDOOR_COUNT));
 		perKindForm.put(MaterialKind.ALLOY, alloyForms);
 
 		putMissingSpikeDefaults(perKindForm);
@@ -263,6 +289,13 @@ public final class AssetsThemeConfig {
 				List.of(id("tools/spear/handle_in_hand")), numbered("tools/spear/handle_in_hand_", 2));
 		putMissingSpearDefaults(global);
 
+		// Remove old vanilla sandstone fallbacks — the builder now uses the sand texture pool directly.
+		fallbacks.remove(AssetsTheme.Slot.SANDSTONE_TOP);
+		fallbacks.remove(AssetsTheme.Slot.SANDSTONE_SIDE);
+		fallbacks.remove(AssetsTheme.Slot.SANDSTONE_BOTTOM);
+		fallbacks.remove(AssetsTheme.Slot.SANDSTONE_CUT);
+		fallbacks.remove(AssetsTheme.Slot.SANDSTONE_CHISELED);
+
 		replaceIfEquals(fallbacks, AssetsTheme.Slot.DOOR_ITEM_METAL,
 				List.of(withDefaultNamespace("item/iron_door")), List.of(id("decor/door")));
 		replaceIfEquals(fallbacks, AssetsTheme.Slot.DOOR_ITEM_METAL,
@@ -283,8 +316,25 @@ public final class AssetsThemeConfig {
 		replaceIfEquals(globalForm, Form.FENCE_GATE,
 				List.of(withDefaultNamespace("block/oak_planks")), List.of(id("decor/planks")));
 
+		// Migrate old lamp_overlay1 single-file fallback → global pool (added in texture expansion)
+		global.remove(AssetsTheme.Slot.LAMP_OVERLAY_1);  // clear any stale single-texture global
+		fallbacks.remove(AssetsTheme.Slot.LAMP_OVERLAY_1); // was a fallback in older configs
+		global.putIfAbsent(AssetsTheme.Slot.LAMP_OVERLAY_1, numbered("crystal/lamp_overlay", LAMP_OVERLAY_COUNT));
+
+		// Migrate old hammer fallbacks that reused axe textures
+		replaceIfEquals(fallbacks, AssetsTheme.Slot.HAMMER_HEAD,
+				List.of(id("tools/axe/axe_head_1")), List.of(id("tools/hammer_head")));
+		replaceIfEquals(fallbacks, AssetsTheme.Slot.HAMMER_HANDLE,
+				List.of(id("tools/axe/axe_stick_1")), List.of(id("tools/hammer_stick")));
+
+		// Migrate old horse armor fallback that reused plate texture
+		replaceIfEquals(fallbacks, AssetsTheme.Slot.HORSE_ARMOR_ITEM,
+				List.of(id("plates/plate_1")), List.of(id("armor/horse_armor_base")));
+
 		migrateMetalDecor(perKindForm, MaterialKind.METAL);
 		migrateMetalDecor(perKindForm, MaterialKind.ALLOY);
+		migrateMetalBlockTextures(perKind, MaterialKind.METAL);
+		migrateMetalBlockTextures(perKind, MaterialKind.ALLOY);
 		putMissingSpikeDefaults(perKindForm);
 
 		return new Data(global, fallbacks, perKind, globalForm, perKindForm);
@@ -317,12 +367,41 @@ public final class AssetsThemeConfig {
 
 	private static void migrateMetalDecor(Map<MaterialKind, Map<Form, List<Identifier>>> perKindForm, MaterialKind kind) {
 		var forms = perKindForm.computeIfAbsent(kind, ignored -> new EnumMap<>(Form.class));
+		// Migrate old single-file bars → numbered pool
+		replaceIfEquals(forms, Form.BARS,
+				List.of(id("metal/metal_bars")), numbered("metal/metal_bars_", METAL_BARS_COUNT));
+		forms.putIfAbsent(Form.BARS, numbered("metal/metal_bars_", METAL_BARS_COUNT));
+		forms.putIfAbsent(Form.GRATE, List.of(id("metal/grate")));
+		// Migrate old single-file chain → numbered pool
+		replaceIfEquals(forms, Form.CHAIN,
+				List.of(id("metal/metal_chains")), numbered("metal/metal_chains_", METAL_CHAINS_COUNT));
+		forms.putIfAbsent(Form.CHAIN, numbered("metal/metal_chains_", METAL_CHAINS_COUNT));
 		replaceIfEquals(forms, Form.DOOR,
 				List.of(withDefaultNamespace("block/iron_door_bottom")), List.of(id("decor/door_bottom")));
 		replaceIfEquals(forms, Form.DOOR,
 				List.of(id("decor/door_bottom")), List.of(id("decor/metal_door_bottom")));
+		// Migrate old single-file door/trapdoor → numbered pools
+		replaceIfEquals(forms, Form.DOOR,
+				List.of(id("decor/metal_door_bottom")), numbered("decor/metal_door_bottom_", METAL_DOOR_COUNT));
+		forms.putIfAbsent(Form.DOOR, numbered("decor/metal_door_bottom_", METAL_DOOR_COUNT));
 		replaceIfEquals(forms, Form.TRAPDOOR,
 				List.of(id("decor/trapdoor")), List.of(withDefaultNamespace("block/iron_trapdoor")));
+		replaceIfEquals(forms, Form.TRAPDOOR,
+				List.of(withDefaultNamespace("block/iron_trapdoor")), numbered("decor/metal_trapdoor_", METAL_TRAPDOOR_COUNT));
+		replaceIfEquals(forms, Form.TRAPDOOR,
+				List.of(id("decor/metal_trapdoor")), numbered("decor/metal_trapdoor_", METAL_TRAPDOOR_COUNT));
+		forms.putIfAbsent(Form.TRAPDOOR, numbered("decor/metal_trapdoor_", METAL_TRAPDOOR_COUNT));
+	}
+
+	private static void migrateMetalBlockTextures(Map<MaterialKind, Map<AssetsTheme.Slot, List<Identifier>>> perKind, MaterialKind kind) {
+		var slots = perKind.computeIfAbsent(kind, ignored -> new EnumMap<>(AssetsTheme.Slot.class));
+		// Migrate old single-file metal_bricks → numbered pool
+		replaceIfEquals(slots, AssetsTheme.Slot.STONE_BRICKS,
+				List.of(id("metal/metal_bricks")), numbered("metal/metal_bricks_", METAL_BRICKS_COUNT));
+		slots.putIfAbsent(AssetsTheme.Slot.STONE_BRICKS, numbered("metal/metal_bricks_", METAL_BRICKS_COUNT));
+		// Add pillar textures if not present
+		slots.putIfAbsent(AssetsTheme.Slot.PILLAR_SIDE, List.of(id("metal/metal_pillar_side")));
+		slots.putIfAbsent(AssetsTheme.Slot.PILLAR_TOP,  List.of(id("metal/metal_pillar_top")));
 	}
 
 	private static List<Identifier> numbered(String base, int max) {

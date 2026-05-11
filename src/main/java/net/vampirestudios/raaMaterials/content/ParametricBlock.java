@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
+import net.vampirestudios.raaMaterials.RAAConfig;
 import net.vampirestudios.raaMaterials.YComponents;
 import net.vampirestudios.raaMaterials.material.ClientMaterialCache;
 import net.vampirestudios.raaMaterials.material.MaterialRegistry;
@@ -19,7 +20,7 @@ import net.vampirestudios.raaMaterials.material.MaterialRegistry;
 import java.util.List;
 
 public class ParametricBlock extends Block {
-	public static final int MAX_MATERIAL_STATE = 255;
+	public static final int MAX_MATERIAL_STATE = RAAConfig.active().materialsMax();
 	public static final IntegerProperty MAT = IntegerProperty.create("mat", 0, MAX_MATERIAL_STATE);
 
 	public static int clampMaterialIndex(int idx) {

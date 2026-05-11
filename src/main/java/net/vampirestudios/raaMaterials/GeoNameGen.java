@@ -92,6 +92,7 @@ public final class GeoNameGen {
 	private static final PrefixEntry[] COLOR_TEAL = p("teal", "Teal", "turqu", "Turqu", "viridcyan", "Viridcyan", "aqua", "Aqua");
 
 	private static final PrefixEntry[] CHEM = p(
+
 			"silic", "Silico",
 			"calc", "Calci",
 			"dolom", "Dolomo",
@@ -110,7 +111,19 @@ public final class GeoNameGen {
 			"sulf", "Sulfo",
 			"lith", "Lithio",
 			"sod", "Sodo",
-			"potass", "Potasso"
+			"potass", "Potasso",
+			"alum", "Alumo",
+			"chrom", "Chromo",
+			"titan", "Titano",
+			"vanad", "Vanado",
+			"wolfr", "Wolfro",
+			"zinc", "Zinco",
+			"bism", "Bismo",
+			"arsen", "Arseno",
+			"antim", "Antimo",
+			"phosph", "Phospho",
+			"natr", "Natro",
+			"bary", "Baryo"
 	);
 
 	private static final PrefixEntry[] DESCRIPTOR = p(
@@ -131,7 +144,42 @@ public final class GeoNameGen {
 			"blaze",   "Blaze",
 			"tide",    "Tide",
 			"crest",   "Crest",
-			"hollow",  "Hollow"
+			"hollow",  "Hollow",
+			"ashen",   "Ashen",
+			"sunken",  "Sunken",
+			"wild",    "Wild",
+			"pale",    "Pale",
+			"gloom",   "Gloom",
+			"bright",  "Bright",
+			"scarlet", "Scarlet",
+			"cinder",  "Cinder",
+			"moon",    "Moon",
+			"star",    "Star",
+			"root",    "Root",
+			"mist",    "Mist",
+			"grave",   "Grave",
+			"rift",    "Rift",
+			"echo",    "Echo",
+			"wildfire", "Wildfire"
+	);
+
+	private static final PrefixEntry[] LOOSE_DESCRIPTOR = p(
+			"dry", "Dry",
+			"dusty", "Dusty",
+			"fine", "Fine",
+			"coarse", "Coarse",
+			"packed", "Packed",
+			"rich", "Rich",
+			"dark", "Dark",
+			"pale", "Pale",
+			"loamy", "Loamy",
+			"silty", "Silty",
+			"rocky", "Rocky",
+			"weathered", "Weathered",
+			"mineral", "Mineral",
+			"fertile", "Fertile",
+			"chalky", "Chalky",
+			"clayey", "Clayey"
 	);
 
 	private static final CoreEntry[] METAL_CORES = c(
@@ -331,21 +379,32 @@ public final class GeoNameGen {
 	private static final String[] SCI_FI_STEMS = {
 			"vex", "neutro", "ion", "quant", "xeno", "cryon", "plasma", "radon",
 			"tachy", "nex", "zeron", "flux", "positr", "aether",
-			"nano", "proto", "hyper", "ultra", "meta", "chrono", "photon", "helix",
-			"axiom", "synth", "vertex", "cipher", "helix", "sonar"
+			"nano", "proto", "hyper", "ultra", "meta", "chrono", "photon",
+			"axiom", "synth", "vertex", "cipher", "helix", "sonar",
+			"quark", "muon", "lepton", "boson", "gluon", "hadron",
+			"phase", "vector", "ionic", "neon", "argon", "krypton",
+			"pulse", "matrix", "relay", "nova", "singul", "orbital"
 	};
 
 	private static final String[] STUPID_STEMS = {
 			"bean", "goob", "wobble", "bonk", "squish", "mlem", "bloop", "yoink",
 			"nug", "chonko", "glorp", "snorf",
-			"plop", "zorp", "splat", "bork", "doot", "gloop", "florp", "shlorp"
+			"plop", "zorp", "splat", "bork", "doot", "gloop", "florp", "shlorp",
+			"goop", "gorp", "vorn", "vlim", "garn", "froth",
+			"blorp", "splorp", "snorp", "gronk", "cronk", "skronk", "womp", "thwomp",
+			"wibble", "wob", "wug", "blib", "blim", "blunk", "glunk", "grumbo",
+			"scrunk", "crungle", "gibble", "gribble", "zibble", "snoot", "splunk",
+			"floob", "gloob", "klorp", "drub", "frunk", "snub", "morb", "blat"
 	};
 
 	private static final String[] FICTION_STEMS = {
 			"eldr", "void", "moon", "star", "dragon", "wyrm", "shadow", "sun",
 			"myth", "rune", "fae", "dread", "ember", "frost",
 			"arcane", "astral", "chaos", "primal", "spectral", "nexus",
-			"hollow", "titan", "wyrd", "riven", "sable", "azure"
+			"hollow", "titan", "wyrd", "riven", "sable", "azure",
+			"lunar", "solar", "nether", "abyss", "dream", "spirit",
+			"grave", "blood", "soul", "thorn", "veil", "rift",
+			"omen", "curse", "wisp", "glyph", "echo", "mirage"
 	};
 
 	private static final String[] MICRO = {
@@ -354,7 +413,12 @@ public final class GeoNameGen {
 	};
 
 	private static final Set<String> BLOCKED_NAMES = Set.of(
-			"stone", "dirt", "sand", "gravel", "clay", "mud", "wood"
+			"stone", "dirt", "sand", "gravel", "clay", "mud", "wood",
+			"iron", "gold", "copper", "diamond", "emerald", "quartz",
+			"coal", "lapis", "redstone", "netherite", "amethyst",
+			"oak", "birch", "spruce", "jungle", "acacia", "mangrove",
+			"cherry", "bamboo", "crimson", "warped", "darkoak", "andesite",
+			"granite", "diorite", "sulfur", "calcite", "tuff"
 	);
 
 	public static NameInformation generate(long worldSeed, int index, MaterialDef def) {
@@ -365,7 +429,8 @@ public final class GeoNameGen {
 		Random rng = new Random(mix(worldSeed, 0x6A09E667F3BCC909L, kind.ordinal(), index));
 
 		String display = genDisplay(rng, kind, primaryColor, spawn);
-		String id = slug(display) + "_" + shortHash(mix(worldSeed, index, kind.ordinal()));
+		String key = slug(display).replace("_", "");
+		String id = key + shortHash(mix(worldSeed, index, kind.ordinal(), display.hashCode()));
 
 		return new NameInformation(RAAMaterials.id(id), display);
 	}
@@ -396,7 +461,7 @@ public final class GeoNameGen {
 	}
 
 	private static String genDisplay(Random rng, MaterialKind kind, int rgb, SpawnInfo spawn) {
-		NameStyle style = pickStyle(rng);
+		NameStyle style = pickStyle(rng, kind);
 
 		if (rng.nextInt(100) < 2) {
 			return titleWords(pick(rng, MICRO));
@@ -405,7 +470,7 @@ public final class GeoNameGen {
 		String raw;
 
 		if (style == NameStyle.GEO_FANTASY || style == NameStyle.REALISH) {
-			NameParts parts = pickNameParts(rng, kind, rgb, spawn);
+			NameParts parts = pickNameParts(rng, kind, rgb, spawn, style == NameStyle.REALISH);
 			raw = renderDisplay(rng, parts);
 		} else {
 			raw = renderStyledFantasy(rng, kind, style);
@@ -435,25 +500,32 @@ public final class GeoNameGen {
 			case STONE, OTHER -> pick(rng, FANTASY_STONE_SUFFIXES);
 			case SALT    -> pick(rng, FANTASY_SALT_SUFFIXES);
 			case VOLCANIC -> pick(rng, FANTASY_VOLCANIC_SUFFIXES);
-			default      -> pick(rng, "ite", "ium", "stone");
+			case SOIL -> pick(rng, "soil", "dirt", "earth", "loam");
+			case SAND -> pick(rng, "sand", "dust", "grit");
+			case GRAVEL -> pick(rng, "gravel", "grit", "rock");
+			case CLAY -> pick(rng, "clay", "shale", "mud");
+			case MUD -> pick(rng, "mud", "slurry", "mire");
+			default -> pick(rng, "ite", "ium");
 		};
 
 		return smoothJoin(stem, suffix);
 	}
 
-	private static NameStyle pickStyle(Random rng) {
-		int roll = rng.nextInt(100);
+	private static NameStyle pickStyle(Random rng, MaterialKind kind) {
+		if (kind == MaterialKind.WOOD || isLooseMaterial(kind)) {
+			return rng.nextInt(100) < 85 ? NameStyle.GEO_FANTASY : NameStyle.FICTIONAL;
+		}
 
+		int roll = rng.nextInt(100);
 		if (roll < 55) return NameStyle.GEO_FANTASY;
 		if (roll < 75) return NameStyle.SCI_FI;
 		if (roll < 92) return NameStyle.FICTIONAL;
 		if (roll < 97) return NameStyle.REALISH;
-
 		return NameStyle.STUPID;
 	}
 
-	private static NameParts pickNameParts(Random rng, MaterialKind kind, int rgb, SpawnInfo spawn) {
-		CoreEntry core = pickCore(rng, kind);
+	private static NameParts pickNameParts(Random rng, MaterialKind kind, int rgb, SpawnInfo spawn, boolean forceReal) {
+		CoreEntry core = forceReal ? pickRealCore(rng, kind) : pickCore(rng, kind);
 
 		PrefixEntry prefix = PrefixEntry.NONE;
 		if (shouldUsePrefix(rng, kind, core)) {
@@ -473,16 +545,15 @@ public final class GeoNameGen {
 		CoreEntry[] cores = coresFor(kind);
 
 		int realChance = switch (kind) {
-			case METAL -> 20;
+			case METAL, STONE -> 20;
 			case GEM -> 18;
 			case CRYSTAL -> 22;
-			case STONE -> 20;
 			case SALT -> 35;
 			case VOLCANIC -> 30;
 			default -> 0;
 		};
 
-		if (realChance <= 0) {
+		if (realChance == 0) {
 			return pick(rng, cores);
 		}
 
@@ -498,6 +569,24 @@ public final class GeoNameGen {
 		return pick(rng, cores);
 	}
 
+	private static CoreEntry pickRealCore(Random rng, MaterialKind kind) {
+		CoreEntry[] cores = coresFor(kind);
+
+		List<CoreEntry> real = new ArrayList<>();
+
+		for (CoreEntry core : cores) {
+			if (core.form() == CoreForm.REAL_MINERAL) {
+				real.add(core);
+			}
+		}
+
+		if (real.isEmpty()) {
+			return pick(rng, cores);
+		}
+
+		return real.get(rng.nextInt(real.size()));
+	}
+
 	private static String renderDisplay(Random rng, NameParts parts) {
 		return switch (parts.kind()) {
 			case ALLOY -> renderAlloy(parts);
@@ -510,11 +599,12 @@ public final class GeoNameGen {
 	private static String renderMineral(Random rng, NameParts parts) {
 		CoreEntry core = parts.core();
 
-		String base = switch (core.form()) {
-			case REAL_MINERAL -> core.display();
-			case FANTASY_STEM -> deriveFantasyName(rng, parts.kind(), core);
-			default -> core.display();
-		};
+		String base;
+		if (core.form() == CoreForm.FANTASY_STEM) {
+			base = deriveFantasyName(rng, parts.kind(), core);
+		} else {
+			base = core.display();
+		}
 
 		if (parts.prefix() == PrefixEntry.NONE) {
 			return base;
@@ -552,14 +642,13 @@ public final class GeoNameGen {
 			case MUD -> switch (core.token()) {
 				case "pelit" -> "Pelite";
 				case "lutit" -> "Lutite";
-				case "silt" -> pick(rng, "Mud", "Mudstone");
 				default -> pick(rng, "Mud", "Mudstone");
 			};
 			default -> "";
 		};
 
 		String rendered;
-		if (material.equals(base)) {
+		if (material.equalsIgnoreCase(base) || coreAlreadyRepresentsMaterial(core, material)) {
 			rendered = base;
 		} else if (isStandaloneLooseMaterial(material)) {
 			rendered = material;
@@ -572,6 +661,23 @@ public final class GeoNameGen {
 		}
 
 		return prefix.display() + " " + rendered;
+	}
+
+	private static boolean coreAlreadyRepresentsMaterial(CoreEntry core, String material) {
+		String c = core.display().toLowerCase(Locale.ROOT);
+		String m = material.toLowerCase(Locale.ROOT);
+
+		if (c.contains(m)) {
+			return true;
+		}
+
+		return switch (m) {
+			case "sand" -> c.equals("silica") || c.equals("quartz");
+			case "gravel" -> c.equals("gruss") || c.equals("rudite");
+			case "clay" -> c.equals("kaolin") || c.equals("bentonite");
+			case "mud" -> c.equals("pelite") || c.equals("lutite");
+			default -> false;
+		};
 	}
 
 	private static String renderAlloy(NameParts parts) {
@@ -608,7 +714,7 @@ public final class GeoNameGen {
 			"glass", "tuff", "ash", "scoria", "tephra", "lava", "cinder",
 			"salt", "brine", "halite", "evaporite",
 			"alloy", "steel", "bronze", "metal", "amalgam", "composite", "weave", "cast", "blend",
-			"wood", "bark", "timber", "plank", "lumber", "grain",
+			"wood", "bark", "heartwood", "timber", "plank", "lumber", "grain",
 			"spike", "point", "shard", "cryst", "spar"
 	);
 
@@ -653,12 +759,8 @@ public final class GeoNameGen {
 		}
 
 		return rng.nextInt(100) < switch (kind) {
-			case METAL -> 25;
-			case GEM -> 35;
-			case CRYSTAL -> 35;
-			case STONE -> 25;
-			case SALT -> 30;
-			case VOLCANIC -> 30;
+			case GEM, CRYSTAL -> 35;
+			case SALT, VOLCANIC -> 30;
 			default -> 25;
 		};
 	}
@@ -677,12 +779,14 @@ public final class GeoNameGen {
 		if (dark) add(pool, COLOR_BLACK, 2);
 		if (bright) add(pool, COLOR_MISC, 1);
 
-		if (!isLooseMaterial(kind)) {
+		if (isLooseMaterial(kind)) {
+			add(pool, LOOSE_DESCRIPTOR, 3);
+		} else {
 			add(pool, CHEM, switch (kind) {
 				case METAL, SALT -> 3;
-				case GEM, CRYSTAL, STONE, VOLCANIC -> 1;
 				default -> 1;
 			});
+
 			add(pool, DESCRIPTOR, 2);
 		}
 
@@ -757,13 +861,6 @@ public final class GeoNameGen {
 
 	private static boolean isVowel(char c) {
 		return "aeiouy".indexOf(Character.toLowerCase(c)) >= 0;
-	}
-
-	private static String cleanDisplay(String s) {
-		s = Normalizer.normalize(s, Normalizer.Form.NFD).replaceAll("\\p{M}+", "");
-		s = s.replaceAll("[^A-Za-z ]", "");
-		s = s.replaceAll("\\s+", " ").trim();
-		return s.isEmpty() ? "Mineralite" : s;
 	}
 
 	private static String titleWords(String s) {

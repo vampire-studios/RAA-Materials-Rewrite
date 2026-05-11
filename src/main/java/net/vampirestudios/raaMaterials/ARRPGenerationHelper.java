@@ -463,11 +463,27 @@ public class ARRPGenerationHelper {
     }
 
     public static void generateTopBottomBlockModel(RuntimeResourcePack clientResourcePackBuilder, Identifier name, Identifier topTexture, Identifier bottomTexture, Identifier sideTexture) {
-        clientResourcePackBuilder.addModel(model("block/cube_top_bottom").textures(textures()
-                .var("top", blockTexture(topTexture))
-                .var("bottom", blockTexture(bottomTexture))
-                .var("side", blockTexture(sideTexture))
-        ), name);
+        // Use explicit elements (with tintindex) rather than inheriting block/cube_top_bottom.
+        // An unqualified parent "block/cube_top_bottom" resolves to the current pack namespace in
+        // modern MC, which doesn't exist, producing a missing model.  Explicit elements also let
+        // BlockColorProviders tint the block correctly (tintindex: 0 on every face).
+        var model = JModel.model("minecraft:block/block")
+                .textures(JModel.textures()
+                        .var("top",    blockTexture(topTexture))
+                        .var("bottom", blockTexture(bottomTexture))
+                        .var("side",   blockTexture(sideTexture)))
+                .element(JModel.element()
+                        .bounds(0, 0, 0, 16, 16, 16)
+                        .faces(JModel.faces()
+                                .up(   JModel.face("top")   .uv(0,0,16,16).cullface(Direction.UP)   .tintIndex(0))
+                                .down( JModel.face("bottom").uv(0,0,16,16).cullface(Direction.DOWN) .tintIndex(0))
+                                .north(JModel.face("side")  .uv(0,0,16,16).cullface(Direction.NORTH).tintIndex(0))
+                                .south(JModel.face("side")  .uv(0,0,16,16).cullface(Direction.SOUTH).tintIndex(0))
+                                .east( JModel.face("side")  .uv(0,0,16,16).cullface(Direction.EAST) .tintIndex(0))
+                                .west( JModel.face("side")  .uv(0,0,16,16).cullface(Direction.WEST) .tintIndex(0))
+                        )
+                );
+        clientResourcePackBuilder.addModel(model, name);
     }
 
     public static void generateLadderBlockModel(RuntimeResourcePack clientResourcePackBuilder, Identifier name) {

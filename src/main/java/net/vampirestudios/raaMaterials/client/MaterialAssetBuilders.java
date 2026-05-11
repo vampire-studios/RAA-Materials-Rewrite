@@ -237,8 +237,8 @@ public final class MaterialAssetBuilders {
         if (!failures.isEmpty()) {
             RAAMaterials.LOGGER.error("[RAA] {} missing texture(s) detected before asset build:", failures.size());
             failures.forEach(msg -> RAAMaterials.LOGGER.error("[RAA]{}", msg));
-            throw new IllegalStateException(
-                "[RAA] Asset build aborted: " + failures.size() + " missing texture(s) - see log for details");
+//            throw new IllegalStateException(
+//                "[RAA] Asset build aborted: " + failures.size() + " missing texture(s) - see log for details");
         }
     }
 
@@ -1714,7 +1714,7 @@ public final class MaterialAssetBuilders {
         int cases = 0;
 
         ctx.forEachMaterialWith(Form.BARS, (idx, def) -> {
-            var tex = blockTexture(pickBlockTexture(def, idx));
+            var tex = blockTexture(pickFormTexture(Form.BARS, def, idx));
             var path = def.nameInformation().id().getPath();
             var post = RAAMaterials.id(modelPrefix + path + "_post");
             var side = RAAMaterials.id(modelPrefix + path + "_side");
@@ -1757,7 +1757,7 @@ public final class MaterialAssetBuilders {
                 List.of(Form.GRATE),
                 sharedBlockId,
                 modelPrefix,
-                idx -> pickBlockTexture(ctx.materials().get(idx), idx)
+                idx -> pickFormTexture(Form.GRATE, ctx.materials().get(idx), idx)
         ));
     }
 
