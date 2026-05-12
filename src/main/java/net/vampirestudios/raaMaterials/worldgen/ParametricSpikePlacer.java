@@ -58,7 +58,7 @@ final class ParametricSpikePlacer {
 
         int maxHeight = RAAConfig.active().formChances().spikeMaxHeight();
         float density = 0.35f + rng.nextFloat() * 0.45f; // 0.35–0.80
-        int radius    = 1 + rng.nextInt(3);              // cluster radius 1–3 blocks
+        int radius    = 1 + rng.nextInt(6);              // cluster radius 1–3 blocks
 
         boolean placedAny = false;
         for (int dx = -radius; dx <= radius; dx++) {

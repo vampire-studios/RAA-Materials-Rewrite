@@ -39,6 +39,36 @@ public final class AssetsTheme {
 		return Optional.ofNullable(fallbacks.get(s));
 	}
 
+	private Optional<Identifier> pickByIndex(MaterialKind k, Slot s, int index) {
+		var km = perKind.get(k);
+		if (km != null) {
+			var rls = km.get(s);
+			if (rls != null && !rls.isEmpty())
+				return Optional.of(rls.get(rls.size() == 1 ? 0 : Math.floorMod(index, rls.size())));
+		}
+
+		var g = global.get(s);
+		if (g != null && !g.isEmpty())
+			return Optional.of(g.get(g.size() == 1 ? 0 : Math.floorMod(index, g.size())));
+
+		return Optional.ofNullable(fallbacks.get(s));
+	}
+
+	private int pickVariantIndex(MaterialKind k, Slot s, RandomGenerator rnd) {
+		var km = perKind.get(k);
+		if (km != null) {
+			var rls = km.get(s);
+			if (rls != null && !rls.isEmpty())
+				return rls.size() == 1 ? 0 : rnd.nextInt(rls.size());
+		}
+
+		var g = global.get(s);
+		if (g != null && !g.isEmpty())
+			return g.size() == 1 ? 0 : rnd.nextInt(g.size());
+
+		return 0;
+	}
+
 	private Optional<Identifier> pickForm(MaterialKind k, Form f, RandomGenerator rnd) {
 		var km = perKindForm.get(k);
 		if (km != null) {
@@ -169,10 +199,12 @@ public final class AssetsTheme {
 		Optional<Identifier> hoeHandle = pick(k, Slot.HOE_STICK, rnd);
 		Optional<Identifier> shearsBase = pick(k, Slot.SHEARS_BASE, rnd);
 		Optional<Identifier> shearsMetal = pick(k, Slot.SHEARS_METAL, rnd);
-		Optional<Identifier> spearHead = pick(k, Slot.SPEAR_HEAD, rnd);
-		Optional<Identifier> spearHandle = pick(k, Slot.SPEAR_HANDLE, rnd);
-		Optional<Identifier> spearHeadInHand = pick(k, Slot.SPEAR_HEAD_IN_HAND, rnd);
-		Optional<Identifier> spearHandleInHand = pick(k, Slot.SPEAR_HANDLE_IN_HAND, rnd);
+		int spearVariant = pickVariantIndex(k, Slot.SPEAR_HEAD, rnd);
+
+		Optional<Identifier> spearHead = pickByIndex(k, Slot.SPEAR_HEAD, spearVariant);
+		Optional<Identifier> spearHandle = pickByIndex(k, Slot.SPEAR_HANDLE, spearVariant);
+		Optional<Identifier> spearHeadInHand = pickByIndex(k, Slot.SPEAR_HEAD_IN_HAND, spearVariant);
+		Optional<Identifier> spearHandleInHand = pickByIndex(k, Slot.SPEAR_HANDLE_IN_HAND, spearVariant);
 
 		return new ToolTextureSet(
 				pickHead, pickHandle, axeHead, axeHandle, swordBlade, swordHandle,

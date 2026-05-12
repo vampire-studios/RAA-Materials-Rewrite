@@ -1,10 +1,11 @@
 package net.vampirestudios.raaMaterials.worldgen;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.Feature;
@@ -13,8 +14,6 @@ import net.minecraft.world.level.levelgen.feature.configurations.DiskConfigurati
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
-import net.minecraft.util.valueproviders.UniformInt;
-import net.minecraft.core.BlockPos;
 import net.vampirestudios.raaMaterials.material.MaterialDef;
 import net.vampirestudios.raaMaterials.material.MaterialKind;
 import net.vampirestudios.raaMaterials.material.SpawnInfo;
@@ -74,19 +73,19 @@ final class ParametricOrePlacer {
 
     private static int terrainPatchMin(MaterialKind kind, SpawnInfo spawn) {
         return switch (kind) {
-            case STONE    -> Math.max(spawn.veinMin() * 2, 16);
-            case VOLCANIC -> Math.max(spawn.veinMin() * 2, 14);
-            case SALT     -> Math.max(spawn.veinMin() * 2, 12);
-            default       -> Math.max(spawn.veinMin(), 6);
+            case STONE    -> Math.max(spawn.veinMin() * 4, 32);
+            case VOLCANIC -> Math.max(spawn.veinMin() * 4, 28);
+            case SALT     -> Math.max(spawn.veinMin() * 3, 24);
+            default       -> Math.max(spawn.veinMin() * 2, 12);
         };
     }
 
     private static int terrainPatchMax(MaterialKind kind, SpawnInfo spawn) {
         return switch (kind) {
-            case STONE    -> Math.min(Math.max(spawn.veinMax() * 2, 36), 56);
-            case VOLCANIC -> Math.min(Math.max(spawn.veinMax() * 2, 30), 46);
-            case SALT     -> Math.min(Math.max(spawn.veinMax() * 2, 26), 40);
-            default       -> Math.min(Math.max(spawn.veinMax(), 18), 28);
+            case STONE    -> Math.clamp(spawn.veinMax() * 5L, 96, 160);
+            case VOLCANIC -> Math.clamp(spawn.veinMax() * 4L, 72, 128);
+            case SALT     -> Math.clamp(spawn.veinMax() * 4L, 56, 96);
+            default       -> Math.clamp(spawn.veinMax() * 2L, 32, 48);
         };
     }
 

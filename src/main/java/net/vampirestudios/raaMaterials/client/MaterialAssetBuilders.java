@@ -542,7 +542,7 @@ public final class MaterialAssetBuilders {
                 idx -> RAAMaterials.id("crystal/crystal_" + oneIndexed(idx, AssetsThemeConfig.CRYSTAL_CLUSTER_COUNT))
         );
 
-        buildSpikeFamily(ctx, RAAMaterials.id("material_spike"), "block/material_spike/");
+        buildSpikeFamily(ctx, RAAMaterials.id("material_spike"));
     }
 
     public static void buildShapeFamilies(MaterialAssetContext ctx) {
@@ -1413,7 +1413,6 @@ public final class MaterialAssetBuilders {
         ctx.pack().addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
     }
 
-    // dir/thickness pairs matching DripstoneThickness serialized names
     private static final List<String[]> SPIKE_VARIANTS = List.of(
             new String[]{"up",   "tip_merge"},
             new String[]{"up",   "tip"},
@@ -1427,7 +1426,7 @@ public final class MaterialAssetBuilders {
             new String[]{"down", "base"}
     );
 
-    private static void buildSpikeFamily(MaterialAssetContext ctx, Identifier sharedBlockId, String modelPrefix) {
+    private static void buildSpikeFamily(MaterialAssetContext ctx, Identifier sharedBlockId) {
         var select = JItemModel.select().property(MAT_COMP);
         var variant = JState.variant();
 
@@ -1436,6 +1435,16 @@ public final class MaterialAssetBuilders {
                     .orElse(RAAMaterials.id("block/stone/spikes/1/spike"));
             String matPath = def.nameInformation().id().getPath();
 
+            String spikeSet = spikeSetFromTexture(texPrefix);
+            Identifier itemTex = RAAMaterials.id("item/spikes/spike_" + spikeSet);
+            Identifier itemModel = RAAMaterials.id("item/material_spike/" + matPath + "_item");
+
+            ctx.pack().addModel(
+                    JModel.model("minecraft:item/generated")
+                            .textures(JModel.textures().layer0(itemTex.toString())),
+                    itemModel
+            );
+
             for (String[] sv : SPIKE_VARIANTS) {
                 String dir = sv[0];
                 String thickness = sv[1];
@@ -1443,18 +1452,17 @@ public final class MaterialAssetBuilders {
                         texPrefix.getNamespace(),
                         texPrefix.getPath() + "_" + dir + "_" + thickness
                 );
-                Identifier templateId = RAAMaterials.id("block/raa_spike_" + dir + "_" + thickness);
-                Identifier modelId = RAAMaterials.id(modelPrefix + matPath + "_" + dir + "_" + thickness);
+                Identifier templateId = RAAMaterials.id("block/raa_spike");
+                Identifier modelId = RAAMaterials.id("block/material_spike/" + matPath + "_" + dir + "_" + thickness);
 
                 ctx.pack().addModel(
                         JModel.model(templateId.toString())
-                              .textures(JModel.textures().var("spike", blockTexture(texId))),
+                              .textures(JModel.textures().var("cross", blockTexture(texId))),
                         modelId
                 );
                 variant.put(Map.of("mat", idx, "vertical_direction", dir, "thickness", thickness), JState.model(modelId));
             }
 
-            Identifier itemModel = RAAMaterials.id(modelPrefix + matPath + "_up_tip");
             select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(itemModel, def)));
         });
 
@@ -1467,6 +1475,16 @@ public final class MaterialAssetBuilders {
         ctx.pack().addBlockState(JState.state(variant), sharedBlockId);
         select.fallback(JModelBasic.of("minecraft:block/pointed_dripstone_up_tip"));
         ctx.pack().addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
+    }
+
+    private static String spikeSetFromTexture(Identifier texPrefix) {
+        String path = texPrefix.getPath();
+
+        if (path.contains("/spikes/1/")) return "1";
+        if (path.contains("/spikes/2/")) return "2";
+        if (path.contains("/spikes/3/")) return "3";
+
+        return "1";
     }
 
     private static void buildDoorFamily(MaterialAssetContext ctx, Identifier sharedBlockId, String modelPrefix) {

@@ -87,6 +87,7 @@ public class ParametricSpikeBlock extends ParametricBlock implements SimpleWater
         DripstoneThickness thickness = calculateSpikeThickness(level, pos, dir, matIdx, mergeOpposingTips);
         boolean waterlogged = ctx.getLevel().getFluidState(ctx.getClickedPos()).is(Fluids.WATER);
         return defaultBlockState()
+                .setValue(MAT, matIdx)
                 .setValue(VERTICAL_DIRECTION, dir)
                 .setValue(THICKNESS, thickness)
                 .setValue(WATERLOGGED, waterlogged);
