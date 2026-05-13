@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    { "id": "#c:ores", "required": false },
+    "#c:ores",
     "#minecraft:coal_ores",
     "#minecraft:iron_ores",
     "#minecraft:gold_ores",
@@ -10,7 +10,7 @@
     "#minecraft:lapis_ores",
     "#minecraft:emerald_ores",
     "#minecraft:copper_ores",
-    "#minecraft:quartz_ores",
+    "minecraft:nether_quartz_ore",
     "minecraft:ancient_debris",
     "raa_materials:material_ore"
   ]

@@ -52,8 +52,36 @@ public class ParametricBlockItem extends BlockItem {
 				lower.isEmpty() ? "" : String.format("%s", lower.charAt(lower.length() - 1))
 		};
 
-		String cooked = ICUFormatter.format(key, icuArgs);
+		String cooked = removeDuplicateWords(ICUFormatter.format(key, icuArgs));
 		return Component.literal(cooked);
+	}
+
+	private static String removeDuplicateWords(String text) {
+		if (text == null || text.isBlank()) return text;
+
+		String[] parts = text.trim().split("\\s+");
+		StringBuilder result = new StringBuilder();
+
+		String previousNormalized = null;
+
+		for (String part : parts) {
+			String normalized = part
+					.replaceAll("^\\p{Punct}+|\\p{Punct}+$", "")
+					.toLowerCase(Locale.ROOT);
+
+			if (!normalized.isEmpty() && normalized.equals(previousNormalized)) {
+				continue;
+			}
+
+			if (!result.isEmpty()) result.append(' ');
+			result.append(part);
+
+			if (!normalized.isEmpty()) {
+				previousNormalized = normalized;
+			}
+		}
+
+		return result.toString();
 	}
 
 	private static Optional<MaterialDef> materialDefinition(ItemStack stack) {

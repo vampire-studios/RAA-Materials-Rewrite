@@ -67,7 +67,7 @@ public final class YItems {
 			PARAM_FENCE_ITEM, PARAM_FENCE_GATE_ITEM,
 			PARAM_CHAIN_ITEM, PARAM_LANTERN_ITEM, PARAM_LAMP_ITEM;
 
-	public static Item PARAM_CRYSTAL_PANE_ITEM, PARAM_ROD_BLOCK_ITEM; // pane + rod-like light
+	public static Item PARAM_PANE_ITEM, PARAM_ROD_BLOCK_ITEM; // pane + rod-like light
 
 	// Base shapes
 	public static Item PARAM_SLAB_ITEM, PARAM_STAIRS_ITEM, PARAM_WALL_ITEM;
@@ -191,7 +191,7 @@ public final class YItems {
 		PARAM_LAMP_ITEM = regBlockItem("material_lamp", YBlocks.PARAM_LAMP);
 
 		// ---- NEW crystal-ish block items ----
-		PARAM_CRYSTAL_PANE_ITEM = regBlockItem("material_crystal_pane", YBlocks.PARAM_CRYSTAL_PANE);
+		PARAM_PANE_ITEM = regBlockItem("material_crystal_pane", YBlocks.PARAM_CRYSTAL_PANE);
 		PARAM_ROD_BLOCK_ITEM = regBlockItem("material_rod_block", YBlocks.PARAM_ROD_BLOCK);
 
 		PARAM_GLASS_ITEM = regBlockItem("material_glass", YBlocks.PARAM_GLASS);

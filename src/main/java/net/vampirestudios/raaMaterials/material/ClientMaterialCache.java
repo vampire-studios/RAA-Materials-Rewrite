@@ -1,4 +1,3 @@
-// ClientMaterialCache.java
 package net.vampirestudios.raaMaterials.material;
 
 import net.minecraft.resources.Identifier;

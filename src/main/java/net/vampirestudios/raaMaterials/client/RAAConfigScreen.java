@@ -46,6 +46,7 @@ public final class RAAConfigScreen {
 				.category(worldgen(draft))
 				.category(blockStats(draft))
 				.category(formChances(draft))
+				.category(colorRanges(draft))
 				.category(forms(draft))
 				.category(formGroups(formGroupDraft))
 				.category(openEnded(draft))
@@ -184,7 +185,26 @@ public final class RAAConfigScreen {
 						.option(floatField("Geode crystal wall chance", 0.0F, 1.0F, () -> fc.geodeCrystalWallChance, v -> fc.geodeCrystalWallChance = v))
 						.option(floatField("Geode crystal cluster chance", 0.0F, 1.0F, () -> fc.geodeCrystalClusterChance, v -> fc.geodeCrystalClusterChance = v))
 						.build())
+				.group(OptionGroup.createBuilder()
+						.name(text("Hammer"))
+						.option(intSlider("Hammer AoE radius", 0, 4, 1, () -> fc.hammerAoeRadius, v -> fc.hammerAoeRadius = v))
+						.build())
 				.build();
+	}
+
+	private static ConfigCategory colorRanges(Draft draft) {
+		var category = ConfigCategory.createBuilder().name(text("Color ranges"));
+		for (var kind : MaterialKind.values()) {
+			category.group(OptionGroup.createBuilder()
+					.name(text(title(kind)))
+					.collapsed(true)
+					.option(floatField("Lightness minimum", 0.0F, 1.0F, () -> draft.colorRange(kind).lMin, v -> draft.colorRange(kind).lMin = v))
+					.option(floatField("Lightness maximum", 0.0F, 1.0F, () -> draft.colorRange(kind).lMax, v -> draft.colorRange(kind).lMax = v))
+					.option(floatField("Chroma minimum", 0.0F, 1.0F, () -> draft.colorRange(kind).cMin, v -> draft.colorRange(kind).cMin = v))
+					.option(floatField("Chroma maximum", 0.0F, 1.0F, () -> draft.colorRange(kind).cMax, v -> draft.colorRange(kind).cMax = v))
+					.build());
+		}
+		return category.build();
 	}
 
 	private static ConfigCategory forms(Draft draft) {
@@ -392,7 +412,7 @@ public final class RAAConfigScreen {
 		EnumMap<MaterialKind, MutablePolicy> formControls;
 		int toolChancePercent;
 		MaterialGenerator.Profile defaultProfile;
-		Map<MaterialKind, RAAConfig.ColorRanges> colorRanges;
+		EnumMap<MaterialKind, MutableColorRanges> colorRanges;
 		MutableFormChances formChances;
 
 		Draft(RAAConfig config) {
@@ -436,7 +456,12 @@ public final class RAAConfigScreen {
 			}
 			toolChancePercent = config.toolChancePercent();
 			defaultProfile = config.defaultProfile();
-			colorRanges = config.colorRanges();
+			colorRanges = new EnumMap<>(MaterialKind.class);
+			var defaultCr = RAAConfig.defaultColorRanges();
+			for (var kind : MaterialKind.values()) {
+				var cr = config.colorRanges().getOrDefault(kind, defaultCr.getOrDefault(kind, new RAAConfig.ColorRanges(0.4f, 0.8f, 0.05f, 0.2f)));
+				colorRanges.put(kind, new MutableColorRanges(cr));
+			}
 			formChances = new MutableFormChances(config.formChances());
 		}
 
@@ -454,6 +479,10 @@ public final class RAAConfigScreen {
 
 		MutableSpawnProfile spawnProfile(MaterialKind kind) {
 			return spawnProfiles.get(kind);
+		}
+
+		MutableColorRanges colorRange(MaterialKind kind) {
+			return colorRanges.get(kind);
 		}
 
 		RAAConfig toConfig() {
@@ -476,7 +505,7 @@ public final class RAAConfigScreen {
 					toolChancePercent,
 					spawnProfileMap(),
 					defaultProfile,
-					colorRanges,
+					colorRangeMap(),
 					formChances.toRecord()
 			);
 		}
@@ -502,6 +531,12 @@ public final class RAAConfigScreen {
 		private Map<MaterialKind, RAAConfig.SpawnProfile> spawnProfileMap() {
 			var map = new EnumMap<MaterialKind, RAAConfig.SpawnProfile>(MaterialKind.class);
 			spawnProfiles.forEach((kind, profile) -> map.put(kind, profile.toRecord()));
+			return map;
+		}
+
+		private Map<MaterialKind, RAAConfig.ColorRanges> colorRangeMap() {
+			var map = new EnumMap<MaterialKind, RAAConfig.ColorRanges>(MaterialKind.class);
+			colorRanges.forEach((kind, cr) -> map.put(kind, cr.toRecord()));
 			return map;
 		}
 	}
@@ -605,6 +640,24 @@ public final class RAAConfigScreen {
 					geodeCrystalWallChance, geodeCrystalClusterChance,
 					hammerAoeRadius
 			);
+		}
+	}
+
+	private static final class MutableColorRanges {
+		float lMin;
+		float lMax;
+		float cMin;
+		float cMax;
+
+		MutableColorRanges(RAAConfig.ColorRanges cr) {
+			lMin = cr.lMin();
+			lMax = cr.lMax();
+			cMin = cr.cMin();
+			cMax = cr.cMax();
+		}
+
+		RAAConfig.ColorRanges toRecord() {
+			return new RAAConfig.ColorRanges(lMin, lMax, cMin, cMax);
 		}
 	}
 

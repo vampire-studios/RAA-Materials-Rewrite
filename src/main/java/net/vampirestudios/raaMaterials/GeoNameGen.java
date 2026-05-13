@@ -456,8 +456,7 @@ public final class GeoNameGen {
 			}
 		}
 
-		String id = slug(display) + "_" + shortHash(mix(worldSeed, index, kind.ordinal()));
-		return new NameInformation(RAAMaterials.id(id), display);
+		return new NameInformation(RAAMaterials.id(slug(display)), display);
 	}
 
 	private static String genDisplay(Random rng, MaterialKind kind, int rgb, SpawnInfo spawn) {

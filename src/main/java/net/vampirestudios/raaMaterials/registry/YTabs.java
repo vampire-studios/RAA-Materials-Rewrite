@@ -307,7 +307,7 @@ public final class YTabs {
 									addBlocksIf(output, def, idx, new Object[][]{
 											{Form.BLOCK, YItems.PARAM_CRYSTAL_BLOCK_ITEM},
 											{Form.CRYSTAL_BRICKS, YItems.PARAM_CRYSTAL_BRICKS_ITEM},
-											{Form.PANE, YItems.PARAM_CRYSTAL_PANE_ITEM},
+											{Form.PANE, YItems.PARAM_PANE_ITEM},
 											{Form.ROD_BLOCK, YItems.PARAM_ROD_BLOCK_ITEM},
 //											{Form.BUDDING, YItems.PARAM_BUDDING_BLOCK_ITEM},
 //											{Form.BUD_SMALL, YItems.PARAM_BUD_SMALL_ITEM},

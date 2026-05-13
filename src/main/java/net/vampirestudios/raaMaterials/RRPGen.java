@@ -3,6 +3,7 @@ package net.vampirestudios.raaMaterials;
 
 import net.vampirestudios.arrp.api.RRPCallback;
 import net.vampirestudios.arrp.api.RuntimeResourcePack;
+import net.vampirestudios.raaMaterials.recipe.RRPRecipes;
 
 public final class RRPGen {
     public static final RuntimeResourcePack PACK = RuntimeResourcePack.create("raa_materials:runtime");
@@ -12,7 +13,8 @@ public final class RRPGen {
 		if (initialized) return;
 		initialized = true;
 		ARRPGenerationHelper.generateParametricBlockLootTables(PACK);
-		ARRPGenerationHelper.generateParametricRecipes(PACK);
+//		ARRPGenerationHelper.generateParametricRecipes(PACK);
+		RRPRecipes.recipes(PACK);
 		RRPCallback.AFTER_VANILLA.register(a -> a.add(PACK));
 	}
 }

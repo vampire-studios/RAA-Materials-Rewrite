@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import static net.vampirestudios.raaMaterials.client.MaterialTexturePickers.*;
@@ -480,7 +481,7 @@ public final class MaterialAssetBuilders {
         buildTrapdoorFamily(ctx, RAAMaterials.id("material_trapdoor_wood"), "block/material_trapdoor_wood/");
         buildFenceFamily(ctx, RAAMaterials.id("material_fence"), "block/material_fence/");
         buildFenceGateFamily(ctx, RAAMaterials.id("material_fence_gate"), "block/material_fence_gate/");
-        buildChainFamily(ctx, RAAMaterials.id("material_chain"), "block/material_chain/");
+        buildChainFamily(ctx, RAAMaterials.id("material_chain"));
         buildLanternFamily(ctx, RAAMaterials.id("material_lantern"), "block/material_lantern/");
         buildBarsFamily(ctx, RAAMaterials.id("material_bars"), "block/material_bars/");
         buildGrateFamily(ctx, RAAMaterials.id("material_grate"), "block/material_grate/");
@@ -1494,7 +1495,7 @@ public final class MaterialAssetBuilders {
 
         ctx.forEachMaterialWith(Form.DOOR, (idx, def) -> {
             var bottomTexture = pickDecorTexture(Form.DOOR, def, idx);
-            var topTexture = textures(def).decorTextures().doorTop().orElseGet(() -> pairedDoorTopTexture(bottomTexture));
+            var topTexture = pickDoorTopTexture(def, bottomTexture, idx);
             var itemTexture = textures(def).decorTextures().doorItem().orElse(bottomTexture);
             var path = def.nameInformation().id().getPath();
             var itemModel = RAAMaterials.id(modelPrefix + path + "_item");
@@ -1609,29 +1610,41 @@ public final class MaterialAssetBuilders {
         ctx.pack().addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
     }
 
-    private static void buildChainFamily(MaterialAssetContext ctx, Identifier sharedBlockId, String modelPrefix) {
+    private static void buildChainFamily(MaterialAssetContext ctx, Identifier sharedBlockId) {
         var select = JItemModel.select().property(MAT_COMP);
         var variant = JState.variant();
-        int cases = 0;
+        AtomicInteger cases = new AtomicInteger();
 
         ctx.forEachMaterialWith(Form.CHAIN, (idx, def) -> {
-            var modelId = RAAMaterials.id(modelPrefix + def.nameInformation().id().getPath());
-            ctx.pack().addModel(JModel.model("raa_materials:block/raa_chain")
-                    .textures(JModel.textures().var("texture", blockTexture(pickDecorTexture(Form.CHAIN, def, idx)))), modelId);
+            var modelId = RAAMaterials.id("block/material_chain/" + def.nameInformation().id().getPath());
+            var itemModelId = RAAMaterials.id("item/material_chain/" + def.nameInformation().id().getPath());
+
+            ctx.pack().addModel(
+                    JModel.model("raa_materials:block/raa_chain")
+                            .textures(JModel.textures()
+                                    .var("texture", blockTexture(pickDecorTexture(Form.CHAIN, def, idx)))),
+                    modelId
+            );
+
+            ctx.pack().addModel(
+                    JModel.model("minecraft:item/generated")
+                            .textures(JModel.textures()
+                                    .layer0(RAAMaterials.id("item/chain").toString())),
+                    itemModelId
+            );
 
             variant.put(Map.of("mat", idx, "axis", "y"), JState.model(modelId));
             variant.put(Map.of("mat", idx, "axis", "x"), JState.model(modelId).x(90).y(90));
             variant.put(Map.of("mat", idx, "axis", "z"), JState.model(modelId).x(90));
+
             select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(modelId, def)));
+            cases.getAndIncrement();
         });
 
-        for (MaterialDef def : ctx.materials()) {
-            if (ctx.has(def, Form.CHAIN)) cases++;
-        }
-
-        if (cases == 0) return;
+        if (cases.get() == 0) return;
 
         ctx.pack().addBlockState(JState.state(variant), sharedBlockId);
+
         select.fallback(JModelBasic.of("minecraft:block/iron_chain"));
         ctx.pack().addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
     }
@@ -2169,14 +2182,32 @@ public final class MaterialAssetBuilders {
         return texture.orElseGet(() -> pickFormTexture(form, def, idx));
     }
 
+    private static Identifier pickDoorTopTexture(MaterialDef def, Identifier bottomTexture, int idx) {
+        return textures(def).decorTextures().doorTop()
+                .orElseGet(() -> {
+                    Identifier picked = pickFormTexture(Form.DOOR, def, idx);
+                    Identifier paired = pairedDoorTopTexture(picked);
+                    return paired.equals(picked) ? pairedDoorTopTexture(bottomTexture) : paired;
+                });
+    }
+
     private static Identifier pairedDoorTopTexture(Identifier bottomTexture) {
         String path = bottomTexture.getPath();
-        if (path.endsWith("_bottom")) {
-            return Identifier.fromNamespaceAndPath(bottomTexture.getNamespace(), path.substring(0, path.length() - "_bottom".length()) + "_top");
+
+        if (path.contains("_bottom")) {
+            return Identifier.fromNamespaceAndPath(
+                    bottomTexture.getNamespace(),
+                    path.replace("_bottom", "_top")
+            );
         }
-        if (path.endsWith("bottom")) {
-            return Identifier.fromNamespaceAndPath(bottomTexture.getNamespace(), path.substring(0, path.length() - "bottom".length()) + "top");
+
+        if (path.contains("/bottom")) {
+            return Identifier.fromNamespaceAndPath(
+                    bottomTexture.getNamespace(),
+                    path.replace("/bottom", "/top")
+            );
         }
+
         return bottomTexture;
     }
 

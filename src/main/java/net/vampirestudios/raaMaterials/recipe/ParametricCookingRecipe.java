@@ -16,6 +16,7 @@ import net.minecraft.world.level.Level;
 import net.vampirestudios.raaMaterials.material.Form;
 import net.vampirestudios.raaMaterials.material.MaterialKind;
 import net.vampirestudios.raaMaterials.registry.YItems;
+import org.jspecify.annotations.NonNull;
 
 public final class ParametricCookingRecipe extends AbstractCookingRecipe {
 	private final Kind kind;
@@ -33,7 +34,7 @@ public final class ParametricCookingRecipe extends AbstractCookingRecipe {
 	}
 
 	@Override
-	public boolean matches(SingleRecipeInput input, Level level) {
+	public boolean matches(SingleRecipeInput input, @NonNull Level level) {
 		var stack = input.item();
 		if (stack.isEmpty() || !stack.is(kind.input())) return false;
 		var material = ParametricRecipeUtil.material(stack);
@@ -44,14 +45,14 @@ public final class ParametricCookingRecipe extends AbstractCookingRecipe {
 	}
 
 	@Override
-	public ItemStack assemble(SingleRecipeInput input) {
+	public @NonNull ItemStack assemble(SingleRecipeInput input) {
 		return ParametricRecipeUtil.material(input.item())
 				.map(material -> ParametricRecipeUtil.stack(kind.output(), material, 1))
 				.orElse(ItemStack.EMPTY);
 	}
 
 	@Override
-	public RecipeSerializer<? extends AbstractCookingRecipe> getSerializer() {
+	public @NonNull RecipeSerializer<? extends AbstractCookingRecipe> getSerializer() {
 		return switch (kind) {
 			case SMELT_ORE_TO_INGOT -> ParametricRecipes.SMELT_ORE_TO_INGOT;
 			case BLAST_ORE_TO_INGOT -> ParametricRecipes.BLAST_ORE_TO_INGOT;
@@ -62,17 +63,17 @@ public final class ParametricCookingRecipe extends AbstractCookingRecipe {
 	}
 
 	@Override
-	public RecipeType<? extends AbstractCookingRecipe> getType() {
+	public @NonNull RecipeType<? extends AbstractCookingRecipe> getType() {
 		return kind.blasting ? RecipeType.BLASTING : RecipeType.SMELTING;
 	}
 
 	@Override
-	public RecipeBookCategory recipeBookCategory() {
+	public @NonNull RecipeBookCategory recipeBookCategory() {
 		return kind.blasting ? RecipeBookCategories.BLAST_FURNACE_MISC : RecipeBookCategories.FURNACE_MISC;
 	}
 
 	@Override
-	protected Item furnaceIcon() {
+	protected @NonNull Item furnaceIcon() {
 		return kind.blasting ? Items.BLAST_FURNACE : Items.FURNACE;
 	}
 
