@@ -223,8 +223,7 @@ public final class MaterialGenerator {
 	);
 
 	private static final List<Form> METAL_PARTS = List.of(
-			INGOT, SHEET, GEAR, ROD, WIRE, COIL,
-			RIVET, BOLT, NAIL, RING
+			INGOT, SHEET, GEAR, RING
 	);
 
 	private static final List<Form> METAL_DECOR_BLOCKS = List.of(

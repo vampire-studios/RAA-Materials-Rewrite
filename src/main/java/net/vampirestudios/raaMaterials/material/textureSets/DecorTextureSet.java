@@ -12,6 +12,7 @@ import java.util.Optional;
 public record DecorTextureSet(
 		Optional<Identifier> chain,
 		Optional<Identifier> lantern,
+		Optional<Identifier> lanternLight,
 		Optional<Identifier> doorItem,
 		Optional<Identifier> doorBottom,
 		Optional<Identifier> doorTop,
@@ -27,12 +28,14 @@ public record DecorTextureSet(
 			Optional.empty(),
 			Optional.empty(),
 			Optional.empty(),
+			Optional.empty(),
 			Optional.empty()
 	);
 
 	public static final Codec<DecorTextureSet> CODEC = RecordCodecBuilder.create(i -> i.group(
 			Identifier.CODEC.optionalFieldOf("chain").forGetter(DecorTextureSet::chain),
 			Identifier.CODEC.optionalFieldOf("lantern").forGetter(DecorTextureSet::lantern),
+			Identifier.CODEC.optionalFieldOf("lantern_light").forGetter(DecorTextureSet::lanternLight),
 			Identifier.CODEC.optionalFieldOf("door_item").forGetter(DecorTextureSet::doorItem),
 			Identifier.CODEC.optionalFieldOf("door_bottom").forGetter(DecorTextureSet::doorBottom),
 			Identifier.CODEC.optionalFieldOf("door_top").forGetter(DecorTextureSet::doorTop),
@@ -44,6 +47,7 @@ public record DecorTextureSet(
 	public static final StreamCodec<ByteBuf, DecorTextureSet> STREAM_CODEC = StreamCodec.composite(
 			ByteBufCodecs.optional(Identifier.STREAM_CODEC), DecorTextureSet::chain,
 			ByteBufCodecs.optional(Identifier.STREAM_CODEC), DecorTextureSet::lantern,
+			ByteBufCodecs.optional(Identifier.STREAM_CODEC), DecorTextureSet::lanternLight,
 			ByteBufCodecs.optional(Identifier.STREAM_CODEC), DecorTextureSet::doorItem,
 			ByteBufCodecs.optional(Identifier.STREAM_CODEC), DecorTextureSet::doorBottom,
 			ByteBufCodecs.optional(Identifier.STREAM_CODEC), DecorTextureSet::doorTop,

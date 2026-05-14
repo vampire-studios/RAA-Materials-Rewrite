@@ -120,7 +120,7 @@ public final class MaterialAssetBuilders {
             RAAMaterials.id("material_pressure_plate_metal"),
             RAAMaterials.id("material_pressure_plate_stone"),
             RAAMaterials.id("material_pressure_plate_wood"),
-            RAAMaterials.id("material_crystal_pane"),
+            RAAMaterials.id("material_pane"),
             RAAMaterials.id("material_rod_block"),
             RAAMaterials.id("material_cobbled"),
             RAAMaterials.id("material_bricks"),
@@ -530,8 +530,7 @@ public final class MaterialAssetBuilders {
 
         buildPaneFamily(
                 ctx,
-                RAAMaterials.id("material_crystal_pane"),
-                "block/material_crystal_pane/",
+                RAAMaterials.id("material_pane"),
                 idx -> textures(ctx.materials().get(idx)).crystalTextures().crystalGlass()
                         .orElse(RAAMaterials.id("crystal/crystal_glass"))
         );
@@ -1022,6 +1021,11 @@ public final class MaterialAssetBuilders {
         var variant = JState.variant();
         int cases = 0;
 
+        BlockstateTemplates.addSlab(variant, Map.of("mat", 0),
+                JState.model(Identifier.withDefaultNamespace("block/stone_slab")),
+                JState.model(Identifier.withDefaultNamespace("block/stone_slab_top")),
+                JState.model(Identifier.withDefaultNamespace("block/stone")));
+
         for (int idx = 0; idx < ctx.materials().size(); idx++) {
             var def = ctx.materials().get(idx);
 
@@ -1057,6 +1061,11 @@ public final class MaterialAssetBuilders {
         var variant = JState.variant();
         int cases = 0;
 
+        addStairVariants(variant, 0,
+                Identifier.withDefaultNamespace("block/stone_stairs"),
+                Identifier.withDefaultNamespace("block/stone_stairs_inner"),
+                Identifier.withDefaultNamespace("block/stone_stairs_outer"));
+
         for (int idx = 0; idx < ctx.materials().size(); idx++) {
             var def = ctx.materials().get(idx);
 
@@ -1083,7 +1092,7 @@ public final class MaterialAssetBuilders {
         }
 
         ctx.pack().addBlockState(JState.state(variant), sharedStairsId);
-        select.fallback(JModelBasic.of("minecraft:block/stone"));
+        select.fallback(JModelBasic.of("minecraft:block/stone_stairs"));
         ctx.pack().addItemModelInfo(new JItemInfo().model(select), sharedStairsId);
     }
 
@@ -1128,6 +1137,11 @@ public final class MaterialAssetBuilders {
         var variant = JState.variant();
         int cases = 0;
 
+        BlockstateTemplates.addSlab(variant, Map.of("mat", 0),
+                JState.model(Identifier.withDefaultNamespace("block/stone_slab")),
+                JState.model(Identifier.withDefaultNamespace("block/stone_slab_top")),
+                JState.model(Identifier.withDefaultNamespace("block/stone")));
+
         for (int idx = 0; idx < ctx.materials().size(); idx++) {
             var def = ctx.materials().get(idx);
             if (!ctx.has(def, Form.SLAB) || !ctx.has(def, sourceForm)) continue;
@@ -1155,6 +1169,11 @@ public final class MaterialAssetBuilders {
         var select = JItemModel.select().property(MAT_COMP);
         var variant = JState.variant();
         int cases = 0;
+
+        addStairVariants(variant, 0,
+                Identifier.withDefaultNamespace("block/stone_stairs"),
+                Identifier.withDefaultNamespace("block/stone_stairs_inner"),
+                Identifier.withDefaultNamespace("block/stone_stairs_outer"));
 
         for (int idx = 0; idx < ctx.materials().size(); idx++) {
             var def = ctx.materials().get(idx);
@@ -1213,6 +1232,11 @@ public final class MaterialAssetBuilders {
         var variant = JState.variant();
         int cases = 0;
 
+        BlockstateTemplates.addSlab(variant, Map.of("mat", 0),
+                JState.model(Identifier.withDefaultNamespace("block/sandstone_slab")),
+                JState.model(Identifier.withDefaultNamespace("block/sandstone_slab_top")),
+                JState.model(Identifier.withDefaultNamespace("block/sandstone")));
+
         for (int idx = 0; idx < ctx.materials().size(); idx++) {
             var def = ctx.materials().get(idx);
             if (!ctx.has(def, Form.SLAB) || !ctx.has(def, Form.SANDSTONE)) continue;
@@ -1240,6 +1264,11 @@ public final class MaterialAssetBuilders {
         var select = JItemModel.select().property(MAT_COMP);
         var variant = JState.variant();
         int cases = 0;
+
+        addStairVariants(variant, 0,
+                Identifier.withDefaultNamespace("block/sandstone_stairs"),
+                Identifier.withDefaultNamespace("block/sandstone_stairs_inner"),
+                Identifier.withDefaultNamespace("block/sandstone_stairs_outer"));
 
         for (int idx = 0; idx < ctx.materials().size(); idx++) {
             var def = ctx.materials().get(idx);
@@ -1615,29 +1644,30 @@ public final class MaterialAssetBuilders {
         var variant = JState.variant();
         AtomicInteger cases = new AtomicInteger();
 
+        var sharedChainItemModelId = RAAMaterials.id("item/chain");
+        ctx.pack().addModel(
+                JModel.model("minecraft:item/generated")
+                        .textures(JModel.textures()
+                                .layer0("raa_materials:item/chain")),
+                sharedChainItemModelId
+        );
+
         ctx.forEachMaterialWith(Form.CHAIN, (idx, def) -> {
+            var chainTex = blockTexture(pickDecorTexture(Form.CHAIN, def, idx));
             var modelId = RAAMaterials.id("block/material_chain/" + def.nameInformation().id().getPath());
-            var itemModelId = RAAMaterials.id("item/material_chain/" + def.nameInformation().id().getPath());
 
             ctx.pack().addModel(
                     JModel.model("raa_materials:block/raa_chain")
                             .textures(JModel.textures()
-                                    .var("texture", blockTexture(pickDecorTexture(Form.CHAIN, def, idx)))),
+                                    .var("texture", chainTex)),
                     modelId
-            );
-
-            ctx.pack().addModel(
-                    JModel.model("minecraft:item/generated")
-                            .textures(JModel.textures()
-                                    .layer0(RAAMaterials.id("item/chain").toString())),
-                    itemModelId
             );
 
             variant.put(Map.of("mat", idx, "axis", "y"), JState.model(modelId));
             variant.put(Map.of("mat", idx, "axis", "x"), JState.model(modelId).x(90).y(90));
             variant.put(Map.of("mat", idx, "axis", "z"), JState.model(modelId).x(90));
 
-            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(modelId, def)));
+            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(sharedChainItemModelId, def)));
             cases.getAndIncrement();
         });
 
@@ -1645,7 +1675,7 @@ public final class MaterialAssetBuilders {
 
         ctx.pack().addBlockState(JState.state(variant), sharedBlockId);
 
-        select.fallback(JModelBasic.of("minecraft:block/iron_chain"));
+        select.fallback(JModelBasic.of("minecraft:item/chain"));
         ctx.pack().addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
     }
 
@@ -1656,17 +1686,28 @@ public final class MaterialAssetBuilders {
 
         ctx.forEachMaterialWith(Form.LANTERN, (idx, def) -> {
             var tex = blockTexture(pickDecorTexture(Form.LANTERN, def, idx));
+            var lightTex = textures(def).decorTextures().lanternLight()
+                    .map(MaterialAssetBuilders::blockTexture)
+                    .orElse(tex);
             var base = RAAMaterials.id(modelPrefix + def.nameInformation().id().getPath());
             var hanging = RAAMaterials.id(modelPrefix + def.nameInformation().id().getPath() + "_hanging");
+            var itemModelId = RAAMaterials.id("item/material_lantern/" + def.nameInformation().id().getPath());
 
             ctx.pack().addModel(JModel.model("raa_materials:block/raa_lantern")
-                    .textures(JModel.textures().var("lantern", tex)), base);
+                    .textures(JModel.textures().var("lantern", tex).var("light", lightTex)), base);
             ctx.pack().addModel(JModel.model("raa_materials:block/raa_hanging_lantern")
-                    .textures(JModel.textures().var("lantern", tex)), hanging);
+                    .textures(JModel.textures().var("lantern", tex).var("light", lightTex)), hanging);
+            ctx.pack().addModel(JModel.model("minecraft:item/generated")
+                    .textures(JModel.textures()
+                            .layer0(itemTexture(pickDecorTexture(Form.LANTERN, def, idx)))
+                            .layer1(textures(def).decorTextures().lanternLight()
+                                    .map(MaterialAssetBuilders::itemTexture)
+                                    .orElseGet(() -> itemTexture(pickDecorTexture(Form.LANTERN, def, idx))))),
+                    itemModelId);
 
             variant.put(Map.of("mat", idx, "hanging", "false"), JState.model(base));
             variant.put(Map.of("mat", idx, "hanging", "true"), JState.model(hanging));
-            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(base, def)));
+            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(itemModelId, def)));
         });
 
         for (MaterialDef def : ctx.materials()) {
@@ -1676,15 +1717,14 @@ public final class MaterialAssetBuilders {
         if (cases == 0) return;
 
         ctx.pack().addBlockState(JState.state(variant), sharedBlockId);
-        select.fallback(JModelBasic.of("minecraft:block/lantern"));
+        select.fallback(JModelBasic.of("minecraft:item/lantern"));
         ctx.pack().addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
     }
 
     private static void buildPaneFamily(
             MaterialAssetContext ctx,
             Identifier sharedBlockId,
-            String modelPrefix,
-            MaterialTexturePickers.TexPicker texture
+            TexPicker texture
     ) {
         var select = JItemModel.select().property(MAT_COMP);
         var state = JState.state();
@@ -1694,11 +1734,18 @@ public final class MaterialAssetBuilders {
             var tex = blockTexture(texture.pick(idx));
             var path = def.nameInformation().id().getPath();
 
-            var post = RAAMaterials.id(modelPrefix + path + "_post");
-            var side = RAAMaterials.id(modelPrefix + path + "_side");
-            var sideAlt = RAAMaterials.id(modelPrefix + path + "_side_alt");
-            var noSide = RAAMaterials.id(modelPrefix + path + "_noside");
-            var noSideAlt = RAAMaterials.id(modelPrefix + path + "_noside_alt");
+            var post = RAAMaterials.id("block/material_pane/" + path + "_post");
+            var side = RAAMaterials.id("block/material_pane/" + path + "_side");
+            var sideAlt = RAAMaterials.id("block/material_pane/" + path + "_side_alt");
+            var noSide = RAAMaterials.id("block/material_pane/" + path + "_noside");
+            var noSideAlt = RAAMaterials.id("block/material_pane/" + path + "_noside_alt");
+            var itemModelId = RAAMaterials.id("item/material_pane/" + path);
+
+            ctx.pack().addModel(
+                    JModel.model("minecraft:item/generated")
+                            .textures(JModel.textures().layer0(tex)),
+                    itemModelId
+            );
 
             ctx.pack().addModel(JModel.model("raa_materials:block/raa_glass_pane_post")
                     .textures(JModel.textures().var("pane", tex)), post);
@@ -1721,7 +1768,7 @@ public final class MaterialAssetBuilders {
             state.add(JState.multipart(JState.model(noSideAlt).y(90)).when(Map.of("mat", idx, "south", "false")));
             state.add(JState.multipart(JState.model(noSide).y(270)).when(Map.of("mat", idx, "west", "false")));
 
-            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(post, def)));
+            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(itemModelId, def)));
         });
 
         for (MaterialDef def : ctx.materials()) {
@@ -1747,19 +1794,30 @@ public final class MaterialAssetBuilders {
         ctx.forEachMaterialWith(Form.BARS, (idx, def) -> {
             var tex = blockTexture(pickFormTexture(Form.BARS, def, idx));
             var path = def.nameInformation().id().getPath();
-            var post = RAAMaterials.id(modelPrefix + path + "_post");
+            var postEnds = RAAMaterials.id(modelPrefix + path + "_post");
+            var post = RAAMaterials.id(modelPrefix + path + "_post_ends");
             var side = RAAMaterials.id(modelPrefix + path + "_side");
             var sideAlt = RAAMaterials.id(modelPrefix + path + "_side_alt");
             var cap = RAAMaterials.id(modelPrefix + path + "_cap");
             var capAlt = RAAMaterials.id(modelPrefix + path + "_cap_alt");
+            var itemModelId = RAAMaterials.id("item/material_bars/" + path);
 
             ctx.pack().addModel(JModel.model("raa_materials:block/raa_iron_bars_post").textures(JModel.textures().var("bars", tex)), post);
+            ctx.pack().addModel(JModel.model("raa_materials:block/raa_iron_bars_post_ends").textures(JModel.textures().var("bars", tex)), postEnds);
             ctx.pack().addModel(JModel.model("raa_materials:block/raa_iron_bars_side").textures(JModel.textures().var("bars", tex)), side);
             ctx.pack().addModel(JModel.model("raa_materials:block/raa_iron_bars_side_alt").textures(JModel.textures().var("bars", tex)), sideAlt);
             ctx.pack().addModel(JModel.model("raa_materials:block/raa_iron_bars_cap").textures(JModel.textures().var("bars", tex)), cap);
             ctx.pack().addModel(JModel.model("raa_materials:block/raa_iron_bars_cap_alt").textures(JModel.textures().var("bars", tex)), capAlt);
 
-            state.add(JState.multipart(JState.model(post)).when(Map.of("mat", idx)));
+            // Flat 2D icon (like vanilla iron_bars) using the bars block texture
+            ctx.pack().addModel(
+                    JModel.model("minecraft:item/generated")
+                            .textures(JModel.textures().layer0(tex)),
+                    itemModelId
+            );
+
+            state.add(JState.multipart(JState.model(postEnds)).when(Map.of("mat", idx)));
+            state.add(JState.multipart(JState.model(post)).when(Map.of("mat", idx, "north", "false", "south", "false", "east", "false", "west", "false")));
             state.add(JState.multipart(JState.model(side)).when(Map.of("mat", idx, "north", "true")));
             state.add(JState.multipart(JState.model(side).y(90)).when(Map.of("mat", idx, "east", "true")));
             state.add(JState.multipart(JState.model(sideAlt)).when(Map.of("mat", idx, "south", "true")));
@@ -1769,7 +1827,7 @@ public final class MaterialAssetBuilders {
             state.add(JState.multipart(JState.model(capAlt).y(90)).when(Map.of("mat", idx, "south", "false")));
             state.add(JState.multipart(JState.model(cap).y(270)).when(Map.of("mat", idx, "west", "false")));
 
-            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(post, def)));
+            select.addCase(JSelectCase.of(def.nameInformation().id().toString(), tintedModel(itemModelId, def)));
         });
 
         for (MaterialDef def : ctx.materials()) {
@@ -1779,7 +1837,7 @@ public final class MaterialAssetBuilders {
         if (cases == 0) return;
 
         ctx.pack().addBlockState(state, sharedBlockId);
-        select.fallback(JModelBasic.of("minecraft:block/iron_bars_post"));
+        select.fallback(JModelBasic.of("minecraft:item/iron_bars"));
         ctx.pack().addItemModelInfo(new JItemInfo().model(select), sharedBlockId);
     }
 

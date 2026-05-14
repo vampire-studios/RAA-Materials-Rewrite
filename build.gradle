@@ -42,7 +42,7 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     implementation "net.fabricmc:fabric-loader:${project.loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    implementation(include("net.vampirestudios:arrp:0.13.0+build.3"))
+    implementation(include("net.vampirestudios:arrp:0.13.0+build.4"))
     implementation "dev.isxander:yet-another-config-lib:${project.yacl_version}"
     implementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 }

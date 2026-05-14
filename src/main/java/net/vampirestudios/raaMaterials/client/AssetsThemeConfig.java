@@ -41,6 +41,9 @@ public final class AssetsThemeConfig {
 	public static final int METAL_DOOR_COUNT     = 3;
 	public static final int METAL_TRAPDOOR_COUNT = 3;
 
+	// Lantern light glow variants.
+	public static final int LANTERN_LIGHT_COUNT  = 4;
+
 	// Crystal lamp overlay variants.
 	public static final int LAMP_OVERLAY_COUNT   = 4;
 
@@ -193,6 +196,7 @@ public final class AssetsThemeConfig {
 		fallbacks.put(AssetsTheme.Slot.BOLT_ITEM, List.of(id("parts/bolt")));
 		fallbacks.put(AssetsTheme.Slot.NAIL_ITEM, List.of(id("nail")));
 		fallbacks.put(AssetsTheme.Slot.RING_ITEM, List.of(id("ring")));
+		global.put(AssetsTheme.Slot.LANTERN_LIGHT, numbered("decor/lantern_light_", LANTERN_LIGHT_COUNT));
 		fallbacks.put(AssetsTheme.Slot.DOOR_ITEM_METAL, List.of(id("decor/metal_door")));
 		fallbacks.put(AssetsTheme.Slot.DOOR_ITEM_WOOD, List.of(id("decor/door")));
 		fallbacks.put(AssetsTheme.Slot.STONE_DEFAULT, List.of(withDefaultNamespace("block/stone")));
@@ -238,17 +242,15 @@ public final class AssetsThemeConfig {
 		globalForm.put(Form.FENCE, List.of(id("decor/planks")));
 		globalForm.put(Form.FENCE_GATE, List.of(id("decor/planks")));
 		var metalForms = new EnumMap<Form, List<Identifier>>(Form.class);
-		metalForms.put(Form.BARS,     numbered("metal/metal_bars_", METAL_BARS_COUNT));
+		metalForms.put(Form.BARS,     List.of(id("metal/metal_bars_1")));
 		metalForms.put(Form.GRATE,    List.of(id("metal/grate")));
-		metalForms.put(Form.CHAIN,    numbered("metal/metal_chains_", METAL_CHAINS_COUNT));
 		metalForms.put(Form.DOOR,     numbered("decor/metal_door_bottom_", METAL_DOOR_COUNT));
 		metalForms.put(Form.TRAPDOOR, numbered("decor/metal_trapdoor_", METAL_TRAPDOOR_COUNT));
 		perKindForm.put(MaterialKind.METAL, metalForms);
 
 		var alloyForms = new EnumMap<Form, List<Identifier>>(Form.class);
-		alloyForms.put(Form.BARS,     numbered("metal/metal_bars_", METAL_BARS_COUNT));
+		alloyForms.put(Form.BARS,     List.of(id("metal/metal_bars_1")));
 		alloyForms.put(Form.GRATE,    List.of(id("metal/grate")));
-		alloyForms.put(Form.CHAIN,    numbered("metal/metal_chains_", METAL_CHAINS_COUNT));
 		alloyForms.put(Form.DOOR,     numbered("decor/metal_door_bottom_", METAL_DOOR_COUNT));
 		alloyForms.put(Form.TRAPDOOR, numbered("decor/metal_trapdoor_", METAL_TRAPDOOR_COUNT));
 		perKindForm.put(MaterialKind.ALLOY, alloyForms);
@@ -321,6 +323,8 @@ public final class AssetsThemeConfig {
 		fallbacks.remove(AssetsTheme.Slot.LAMP_OVERLAY_1); // was a fallback in older configs
 		global.putIfAbsent(AssetsTheme.Slot.LAMP_OVERLAY_1, numbered("crystal/lamp_overlay", LAMP_OVERLAY_COUNT));
 
+		global.putIfAbsent(AssetsTheme.Slot.LANTERN_LIGHT, numbered("decor/lantern_light_", LANTERN_LIGHT_COUNT));
+
 		// Migrate old hammer fallbacks that reused axe textures
 		replaceIfEquals(fallbacks, AssetsTheme.Slot.HAMMER_HEAD,
 				List.of(id("tools/axe/axe_head_1")), List.of(id("tools/hammer_head")));
@@ -367,15 +371,17 @@ public final class AssetsThemeConfig {
 
 	private static void migrateMetalDecor(Map<MaterialKind, Map<Form, List<Identifier>>> perKindForm, MaterialKind kind) {
 		var forms = perKindForm.computeIfAbsent(kind, ignored -> new EnumMap<>(Form.class));
-		// Migrate old single-file bars → numbered pool
 		replaceIfEquals(forms, Form.BARS,
-				List.of(id("metal/metal_bars")), numbered("metal/metal_bars_", METAL_BARS_COUNT));
-		forms.putIfAbsent(Form.BARS, numbered("metal/metal_bars_", METAL_BARS_COUNT));
+				List.of(id("metal/metal_bars")), List.of(id("metal/metal_bars_1")));
+		replaceIfEquals(forms, Form.BARS,
+				numbered("metal/metal_bars_", METAL_BARS_COUNT), List.of(id("metal/metal_bars_1")));
+		forms.putIfAbsent(Form.BARS, List.of(id("metal/metal_bars_1")));
 		forms.putIfAbsent(Form.GRATE, List.of(id("metal/grate")));
-		// Migrate old single-file chain → numbered pool
+		// Migrate old metal chain textures → decor pool
 		replaceIfEquals(forms, Form.CHAIN,
-				List.of(id("metal/metal_chains")), numbered("metal/metal_chains_", METAL_CHAINS_COUNT));
-		forms.putIfAbsent(Form.CHAIN, numbered("metal/metal_chains_", METAL_CHAINS_COUNT));
+				List.of(id("metal/metal_chains")), numbered("decor/chain_", METAL_CHAINS_COUNT));
+		replaceIfEquals(forms, Form.CHAIN,
+				numbered("metal/metal_chains_", METAL_CHAINS_COUNT), numbered("decor/chain_", METAL_CHAINS_COUNT));
 		replaceIfEquals(forms, Form.DOOR,
 				List.of(withDefaultNamespace("block/iron_door_bottom")), List.of(id("decor/door_bottom")));
 		replaceIfEquals(forms, Form.DOOR,

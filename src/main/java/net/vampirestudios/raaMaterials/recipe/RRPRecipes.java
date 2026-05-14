@@ -13,7 +13,6 @@ import net.vampirestudios.raaMaterials.material.MaterialDef;
 import net.vampirestudios.raaMaterials.material.MaterialKind;
 import net.vampirestudios.raaMaterials.registry.YItems;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -65,6 +64,36 @@ public class RRPRecipes {
 				addShapelessComponentRecipe(pack, "raw_from_raw_block/" + id, "misc",
 						List.of(componentIngredient(YItems.PARAM_RAW_BLOCK_ITEM, mat)),
 						YItems.PARAM_RAW, mat, 9
+				);
+			}
+
+			if (isGem(def) && has(def, Form.GEM, Form.BLOCK)) {
+				addShapedComponentRecipe(pack, "block_from_gems/" + id, "misc",
+						new String[]{"XXX", "XXX", "XXX"},
+						Map.of('X', componentIngredient(YItems.PARAM_GEM, mat)),
+						YItems.PARAM_BLOCK_ITEM, mat, 1
+				);
+			}
+
+			if (isGem(def) && has(def, Form.BLOCK, Form.GEM)) {
+				addShapelessComponentRecipe(pack, "gems_from_block/" + id, "misc",
+						List.of(componentIngredient(YItems.PARAM_BLOCK_ITEM, mat)),
+						YItems.PARAM_GEM, mat, 9
+				);
+			}
+
+			if (isCrystal(def) && has(def, Form.CRYSTAL, Form.BLOCK)) {
+				addShapedComponentRecipe(pack, "block_from_crystals/" + id, "misc",
+						new String[]{"XX", "XX"},
+						Map.of('X', componentIngredient(YItems.PARAM_CRYSTAL, mat)),
+						YItems.PARAM_CRYSTAL_BLOCK_ITEM, mat, 1
+				);
+			}
+
+			if (isCrystal(def) && has(def, Form.BLOCK, Form.CRYSTAL)) {
+				addShapelessComponentRecipe(pack, "crystals_from_block/" + id, "misc",
+						List.of(componentIngredient(YItems.PARAM_CRYSTAL_BLOCK_ITEM, mat)),
+						YItems.PARAM_CRYSTAL, mat, 4
 				);
 			}
 
@@ -251,6 +280,15 @@ public class RRPRecipes {
 				);
 			}
 
+			if (isMetal(def) && has(def, Form.SHEET, Form.INGOT)) {
+				addShapelessComponentRecipe(pack, "ingot_from_sheets/" + id, "misc",
+						List.of(componentIngredient(YItems.PARAM_SHEET, mat),
+								componentIngredient(YItems.PARAM_SHEET, mat),
+								componentIngredient(YItems.PARAM_SHEET, mat)),
+						YItems.PARAM_INGOT, mat, 1
+				);
+			}
+
 			if (isMetal(def) && has(def, Form.SHEET, Form.PLATE_BLOCK)) {
 				addShapedComponentRecipe(pack, "plate_block/" + id, "building",
 						new String[]{"XX", "XX"},
@@ -375,9 +413,9 @@ public class RRPRecipes {
 				);
 			}
 
-			if (isMetal(def) && has(def, Form.INGOT, Form.BUTTON)) {
+			if (isMetal(def) && has(def, Form.NUGGET, Form.BUTTON)) {
 				addShapelessComponentRecipe(pack, "metal_button/" + id, "redstone",
-						List.of(componentIngredient(YItems.PARAM_INGOT, mat)),
+						List.of(componentIngredient(YItems.PARAM_NUGGET, mat)),
 						YItems.PARAM_BUTTON_METAL_ITEM, mat, 1
 				);
 			}
@@ -408,36 +446,12 @@ public class RRPRecipes {
 
 			// ── Craft parts ──────────────────────────────────────────────────────────
 
-			if (isMetal(def) && has(def, Form.INGOT, Form.ROD)) {
-				addShapedComponentRecipe(pack, "rod_from_ingots/" + id, "misc",
-						new String[]{"X", "X"},
-						Map.of('X', componentIngredient(YItems.PARAM_INGOT, mat)),
-						YItems.PARAM_ROD, mat, 4
-				);
-			}
-
 			// 4 ingots in a cross → 1 gear (no nugget needed)
 			if (isMetal(def) && has(def, Form.INGOT, Form.GEAR)) {
 				addShapedComponentRecipe(pack, "gear_from_ingots/" + id, "misc",
 						new String[]{" X ", "X X", " X "},
 						Map.of('X', componentIngredient(YItems.PARAM_INGOT, mat)),
-						YItems.PARAM_GEAR, mat, 1
-				);
-			}
-
-			if (isMetal(def) && has(def, Form.ROD, Form.WIRE)) {
-				addShapedComponentRecipe(pack, "wire_from_rod/" + id, "misc",
-						new String[]{"XXX"},
-						Map.of('X', componentIngredient(YItems.PARAM_ROD, mat)),
-						YItems.PARAM_WIRE, mat, 4
-				);
-			}
-
-			if (isMetal(def) && has(def, Form.WIRE, Form.COIL)) {
-				addShapedComponentRecipe(pack, "coil_from_wire/" + id, "misc",
-						new String[]{"XX", "XX"},
-						Map.of('X', componentIngredient(YItems.PARAM_WIRE, mat)),
-						YItems.PARAM_COIL, mat, 1
+						YItems.PARAM_GEAR, mat, 2
 				);
 			}
 
@@ -447,34 +461,6 @@ public class RRPRecipes {
 						new String[]{" X ", "X X", " X "},
 						Map.of('X', componentIngredient(YItems.PARAM_NUGGET, mat)),
 						YItems.PARAM_RING, mat, 2
-				);
-			}
-
-			// 3 nuggets in a horizontal row → 6 rivets
-			if (isMetal(def) && has(def, Form.NUGGET, Form.RIVET)) {
-				addShapedComponentRecipe(pack, "rivet_from_nuggets/" + id, "misc",
-						new String[]{"XXX"},
-						Map.of('X', componentIngredient(YItems.PARAM_NUGGET, mat)),
-						YItems.PARAM_RIVET, mat, 6
-				);
-			}
-
-			// 3 nuggets in a column → 6 nails
-			if (isMetal(def) && has(def, Form.NUGGET, Form.NAIL)) {
-				addShapedComponentRecipe(pack, "nail_from_nuggets/" + id, "misc",
-						new String[]{"X", "X", "X"},
-						Map.of('X', componentIngredient(YItems.PARAM_NUGGET, mat)),
-						YItems.PARAM_NAIL, mat, 6
-				);
-			}
-
-			// nugget–ingot–nugget column → 4 bolts
-			if (isMetal(def) && has(def, Form.INGOT, Form.NUGGET, Form.BOLT)) {
-				addShapedComponentRecipe(pack, "bolt_from_ingots_and_nuggets/" + id, "misc",
-						new String[]{"X", "Y", "X"},
-						Map.of('X', componentIngredient(YItems.PARAM_NUGGET, mat),
-								'Y', componentIngredient(YItems.PARAM_INGOT, mat)),
-						YItems.PARAM_BOLT, mat, 4
 				);
 			}
 
@@ -535,15 +521,6 @@ public class RRPRecipes {
 				);
 			}
 
-			// 6 rods (2×3) → 1 rod block
-			if (isMetal(def) && has(def, Form.ROD, Form.ROD_BLOCK)) {
-				addShapedComponentRecipe(pack, "rod_block_from_rods/" + id, "building",
-						new String[]{"XX", "XX", "XX"},
-						Map.of('X', componentIngredient(YItems.PARAM_ROD, mat)),
-						YItems.PARAM_ROD_BLOCK_ITEM, mat, 1
-				);
-			}
-
 			// Block + vine → mossy variant (shapeless; vine is a vanilla item)
 			if (has(def, Form.BLOCK, Form.MOSSY)) {
 				addShapelessComponentRecipe(pack, "mossy_from_block/" + id, "building",
@@ -597,6 +574,147 @@ public class RRPRecipes {
 						Map.of('X', componentIngredient(YItems.PARAM_INGOT, mat)),
 						YItems.PARAM_WOLF_ARMOR_ITEM, mat, 1
 				);
+			}
+
+			// ── Stonecutting ─────────────────────────────────────────────────────
+
+			// Parametric system covers BLOCK→SLAB/STAIRS/WALL/POLISHED/BRICKS/CUT/CHISELED/PILLAR.
+			// These add secondary cuts from variant blocks.
+
+			if (has(def, Form.POLISHED, Form.SLAB)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/polished_slab/" + id,
+						YItems.PARAM_POLISHED_BLOCK_ITEM, mat, YItems.PARAM_POLISHED_SLAB_ITEM, 2);
+			}
+			if (has(def, Form.POLISHED, Form.STAIRS)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/polished_stairs/" + id,
+						YItems.PARAM_POLISHED_BLOCK_ITEM, mat, YItems.PARAM_POLISHED_STAIRS_ITEM, 1);
+			}
+			if (has(def, Form.POLISHED, Form.WALL)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/polished_wall/" + id,
+						YItems.PARAM_POLISHED_BLOCK_ITEM, mat, YItems.PARAM_POLISHED_WALL_ITEM, 1);
+			}
+			if (has(def, Form.POLISHED, Form.CHISELED)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/polished_chiseled/" + id,
+						YItems.PARAM_POLISHED_BLOCK_ITEM, mat, YItems.PARAM_CHISELED_BLOCK_ITEM, 1);
+			}
+			if (has(def, Form.POLISHED, Form.TILES)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/polished_tiles/" + id,
+						YItems.PARAM_POLISHED_BLOCK_ITEM, mat, YItems.PARAM_TILES_ITEM, 1);
+			}
+			if (has(def, Form.POLISHED, Form.SHINGLES)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/polished_shingles/" + id,
+						YItems.PARAM_POLISHED_BLOCK_ITEM, mat, YItems.PARAM_SHINGLES_BLOCK_ITEM, 1);
+			}
+			if (has(def, Form.POLISHED, Form.MOSAIC)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/polished_mosaic/" + id,
+						YItems.PARAM_POLISHED_BLOCK_ITEM, mat, YItems.PARAM_MOSAIC_ITEM, 1);
+			}
+
+			if (has(def, Form.BRICKS, Form.SLAB)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/brick_slab/" + id,
+						YItems.PARAM_BRICKS_BLOCK_ITEM, mat, YItems.PARAM_BRICK_SLAB_ITEM, 2);
+			}
+			if (has(def, Form.BRICKS, Form.STAIRS)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/brick_stairs/" + id,
+						YItems.PARAM_BRICKS_BLOCK_ITEM, mat, YItems.PARAM_BRICK_STAIRS_ITEM, 1);
+			}
+			if (has(def, Form.BRICKS, Form.WALL)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/brick_wall/" + id,
+						YItems.PARAM_BRICKS_BLOCK_ITEM, mat, YItems.PARAM_BRICK_WALL_ITEM, 1);
+			}
+			if (has(def, Form.BRICKS, Form.CHISELED)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/brick_chiseled/" + id,
+						YItems.PARAM_BRICKS_BLOCK_ITEM, mat, YItems.PARAM_CHISELED_BLOCK_ITEM, 1);
+			}
+			if (has(def, Form.BRICKS, Form.MOSAIC)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/brick_mosaic/" + id,
+						YItems.PARAM_BRICKS_BLOCK_ITEM, mat, YItems.PARAM_MOSAIC_ITEM, 1);
+			}
+
+			if (has(def, Form.SANDSTONE, Form.SLAB)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/sandstone_slab/" + id,
+						YItems.PARAM_SANDSTONE_BLOCK_ITEM, mat, YItems.PARAM_SANDSTONE_SLAB_ITEM, 2);
+			}
+			if (has(def, Form.SANDSTONE, Form.STAIRS)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/sandstone_stairs/" + id,
+						YItems.PARAM_SANDSTONE_BLOCK_ITEM, mat, YItems.PARAM_SANDSTONE_STAIRS_ITEM, 1);
+			}
+			if (has(def, Form.SANDSTONE, Form.WALL)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/sandstone_wall/" + id,
+						YItems.PARAM_SANDSTONE_BLOCK_ITEM, mat, YItems.PARAM_SANDSTONE_WALL_ITEM, 1);
+			}
+			if (has(def, Form.SANDSTONE, Form.CUT)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/sandstone_cut/" + id,
+						YItems.PARAM_SANDSTONE_BLOCK_ITEM, mat, YItems.PARAM_CUT_BLOCK_ITEM, 1);
+			}
+
+			if (has(def, Form.BLOCK, Form.TILES)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/tiles/" + id,
+						YItems.PARAM_BLOCK_ITEM, mat, YItems.PARAM_TILES_ITEM, 1);
+			}
+			if (has(def, Form.BLOCK, Form.MOSAIC)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/mosaic/" + id,
+						YItems.PARAM_BLOCK_ITEM, mat, YItems.PARAM_MOSAIC_ITEM, 1);
+			}
+			if (has(def, Form.BLOCK, Form.SHINGLES)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/shingles/" + id,
+						YItems.PARAM_BLOCK_ITEM, mat, YItems.PARAM_SHINGLES_BLOCK_ITEM, 1);
+			}
+			if (has(def, Form.TILES, Form.MOSAIC)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/mosaic_from_tiles/" + id,
+						YItems.PARAM_TILES_ITEM, mat, YItems.PARAM_MOSAIC_ITEM, 1);
+			}
+
+			// Raw block → polished variants (mirrors vanilla stone → polished stone slab etc.)
+			if (has(def, Form.BLOCK, Form.POLISHED, Form.SLAB)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/polished_slab_from_block/" + id,
+						YItems.PARAM_BLOCK_ITEM, mat, YItems.PARAM_POLISHED_SLAB_ITEM, 2);
+			}
+			if (has(def, Form.BLOCK, Form.POLISHED, Form.STAIRS)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/polished_stairs_from_block/" + id,
+						YItems.PARAM_BLOCK_ITEM, mat, YItems.PARAM_POLISHED_STAIRS_ITEM, 1);
+			}
+			if (has(def, Form.BLOCK, Form.POLISHED, Form.WALL)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/polished_wall_from_block/" + id,
+						YItems.PARAM_BLOCK_ITEM, mat, YItems.PARAM_POLISHED_WALL_ITEM, 1);
+			}
+			if (has(def, Form.BLOCK, Form.POLISHED, Form.CHISELED)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/polished_chiseled_from_block/" + id,
+						YItems.PARAM_BLOCK_ITEM, mat, YItems.PARAM_CHISELED_BLOCK_ITEM, 1);
+			}
+			if (has(def, Form.BLOCK, Form.POLISHED, Form.TILES)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/polished_tiles_from_block/" + id,
+						YItems.PARAM_BLOCK_ITEM, mat, YItems.PARAM_TILES_ITEM, 1);
+			}
+			if (has(def, Form.BLOCK, Form.POLISHED, Form.SHINGLES)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/polished_shingles_from_block/" + id,
+						YItems.PARAM_BLOCK_ITEM, mat, YItems.PARAM_SHINGLES_BLOCK_ITEM, 1);
+			}
+			if (has(def, Form.BLOCK, Form.POLISHED, Form.MOSAIC)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/polished_mosaic_from_block/" + id,
+						YItems.PARAM_BLOCK_ITEM, mat, YItems.PARAM_MOSAIC_ITEM, 1);
+			}
+
+			// Raw block → brick variants
+			if (has(def, Form.BLOCK, Form.BRICKS, Form.SLAB)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/brick_slab_from_block/" + id,
+						YItems.PARAM_BLOCK_ITEM, mat, YItems.PARAM_BRICK_SLAB_ITEM, 2);
+			}
+			if (has(def, Form.BLOCK, Form.BRICKS, Form.STAIRS)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/brick_stairs_from_block/" + id,
+						YItems.PARAM_BLOCK_ITEM, mat, YItems.PARAM_BRICK_STAIRS_ITEM, 1);
+			}
+			if (has(def, Form.BLOCK, Form.BRICKS, Form.WALL)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/brick_wall_from_block/" + id,
+						YItems.PARAM_BLOCK_ITEM, mat, YItems.PARAM_BRICK_WALL_ITEM, 1);
+			}
+			if (has(def, Form.BLOCK, Form.BRICKS, Form.CHISELED)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/brick_chiseled_from_block/" + id,
+						YItems.PARAM_BLOCK_ITEM, mat, YItems.PARAM_CHISELED_BLOCK_ITEM, 1);
+			}
+			if (has(def, Form.BLOCK, Form.BRICKS, Form.MOSAIC)) {
+				addStonecuttingComponentRecipe(pack, "stonecutting/brick_mosaic_from_block/" + id,
+						YItems.PARAM_BLOCK_ITEM, mat, YItems.PARAM_MOSAIC_ITEM, 1);
 			}
 		}
 	}
@@ -684,11 +802,23 @@ public class RRPRecipes {
 		jsonObject.addProperty("raa_materials:material", material.toString());
 	}
 
-	private static void writeRecipe(RuntimeResourcePack pack, String recipePath, JsonObject recipe) {
-		pack.addData(
-				RAAMaterials.id("recipe/" + recipePath + ".json"),
-				recipe.toString().getBytes(StandardCharsets.UTF_8)
+	private static void addStonecuttingComponentRecipe(
+			RuntimeResourcePack pack,
+			String recipePath,
+			Item input,
+			Identifier material,
+			Item output,
+			int count
+	) {
+		JStonecuttingRecipe recipe = JStonecuttingRecipe.stonecutting(
+				JIngredient.fabricComponents(
+						BuiltInRegistries.ITEM.getKey(input),
+						builder -> materialComponent(material, builder)
+				),
+				(JStackedResult) JStackedResult.stackedResult(BuiltInRegistries.ITEM.getKey(output), count)
+						.components(builder -> materialComponent(material, builder))
 		);
+		pack.addRecipe(RAAMaterials.id(recipePath), recipe);
 	}
 
 	private static boolean has(MaterialDef def, Form... forms) {

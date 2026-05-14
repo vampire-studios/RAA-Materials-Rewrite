@@ -93,11 +93,11 @@ public final class AssetsTheme {
 
 	private static Identifier pairedDoorTopTexture(Identifier bottomTexture) {
 		String path = bottomTexture.getPath();
-		if (path.endsWith("_bottom")) {
-			return Identifier.fromNamespaceAndPath(bottomTexture.getNamespace(), path.substring(0, path.length() - "_bottom".length()) + "_top");
+		if (path.contains("_bottom")) {
+			return Identifier.fromNamespaceAndPath(bottomTexture.getNamespace(), path.replace("_bottom", "_top"));
 		}
-		if (path.endsWith("bottom")) {
-			return Identifier.fromNamespaceAndPath(bottomTexture.getNamespace(), path.substring(0, path.length() - "bottom".length()) + "top");
+		if (path.contains("/bottom")) {
+			return Identifier.fromNamespaceAndPath(bottomTexture.getNamespace(), path.replace("/bottom", "/top"));
 		}
 		return bottomTexture;
 	}
@@ -255,6 +255,7 @@ public final class AssetsTheme {
 		var k = m.kind();
 		Optional<Identifier> chain = pickForm(k, Form.CHAIN, rnd);
 		Optional<Identifier> lantern = pickForm(k, Form.LANTERN, rnd);
+		Optional<Identifier> lanternLight = pick(k, Slot.LANTERN_LIGHT, rnd);
 		Optional<Identifier> doorItem = switch (k) {
 			case METAL, ALLOY -> pick(k, Slot.DOOR_ITEM_METAL, rnd);
 			case WOOD -> pick(k, Slot.DOOR_ITEM_WOOD, rnd);
@@ -266,7 +267,7 @@ public final class AssetsTheme {
 		Optional<Identifier> fence = pickForm(k, Form.FENCE, rnd);
 		Optional<Identifier> fenceGate = pickForm(k, Form.FENCE_GATE, rnd);
 
-		return new DecorTextureSet(chain, lantern, doorItem, doorBottom, doorTop, trapdoor, fence, fenceGate);
+		return new DecorTextureSet(chain, lantern, lanternLight, doorItem, doorBottom, doorTop, trapdoor, fence, fenceGate);
 	}
 
 	public MaterialAssetsDef resolve(MaterialDef m) {
@@ -306,7 +307,8 @@ public final class AssetsTheme {
 		HAMMER_HEAD, HAMMER_HANDLE, DAGGER_BLADE, DAGGER_HANDLE,
 		HORSE_ARMOR_ITEM, WOLF_ARMOR_ITEM, NAUTILUS_ARMOR_ITEM,
 		BRICKS, POLISHED, TILES, MOSAIC, PILLAR_SIDE, PILLAR_TOP,
-		COBBLESTONE, CHISELED, STONE_BRICKS, POLISHED_RANDOM;
+		COBBLESTONE, CHISELED, STONE_BRICKS, POLISHED_RANDOM,
+		LANTERN_LIGHT;
 
 		public static final Codec<Slot> CODEC = StringRepresentable.fromEnum(Slot::values);
 
