@@ -14,7 +14,6 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.vampirestudios.raaMaterials.RAAConfig;
 import net.vampirestudios.raaMaterials.YComponents;
-import net.vampirestudios.raaMaterials.material.ClientMaterialCache;
 import net.vampirestudios.raaMaterials.material.MaterialRegistry;
 
 import java.util.List;
@@ -47,8 +46,11 @@ public class ParametricBlock extends Block {
 		ItemStack stack = new ItemStack(this.asItem());
 		int idx = state.getValue(MAT);
 
-		// Resolve the material id from the index
-		ClientMaterialCache.byIndex(idx).ifPresent(def -> stack.set(YComponents.MATERIAL, def.nameInformation().id()));
+		// Resolve the material id — level-aware so this works on dedicated servers too.
+		// MaterialRegistry.byIndex dispatches to ClientMaterialCache on the client side.
+		if (view instanceof net.minecraft.world.level.Level level) {
+			MaterialRegistry.byIndex(level, idx).ifPresent(def -> stack.set(YComponents.MATERIAL, def.nameInformation().id()));
+		}
 
 		// Also stamp the exact blockstate so placement preserves MAT even without lookups
 		stack.set(net.minecraft.core.component.DataComponents.BLOCK_STATE,

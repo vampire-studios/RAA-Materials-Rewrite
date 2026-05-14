@@ -28,7 +28,7 @@ public class ParametricItem extends Item {
 	@Override
 	public Component getName(ItemStack stack) {
 		var mat = stack.get(YComponents.MATERIAL);
-		var def = ClientMaterialCache.byRL(mat);
+		var def = mat != null ? MaterialRegistry.byId(mat) : java.util.Optional.<MaterialDef>empty();
 
 		var kind  = def.map(MaterialDef::kind).orElse(MaterialKind.OTHER);
 		var forms = def.map(MaterialDef::forms).orElse(java.util.List.of());

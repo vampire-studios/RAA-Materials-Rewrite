@@ -374,11 +374,12 @@ public final class ParametricCraftingRecipe extends CustomRecipe {
 		WOOD_FENCE_GATE_FROM_BLOCKS("wood_fence_gate_from_blocks", Form.BLOCK, Form.FENCE_GATE, YItems.PARAM_BLOCK_ITEM, YItems.PARAM_FENCE_GATE_ITEM, 1, Family.WOOD),
 		CHAIN_FROM_INGOT_AND_NUGGETS("chain_from_ingot_and_nuggets", Form.INGOT, Form.CHAIN, YItems.PARAM_INGOT, YItems.PARAM_CHAIN_ITEM, 1, Family.METAL_LIKE, Form.NUGGET),
 		LANTERN_FROM_TORCH_AND_NUGGETS("lantern_from_lamp_and_nuggets", Form.NUGGET, Form.LANTERN, YItems.PARAM_NUGGET, YItems.PARAM_LANTERN_ITEM, 1, Family.METAL_LIKE),
-		PICKAXE_FROM_INGOTS("pickaxe_from_ingots_and_rods", Form.INGOT, Form.PICKAXE, YItems.PARAM_INGOT, YItems.PARAM_PICKAXE, 1, Family.METAL_LIKE, Form.ROD),
-		AXE_FROM_INGOTS("axe_from_ingots_and_rods", Form.INGOT, Form.AXE, YItems.PARAM_INGOT, YItems.PARAM_AXE, 1, Family.METAL_LIKE, Form.ROD),
-		SHOVEL_FROM_INGOTS("shovel_from_ingot_and_rods", Form.INGOT, Form.SHOVEL, YItems.PARAM_INGOT, YItems.PARAM_SHOVEL, 1, Family.METAL_LIKE, Form.ROD),
-		HOE_FROM_INGOTS("hoe_from_ingots_and_rods", Form.INGOT, Form.HOE, YItems.PARAM_INGOT, YItems.PARAM_HOE, 1, Family.METAL_LIKE, Form.ROD),
-		SWORD_FROM_INGOTS("sword_from_ingots_and_rod", Form.INGOT, Form.SWORD, YItems.PARAM_INGOT, YItems.PARAM_SWORD, 1, Family.METAL_LIKE, Form.ROD),
+		// Tools use vanilla sticks as handles, so no extraInputForm check is needed
+		PICKAXE_FROM_INGOTS("pickaxe_from_ingots", Form.INGOT, Form.PICKAXE, YItems.PARAM_INGOT, YItems.PARAM_PICKAXE, 1, Family.METAL_LIKE),
+		AXE_FROM_INGOTS("axe_from_ingots", Form.INGOT, Form.AXE, YItems.PARAM_INGOT, YItems.PARAM_AXE, 1, Family.METAL_LIKE),
+		SHOVEL_FROM_INGOTS("shovel_from_ingots", Form.INGOT, Form.SHOVEL, YItems.PARAM_INGOT, YItems.PARAM_SHOVEL, 1, Family.METAL_LIKE),
+		HOE_FROM_INGOTS("hoe_from_ingots", Form.INGOT, Form.HOE, YItems.PARAM_INGOT, YItems.PARAM_HOE, 1, Family.METAL_LIKE),
+		SWORD_FROM_INGOTS("sword_from_ingots", Form.INGOT, Form.SWORD, YItems.PARAM_INGOT, YItems.PARAM_SWORD, 1, Family.METAL_LIKE),
 
 //		HELMET_FROM_INGOTS("helmet_from_ingots", Form.INGOT, Form.HELMET, YItems.PARAM_INGOT, YItems.PARAM_HELMET, 1, Family.METAL_LIKE),
 //		CHESTPLATE_FROM_INGOTS("chestplate_from_ingots", Form.INGOT, Form.CHESTPLATE, YItems.PARAM_INGOT, YItems.PARAM_CHESTPLATE, 1, Family.METAL_LIKE),

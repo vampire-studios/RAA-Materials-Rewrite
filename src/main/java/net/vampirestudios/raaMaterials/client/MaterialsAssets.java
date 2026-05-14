@@ -16,6 +16,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.vampirestudios.raaMaterials.RAAMaterials;
 import net.vampirestudios.raaMaterials.RRPGen;
+import net.vampirestudios.raaMaterials.recipe.RRPRecipes;
 import net.vampirestudios.raaMaterials.content.ParametricBlock;
 import net.vampirestudios.raaMaterials.material.ClientMaterialCache;
 import net.vampirestudios.raaMaterials.material.MaterialAssets;
@@ -91,6 +92,9 @@ public final class MaterialsAssets {
 		MaterialAssetBuilders.buildSpecialBlockFamilies(ctx);
 		MaterialAssetBuilders.buildShapeFamilies(ctx);
 		MaterialAssetBuilders.buildItemFamilies(ctx);
+
+		// Regenerate recipes into the shared ARRP pack now that materials are known client-side
+		RRPRecipes.recipes(RRPGen.PACK, ctx.materials());
 
 		ctx.pack().dump();
 	}

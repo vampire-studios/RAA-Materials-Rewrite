@@ -8,8 +8,6 @@ import net.minecraft.world.item.Items;
 import net.vampirestudios.arrp.api.RuntimeResourcePack;
 import net.vampirestudios.arrp.json.recipe.*;
 import net.vampirestudios.raaMaterials.RAAMaterials;
-import net.vampirestudios.raaMaterials.YComponents;
-import net.vampirestudios.raaMaterials.material.ClientMaterialCache;
 import net.vampirestudios.raaMaterials.material.Form;
 import net.vampirestudios.raaMaterials.material.MaterialDef;
 import net.vampirestudios.raaMaterials.material.MaterialKind;
@@ -20,8 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 public class RRPRecipes {
-	public static void recipes(RuntimeResourcePack pack) {
-		for (MaterialDef def : ClientMaterialCache.all()) {
+	public static void recipes(RuntimeResourcePack pack, List<MaterialDef> materials) {
+		for (MaterialDef def : materials) {
 			Identifier mat = def.nameInformation().id();
 			String id = mat.getPath();
 
@@ -77,11 +75,25 @@ public class RRPRecipes {
 						YItems.PARAM_PICKAXE, mat, 1
 				);
 			}
+			if (isGem(def) && has(def, Form.GEM, Form.PICKAXE)) {
+				addShapedComponentRecipe(pack, "gem_pickaxe/" + id, "equipment",
+						new String[]{"XXX", " # ", " # "},
+						Map.of('X', componentIngredient(YItems.PARAM_GEM, mat), '#', itemIngredient(Items.STICK)),
+						YItems.PARAM_PICKAXE, mat, 1
+				);
+			}
 
 			if (isMetal(def) && has(def, Form.INGOT, Form.AXE)) {
 				addShapedComponentRecipe(pack, "axe/" + id, "equipment",
 						new String[]{"XX", "X#", " #"},
 						Map.of('X', componentIngredient(YItems.PARAM_INGOT, mat), '#', itemIngredient(Items.STICK)),
+						YItems.PARAM_AXE, mat, 1
+				);
+			}
+			if (isGem(def) && has(def, Form.GEM, Form.AXE)) {
+				addShapedComponentRecipe(pack, "gem_axe/" + id, "equipment",
+						new String[]{"XX", "X#", " #"},
+						Map.of('X', componentIngredient(YItems.PARAM_GEM, mat), '#', itemIngredient(Items.STICK)),
 						YItems.PARAM_AXE, mat, 1
 				);
 			}
@@ -93,11 +105,25 @@ public class RRPRecipes {
 						YItems.PARAM_SHOVEL, mat, 1
 				);
 			}
+			if (isGem(def) && has(def, Form.GEM, Form.SHOVEL)) {
+				addShapedComponentRecipe(pack, "gem_shovel/" + id, "equipment",
+						new String[]{"X", "#", "#"},
+						Map.of('X', componentIngredient(YItems.PARAM_GEM, mat), '#', itemIngredient(Items.STICK)),
+						YItems.PARAM_SHOVEL, mat, 1
+				);
+			}
 
 			if (isMetal(def) && has(def, Form.INGOT, Form.HOE)) {
 				addShapedComponentRecipe(pack, "hoe/" + id, "equipment",
 						new String[]{"XX", " #", " #"},
 						Map.of('X', componentIngredient(YItems.PARAM_INGOT, mat), '#', itemIngredient(Items.STICK)),
+						YItems.PARAM_HOE, mat, 1
+				);
+			}
+			if (isGem(def) && has(def, Form.GEM, Form.HOE)) {
+				addShapedComponentRecipe(pack, "gem_hoe/" + id, "equipment",
+						new String[]{"XX", " #", " #"},
+						Map.of('X', componentIngredient(YItems.PARAM_GEM, mat), '#', itemIngredient(Items.STICK)),
 						YItems.PARAM_HOE, mat, 1
 				);
 			}
@@ -107,6 +133,29 @@ public class RRPRecipes {
 						new String[]{"X", "X", "#"},
 						Map.of('X', componentIngredient(YItems.PARAM_INGOT, mat), '#', itemIngredient(Items.STICK)),
 						YItems.PARAM_SWORD, mat, 1
+				);
+			}
+			if (isGem(def) && has(def, Form.GEM, Form.SWORD)) {
+				addShapedComponentRecipe(pack, "gem_sword/" + id, "equipment",
+						new String[]{"X", "X", "#"},
+						Map.of('X', componentIngredient(YItems.PARAM_GEM, mat), '#', itemIngredient(Items.STICK)),
+						YItems.PARAM_SWORD, mat, 1
+				);
+			}
+
+			// Spear: 1 head at tip + 2 sticks diagonal. Vanilla auto-mirrors the pattern.
+			if (isMetal(def) && has(def, Form.INGOT, Form.SPEAR)) {
+				addShapedComponentRecipe(pack, "spear/" + id, "equipment",
+						new String[]{"  X", " # ", "#  "},
+						Map.of('X', componentIngredient(YItems.PARAM_INGOT, mat), '#', itemIngredient(Items.STICK)),
+						YItems.PARAM_SPEAR, mat, 1
+				);
+			}
+			if (isGem(def) && has(def, Form.GEM, Form.SPEAR)) {
+				addShapedComponentRecipe(pack, "gem_spear/" + id, "equipment",
+						new String[]{"  X", " # ", "#  "},
+						Map.of('X', componentIngredient(YItems.PARAM_GEM, mat), '#', itemIngredient(Items.STICK)),
+						YItems.PARAM_SPEAR, mat, 1
 				);
 			}
 
@@ -356,6 +405,199 @@ public class RRPRecipes {
 						YItems.PARAM_PRESSURE_PLATE_METAL_ITEM, mat, 1
 				);
 			}
+
+			// ── Craft parts ──────────────────────────────────────────────────────────
+
+			if (isMetal(def) && has(def, Form.INGOT, Form.ROD)) {
+				addShapedComponentRecipe(pack, "rod_from_ingots/" + id, "misc",
+						new String[]{"X", "X"},
+						Map.of('X', componentIngredient(YItems.PARAM_INGOT, mat)),
+						YItems.PARAM_ROD, mat, 4
+				);
+			}
+
+			// 4 ingots in a cross → 1 gear (no nugget needed)
+			if (isMetal(def) && has(def, Form.INGOT, Form.GEAR)) {
+				addShapedComponentRecipe(pack, "gear_from_ingots/" + id, "misc",
+						new String[]{" X ", "X X", " X "},
+						Map.of('X', componentIngredient(YItems.PARAM_INGOT, mat)),
+						YItems.PARAM_GEAR, mat, 1
+				);
+			}
+
+			if (isMetal(def) && has(def, Form.ROD, Form.WIRE)) {
+				addShapedComponentRecipe(pack, "wire_from_rod/" + id, "misc",
+						new String[]{"XXX"},
+						Map.of('X', componentIngredient(YItems.PARAM_ROD, mat)),
+						YItems.PARAM_WIRE, mat, 4
+				);
+			}
+
+			if (isMetal(def) && has(def, Form.WIRE, Form.COIL)) {
+				addShapedComponentRecipe(pack, "coil_from_wire/" + id, "misc",
+						new String[]{"XX", "XX"},
+						Map.of('X', componentIngredient(YItems.PARAM_WIRE, mat)),
+						YItems.PARAM_COIL, mat, 1
+				);
+			}
+
+			// 4 nuggets in a diamond ring pattern → 2 rings
+			if (isMetal(def) && has(def, Form.NUGGET, Form.RING)) {
+				addShapedComponentRecipe(pack, "ring_from_nuggets/" + id, "misc",
+						new String[]{" X ", "X X", " X "},
+						Map.of('X', componentIngredient(YItems.PARAM_NUGGET, mat)),
+						YItems.PARAM_RING, mat, 2
+				);
+			}
+
+			// 3 nuggets in a horizontal row → 6 rivets
+			if (isMetal(def) && has(def, Form.NUGGET, Form.RIVET)) {
+				addShapedComponentRecipe(pack, "rivet_from_nuggets/" + id, "misc",
+						new String[]{"XXX"},
+						Map.of('X', componentIngredient(YItems.PARAM_NUGGET, mat)),
+						YItems.PARAM_RIVET, mat, 6
+				);
+			}
+
+			// 3 nuggets in a column → 6 nails
+			if (isMetal(def) && has(def, Form.NUGGET, Form.NAIL)) {
+				addShapedComponentRecipe(pack, "nail_from_nuggets/" + id, "misc",
+						new String[]{"X", "X", "X"},
+						Map.of('X', componentIngredient(YItems.PARAM_NUGGET, mat)),
+						YItems.PARAM_NAIL, mat, 6
+				);
+			}
+
+			// nugget–ingot–nugget column → 4 bolts
+			if (isMetal(def) && has(def, Form.INGOT, Form.NUGGET, Form.BOLT)) {
+				addShapedComponentRecipe(pack, "bolt_from_ingots_and_nuggets/" + id, "misc",
+						new String[]{"X", "Y", "X"},
+						Map.of('X', componentIngredient(YItems.PARAM_NUGGET, mat),
+								'Y', componentIngredient(YItems.PARAM_INGOT, mat)),
+						YItems.PARAM_BOLT, mat, 4
+				);
+			}
+
+			// Ball: 2×2 of the primary crafting unit → 1 ball
+			if (isMetal(def) && has(def, Form.INGOT, Form.BALL)) {
+				addShapedComponentRecipe(pack, "ball_from_ingots/" + id, "misc",
+						new String[]{"XX", "XX"},
+						Map.of('X', componentIngredient(YItems.PARAM_INGOT, mat)),
+						YItems.PARAM_BALL, mat, 1
+				);
+			}
+			if (isGem(def) && has(def, Form.GEM, Form.BALL)) {
+				addShapedComponentRecipe(pack, "ball_from_gems/" + id, "misc",
+						new String[]{"XX", "XX"},
+						Map.of('X', componentIngredient(YItems.PARAM_GEM, mat)),
+						YItems.PARAM_BALL, mat, 1
+				);
+			}
+			if (isCrystal(def) && has(def, Form.CRYSTAL, Form.BALL)) {
+				addShapedComponentRecipe(pack, "ball_from_crystals/" + id, "misc",
+						new String[]{"XX", "XX"},
+						Map.of('X', componentIngredient(YItems.PARAM_CRYSTAL, mat)),
+						YItems.PARAM_BALL, mat, 1
+				);
+			}
+
+			// ── Building blocks ───────────────────────────────────────────────────────
+
+			if (isCrystal(def) && has(def, Form.BLOCK, Form.CRYSTAL_BRICKS)) {
+				addShapedComponentRecipe(pack, "crystal_bricks/" + id, "building",
+						new String[]{"XX", "XX"},
+						Map.of('X', componentIngredient(YItems.PARAM_CRYSTAL_BLOCK_ITEM, mat)),
+						YItems.PARAM_CRYSTAL_BRICKS_ITEM, mat, 4
+				);
+			}
+
+			if (has(def, Form.POLISHED, Form.TILES)) {
+				addShapedComponentRecipe(pack, "tiles_from_polished/" + id, "building",
+						new String[]{"XX", "XX"},
+						Map.of('X', componentIngredient(YItems.PARAM_POLISHED_BLOCK_ITEM, mat)),
+						YItems.PARAM_TILES_ITEM, mat, 4
+				);
+			}
+
+			if (has(def, Form.TILES, Form.MOSAIC)) {
+				addShapedComponentRecipe(pack, "mosaic_from_tiles/" + id, "building",
+						new String[]{"XX", "XX"},
+						Map.of('X', componentIngredient(YItems.PARAM_TILES_ITEM, mat)),
+						YItems.PARAM_MOSAIC_ITEM, mat, 4
+				);
+			}
+
+			if (has(def, Form.POLISHED, Form.SHINGLES)) {
+				addShapedComponentRecipe(pack, "shingles_from_polished/" + id, "building",
+						new String[]{"XX", "XX"},
+						Map.of('X', componentIngredient(YItems.PARAM_POLISHED_BLOCK_ITEM, mat)),
+						YItems.PARAM_SHINGLES_BLOCK_ITEM, mat, 4
+				);
+			}
+
+			// 6 rods (2×3) → 1 rod block
+			if (isMetal(def) && has(def, Form.ROD, Form.ROD_BLOCK)) {
+				addShapedComponentRecipe(pack, "rod_block_from_rods/" + id, "building",
+						new String[]{"XX", "XX", "XX"},
+						Map.of('X', componentIngredient(YItems.PARAM_ROD, mat)),
+						YItems.PARAM_ROD_BLOCK_ITEM, mat, 1
+				);
+			}
+
+			// Block + vine → mossy variant (shapeless; vine is a vanilla item)
+			if (has(def, Form.BLOCK, Form.MOSSY)) {
+				addShapelessComponentRecipe(pack, "mossy_from_block/" + id, "building",
+						List.of(componentIngredient(YItems.PARAM_BLOCK_ITEM, mat),
+								itemIngredient(Items.VINE)),
+						YItems.PARAM_MOSSY_ITEM, mat, 1
+				);
+			}
+
+			// Bricks + vine → mossy bricks (shapeless)
+			if (has(def, Form.BRICKS, Form.MOSSY)) {
+				addShapelessComponentRecipe(pack, "mossy_bricks_from_bricks/" + id, "building",
+						List.of(componentIngredient(YItems.PARAM_BRICKS_BLOCK_ITEM, mat),
+								itemIngredient(Items.VINE)),
+						YItems.PARAM_MOSSY_ITEM, mat, 1
+				);
+			}
+
+			// 3×3 blocks → 1 packed soil (soil / sand / clay / mud / gravel)
+			if (isSoilLike(def) && has(def, Form.BLOCK, Form.PACKED_SOIL)) {
+				addShapedComponentRecipe(pack, "packed_soil_from_block/" + id, "building",
+						new String[]{"XXX", "XXX", "XXX"},
+						Map.of('X', componentIngredient(YItems.PARAM_BLOCK_ITEM, mat)),
+						YItems.PARAM_PACKED_SOIL_ITEM, mat, 1
+				);
+			}
+
+			// Glass block + 4 shards in a cross → 2 tinted glass (crystal / gem)
+			if ((isCrystal(def) || isGem(def)) && has(def, Form.GLASS, Form.SHARD, Form.TINTED_GLASS)) {
+				addShapedComponentRecipe(pack, "tinted_glass/" + id, "building",
+						new String[]{" Y ", "YXY", " Y "},
+						Map.of('X', componentIngredient(YItems.PARAM_GLASS_ITEM, mat),
+								'Y', componentIngredient(YItems.PARAM_SHARD, mat)),
+						YItems.PARAM_TINTED_GLASS_ITEM, mat, 2
+				);
+			}
+
+			// ── Equipment ─────────────────────────────────────────────────────────────
+
+			if (isMetal(def) && has(def, Form.INGOT, Form.HORSE_ARMOR)) {
+				addShapedComponentRecipe(pack, "horse_armor/" + id, "equipment",
+						new String[]{"X X", "XXX", "X X"},
+						Map.of('X', componentIngredient(YItems.PARAM_INGOT, mat)),
+						YItems.PARAM_HORSE_ARMOR_ITEM, mat, 1
+				);
+			}
+
+			if (isMetal(def) && has(def, Form.INGOT, Form.WOLF_ARMOR)) {
+				addShapedComponentRecipe(pack, "wolf_armor/" + id, "equipment",
+						new String[]{"X ", "XXX", "XXX"},
+						Map.of('X', componentIngredient(YItems.PARAM_INGOT, mat)),
+						YItems.PARAM_WOLF_ARMOR_ITEM, mat, 1
+				);
+			}
 		}
 	}
 
@@ -398,25 +640,6 @@ public class RRPRecipes {
 			Identifier material,
 			int count
 	) {
-//		JsonObject recipe = new JsonObject();
-//		recipe.addProperty("type", "minecraft:crafting_shaped");
-//		recipe.addProperty("category", category);
-//
-//		JsonArray patternJson = new JsonArray();
-//		for (String row : pattern) {
-//			patternJson.add(row);
-//		}
-//		recipe.add("pattern", patternJson);
-//
-//		JsonObject keyJson = new JsonObject();
-//		for (Map.Entry<Character, JsonObject> entry : keys.entrySet()) {
-//			keyJson.add(String.valueOf(entry.getKey()), entry.getValue());
-//		}
-//		recipe.add("key", keyJson);
-//
-//		recipe.add("result", componentResult(output, material, count));
-//		writeRecipe(pack, recipePath, recipe);
-
 		var jKeys = JKeys.keys();
 		keys.forEach((character, jIngredient) -> jKeys.key(String.valueOf(character), jIngredient));
 
@@ -445,7 +668,7 @@ public class RRPRecipes {
 	}
 
 	private static JIngredient componentIngredient(Item item, Identifier material) {
-		return JIngredient.fabricComponents(item, components -> components.addProperty("raa_materials:material", material.toString()));
+		return JIngredient.fabricComponents(item, components -> materialComponent(material, components));
 	}
 
 	private static JIngredient itemIngredient(Item item) {
@@ -453,21 +676,12 @@ public class RRPRecipes {
 	}
 
 	private static JResult componentResult(Item item, Identifier material, int count) {
-//		JsonObject result = new JsonObject();
-//		result.addProperty("id", BuiltInRegistries.ITEM.getKey(item).toString());
-//		result.add("components", materialComponent(material));
-//
-//		if (count > 1) {
-//			result.addProperty("count", count);
-//		}
-
 		return JResult.stackedResult(BuiltInRegistries.ITEM.getKey(item), count)
-				.components(builder -> builder.set(YComponents.MATERIAL, material));
+				.components(builder -> materialComponent(material, builder));
 	}
 
 	private static void materialComponent(Identifier material, JsonObject jsonObject) {
 		jsonObject.addProperty("raa_materials:material", material.toString());
-//		return jsonObject;
 	}
 
 	private static void writeRecipe(RuntimeResourcePack pack, String recipePath, JsonObject recipe) {
@@ -491,6 +705,14 @@ public class RRPRecipes {
 				|| def.kind() == MaterialKind.ALLOY;
 	}
 
+	private static boolean isGem(MaterialDef def) {
+		return def.kind() == MaterialKind.GEM;
+	}
+
+	private static boolean isCrystal(MaterialDef def) {
+		return def.kind() == MaterialKind.CRYSTAL;
+	}
+
 	private static boolean isWood(MaterialDef def) {
 		return def.kind() == MaterialKind.WOOD;
 	}
@@ -498,5 +720,12 @@ public class RRPRecipes {
 	private static boolean isStoneLike(MaterialDef def) {
 		return def.kind() == MaterialKind.STONE
 				|| def.kind() == MaterialKind.VOLCANIC;
+	}
+
+	private static boolean isSoilLike(MaterialDef def) {
+		return switch (def.kind()) {
+			case SOIL, SAND, CLAY, MUD, GRAVEL -> true;
+			default -> false;
+		};
 	}
 }

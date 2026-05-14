@@ -58,6 +58,18 @@ public class RAAMaterials implements ModInitializer {
 			}
 			MaterialRegistry.put(overworld.dimension(), set);
 
+			// Populate per-material crafting recipes into the ARRP pack now that the
+			// material list is known.  The pack was already registered with ARRP in
+			// RRPGen.init(), but it was empty when AFTER_VANILLA fired during data
+			// loading, so the recipe manager has no RAA crafting recipes yet.
+			// Trigger a server data-reload to let the recipe manager pick them up.
+			RRPGen.populateRecipes(MaterialRegistry.all(overworld));
+			server.reloadResources(server.getPackRepository().getSelectedIds())
+					.exceptionally(e -> {
+						LOGGER.error("[RAA] Server resource reload after material generation failed", e);
+						return null;
+					});
+
 			var a = overworld.getAttachedOrCreate(MaterialAttachments.LEGENDARIES);
 			if (a.byForm().isEmpty()) {
 				// Only materials with tool textures are viable legendary weapon carriers

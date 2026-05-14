@@ -87,7 +87,7 @@ public class ParametricBlockItem extends BlockItem {
 	private static Optional<MaterialDef> materialDefinition(ItemStack stack) {
 		var mat = stack.get(YComponents.MATERIAL);
 		if (mat != null) {
-			var def = ClientMaterialCache.byRL(mat);
+			var def = MaterialRegistry.byId(mat);
 			if (def.isPresent()) return def;
 		}
 
@@ -95,7 +95,7 @@ public class ParametricBlockItem extends BlockItem {
 		if (props == null || props.get(ParametricBlock.MAT) == null) {
 			return Optional.empty();
 		}
-		return ClientMaterialCache.byIndex(props.get(ParametricBlock.MAT));
+		return MaterialRegistry.byIndexAny(props.get(ParametricBlock.MAT));
 	}
 
 	@Override

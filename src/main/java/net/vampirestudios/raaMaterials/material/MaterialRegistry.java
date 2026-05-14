@@ -37,14 +37,26 @@ public final class MaterialRegistry {
 	}
 
 	public static Optional<MaterialDef> byId(Identifier id) {
-		var clientDef = ClientMaterialCache.byRL(id);
-		if (clientDef.isPresent()) return clientDef;
-
+		// Server path first (avoids touching client class on dedicated servers)
 		for (MaterialSet set : MAP.values()) {
 			var def = set.byId(id);
 			if (def.isPresent()) return def;
 		}
-		return Optional.empty();
+		// Client fallback — no-op on dedicated server (empty cache)
+		return ClientMaterialCache.byRL(id);
+	}
+
+	/**
+	 * Dual-path index lookup that works on both logical sides without a {@link Level}.
+	 * On the server searches all registered material sets; on the client falls back to
+	 * {@link ClientMaterialCache}. Use the level-aware overload when a level is available.
+	 */
+	public static Optional<MaterialDef> byIndexAny(int idx) {
+		for (MaterialSet set : MAP.values()) {
+			var def = set.byIndex(idx);
+			if (def.isPresent()) return def;
+		}
+		return ClientMaterialCache.byIndex(idx);
 	}
 
 	public static List<MaterialDef> all(ServerLevel level) {
