@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "raa_materials:material_block",
+    "raa_materials:material_raw_block",
+    "raa_materials:material_crystal_block",
+    "raa_materials:material_plate_block"
+  ]
+}

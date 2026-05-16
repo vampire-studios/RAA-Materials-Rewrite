@@ -10,7 +10,6 @@ import net.vampirestudios.raaMaterials.material.MaterialKind;
 import net.vampirestudios.raaMaterials.net.NetworkInit;
 import net.vampirestudios.raaMaterials.net.ServerSend;
 import net.vampirestudios.raaMaterials.recipe.ParametricRecipes;
-import net.vampirestudios.raaMaterials.registry.RAARegistries;
 import net.vampirestudios.raaMaterials.registry.YBlocks;
 import net.vampirestudios.raaMaterials.registry.YItems;
 import net.vampirestudios.raaMaterials.registry.YTabs;
@@ -30,13 +29,12 @@ public class RAAMaterials implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		RAAConfig.init(FabricLoader.getInstance().getGameDir());
-		RAARegistries.init();
 		YComponents.init();
 		YBlocks.init();
 		YItems.init();
+		YTabs.init();
 		ParametricRecipes.init();
 		NetworkInit.initCommon();
-		YTabs.init();
 		RAACommands.init();
 		RRPGen.init();
 		WorldgenInit.init();
@@ -83,8 +81,7 @@ public class RAAMaterials implements ModInitializer {
 
 				var uniqueForms = java.util.List.of(
 						Form.BATTLE_AXE, Form.WAR_HAMMER, Form.SICKLE, Form.DAGGER, Form.HAMMER,
-						Form.SCYTHE, Form.SHIELD, Form.BOW, Form.CROSSBOW, Form.STAFF, Form.WAND, Form.CROWN,
-						Form.CLOAK, Form.AMULET, Form.ORB, Form.MUSIC_DISC
+						Form.SCYTHE, Form.SHIELD, Form.BOW, Form.CROSSBOW, Form.STAFF, Form.WAND
 				);
 
 				var rng = new java.util.Random(overworld.getSeed());

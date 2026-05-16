@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "raa_materials:material_slab",
+    "raa_materials:material_sandstone_slab",
+    "raa_materials:material_brick_slab",
+    "raa_materials:material_polished_slab"
+  ]
+}

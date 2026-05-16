@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "raa_materials:material_glass",
+    "raa_materials:material_tinted_glass"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "raa_materials:material_stairs",
+    "raa_materials:material_sandstone_stairs",
+    "raa_materials:material_brick_stairs",
+    "raa_materials:material_polished_stairs"
+  ]
+}

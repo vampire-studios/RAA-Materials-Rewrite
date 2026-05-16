@@ -151,9 +151,16 @@ public final class PaletteRunner {
 		if (row.harmony != null) builder.harmony(row.harmony);
 		else if (a.harmony != null) builder.harmony(a.harmony);
 
-		PaletteRules rules = builder.build();
+		PaletteRules baseRules = builder.build();
 
-		Palette pal = PaletteDeriver.derive(a.materialKey, rules);
+		String key = row.key != null && !row.key.isBlank()
+				? row.key
+				: a.materialKey;
+
+		MaterialProfile profile = MaterialProfileDeriver.derive(key, baseRules);
+		PaletteRules rules = MaterialProfileDeriver.applyToRules(baseRules, profile);
+
+		Palette pal = PaletteDeriver.derive(key, rules);
 
 		// 4) Build ramp (OKLab recommended)
 		int[] ramp = Recolor.buildRampOkLab(pal.stops());
@@ -212,7 +219,7 @@ public final class PaletteRunner {
 			}
 
 			if (hasBundle) {
-				var expanded = expandWoodTextureBundles(raw);
+				var expanded = expandTextureBundles(raw);
 				var rows = new java.util.ArrayList<BatchRow>();
 				var gson = new com.google.gson.Gson();
 
@@ -375,6 +382,247 @@ public final class PaletteRunner {
 		return out;
 	}
 
+	static List<com.google.gson.JsonObject> expandTextureBundles(List<com.google.gson.JsonObject> rows) {
+		var out = new java.util.ArrayList<com.google.gson.JsonObject>();
+
+		for (var row : rows) {
+			String bundle = row.has("bundle") ? row.get("bundle").getAsString() : "";
+
+			if (bundle.isBlank()) {
+				out.add(row);
+				continue;
+			}
+
+			switch (bundle.toUpperCase()) {
+				case "WOOD_TEXTURE_SET" -> expandBundle(row, out, "wood", woodParts());
+				case "METAL_TEXTURE_SET" -> expandBundle(row, out, "metal", metalParts());
+				case "STONE_TEXTURE_SET" -> expandBundle(row, out, "stone", stoneParts());
+				case "GEM_TEXTURE_SET", "CRYSTAL_TEXTURE_SET" -> expandBundle(row, out, "gem", gemParts());
+				default -> throw new IllegalArgumentException("Unknown texture bundle: " + bundle);
+			}
+		}
+
+		return out;
+	}
+
+	private static void expandBundle(
+			com.google.gson.JsonObject row,
+			java.util.List<com.google.gson.JsonObject> out,
+			String folder,
+			java.util.Map<String, String> partOutputs
+	) {
+		String name = requiredString(row, "name");
+		String keyBase = requiredString(row, "keyBase");
+		String outDir = row.has("outDir") ? row.get("outDir").getAsString() : "dev_out";
+
+		var parts = row.getAsJsonObject("parts");
+		if (parts == null) {
+			throw new IllegalArgumentException("Bundle '" + name + "' missing 'parts'");
+		}
+
+		var basePalette = row.has("palette") ? row.getAsJsonObject("palette") : null;
+		var palettes = row.has("palettes") ? row.getAsJsonObject("palettes") : null;
+
+		String base = outDir + "/blocks/" + folder + "/";
+
+		for (var entry : partOutputs.entrySet()) {
+			String part = entry.getKey();
+
+			if (!parts.has(part)) continue;
+
+			var partObj = parts.getAsJsonObject(part);
+
+			if (partObj.has("alias")) {
+				addCopyJob(out, parts, partObj, base, name, entry.getValue());
+				continue;
+			}
+
+			String input = requiredString(partObj, "in");
+			String output = base + entry.getValue().replace("{name}", name);
+
+			var job = new com.google.gson.JsonObject();
+			job.addProperty("in", input);
+			job.addProperty("out", output);
+			job.addProperty("key", keyBase + ":" + part);
+
+			var chosenPalette = mergedPaletteForPart(part, partObj, basePalette, palettes);
+			copyPalette(job, chosenPalette);
+
+			out.add(job);
+		}
+	}
+
+	private static java.util.Map<String, String> woodParts() {
+		return java.util.Map.ofEntries(
+				java.util.Map.entry("planks", "{name}_planks.png"),
+				java.util.Map.entry("log_side", "{name}_log.png"),
+				java.util.Map.entry("log_top", "{name}_log_top.png"),
+				java.util.Map.entry("stripped_log_side", "stripped_{name}_log.png"),
+				java.util.Map.entry("stripped_log_top", "stripped_{name}_log_top.png"),
+				java.util.Map.entry("door_top", "{name}_door_top.png"),
+				java.util.Map.entry("door_bottom", "{name}_door_bottom.png"),
+				java.util.Map.entry("trapdoor", "{name}_trapdoor.png"),
+				java.util.Map.entry("ladder", "{name}_ladder.png")
+		);
+	}
+
+	private static java.util.Map<String, String> metalParts() {
+		return java.util.Map.ofEntries(
+				java.util.Map.entry("block", "{name}_block.png"),
+				java.util.Map.entry("ore", "{name}_ore.png"),
+				java.util.Map.entry("raw_block", "raw_{name}_block.png"),
+				java.util.Map.entry("bricks", "{name}_bricks.png"),
+				java.util.Map.entry("tiles", "{name}_tiles.png"),
+				java.util.Map.entry("plate_block", "{name}_plate_block.png"),
+				java.util.Map.entry("shingles", "{name}_shingles.png"),
+				java.util.Map.entry("pillar", "{name}_pillar.png"),
+				java.util.Map.entry("chiseled", "{name}_chiseled.png"),
+				java.util.Map.entry("bars", "{name}_bars.png"),
+				java.util.Map.entry("grate", "{name}_grate.png"),
+				java.util.Map.entry("door_top", "{name}_door_top.png"),
+				java.util.Map.entry("door_bottom", "{name}_door_bottom.png"),
+				java.util.Map.entry("trapdoor", "{name}_trapdoor.png"),
+				java.util.Map.entry("chain", "{name}_chain.png"),
+				java.util.Map.entry("lantern", "{name}_lantern.png"),
+				java.util.Map.entry("lamp", "{name}_lamp.png")
+		);
+	}
+
+	private static java.util.Map<String, String> stoneParts() {
+		return java.util.Map.ofEntries(
+				java.util.Map.entry("block", "{name}.png"),
+				java.util.Map.entry("ore", "{name}_ore.png"),
+				java.util.Map.entry("cobbled", "cobbled_{name}.png"),
+				java.util.Map.entry("bricks", "{name}_bricks.png"),
+				java.util.Map.entry("tiles", "{name}_tiles.png"),
+				java.util.Map.entry("polished", "polished_{name}.png"),
+				java.util.Map.entry("chiseled", "chiseled_{name}.png"),
+				java.util.Map.entry("pillar", "{name}_pillar.png"),
+				java.util.Map.entry("smooth", "smooth_{name}.png"),
+				java.util.Map.entry("cut", "cut_{name}.png"),
+				java.util.Map.entry("sandstone", "{name}_sandstone.png")
+		);
+	}
+
+	private static java.util.Map<String, String> gemParts() {
+		return java.util.Map.ofEntries(
+				java.util.Map.entry("block", "{name}_block.png"),
+				java.util.Map.entry("ore", "{name}_ore.png"),
+				java.util.Map.entry("cluster", "{name}_cluster.png"),
+				java.util.Map.entry("budding", "budding_{name}.png"),
+				java.util.Map.entry("bud_small", "small_{name}_bud.png"),
+				java.util.Map.entry("bud_medium", "medium_{name}_bud.png"),
+				java.util.Map.entry("bud_large", "large_{name}_bud.png"),
+				java.util.Map.entry("glass", "{name}_glass.png"),
+				java.util.Map.entry("tinted_glass", "tinted_{name}_glass.png"),
+				java.util.Map.entry("lamp", "{name}_lamp.png")
+		);
+	}
+
+	private static com.google.gson.JsonObject mergedPaletteForPart(
+			String part,
+			com.google.gson.JsonObject partObj,
+			com.google.gson.JsonObject basePalette,
+			com.google.gson.JsonObject palettes
+	) {
+		var result = new com.google.gson.JsonObject();
+
+		mergeInto(result, paletteNamed(palettes, "default"));
+		mergeInto(result, basePalette);
+		mergeInto(result, paletteNamed(palettes, part));
+		mergeInto(result, paletteNamed(palettes, roleForPart(part)));
+
+		if (partObj.has("palette")) {
+			mergeInto(result, partObj.getAsJsonObject("palette"));
+		}
+
+		return result;
+	}
+
+	private static String roleForPart(String part) {
+		return switch (part) {
+			case "ore" -> "ore";
+			case "raw_block" -> "raw";
+			case "door_top", "door_bottom" -> "door";
+			case "log_side" -> "logSide";
+			case "log_top" -> "logTop";
+			case "stripped_log_side" -> "strippedLogSide";
+			case "stripped_log_top" -> "strippedLogTop";
+			case "bud_small", "bud_medium", "bud_large" -> "bud";
+			default -> part;
+		};
+	}
+
+	private static com.google.gson.JsonObject paletteNamed(com.google.gson.JsonObject palettes, String name) {
+		if (palettes == null || name == null || !palettes.has(name)) return null;
+		return palettes.getAsJsonObject(name);
+	}
+
+	private static void mergeInto(com.google.gson.JsonObject target, com.google.gson.JsonObject source) {
+		if (source == null) return;
+		for (var e : source.entrySet()) {
+			target.add(e.getKey(), e.getValue());
+		}
+	}
+
+	private static void copyPalette(com.google.gson.JsonObject job, com.google.gson.JsonObject chosen) {
+		if (chosen == null) return;
+
+		String[] keys = {
+				"scheme", "seed", "hueBase", "hueJitterDeg", "satBase", "satVar",
+				"valBase", "valVar", "grain", "speckle", "brightness", "temperature",
+				"roughness", "anisotropy", "enforceContrast", "harmony", "preset",
+				"rankCurve", "rampLo", "rampHi", "gamma", "reverseOrder", "invert"
+		};
+
+		for (String key : keys) {
+			if (chosen.has(key)) {
+				job.add(key, chosen.get(key));
+			}
+		}
+	}
+
+	private static void addCopyJob(
+			java.util.List<com.google.gson.JsonObject> out,
+			com.google.gson.JsonObject parts,
+			com.google.gson.JsonObject partObj,
+			String base,
+			String name,
+			String outputTemplate
+	) {
+		String alias = requiredString(partObj, "alias");
+
+		if (!parts.has(alias)) {
+			throw new IllegalArgumentException("Alias target does not exist: " + alias);
+		}
+
+		var aliasObj = parts.getAsJsonObject(alias);
+
+		if (!aliasObj.has("out")) {
+			return;
+		}
+
+		var job = new com.google.gson.JsonObject();
+		job.addProperty("internal", "COPY_FILE");
+		job.addProperty("from", aliasObj.get("out").getAsString());
+		job.addProperty("to", base + outputTemplate.replace("{name}", name));
+
+		out.add(job);
+	}
+
+	private static String requiredString(com.google.gson.JsonObject obj, String key) {
+		if (!obj.has(key) || obj.get(key).isJsonNull()) {
+			throw new IllegalArgumentException("Missing required field: " + key);
+		}
+
+		String value = obj.get(key).getAsString();
+		if (value.isBlank()) {
+			throw new IllegalArgumentException("Blank required field: " + key);
+		}
+
+		return value;
+	}
+
 	private static String[] split(String line, boolean csv) {
 		if (!csv) return line.split("\\t");
 		// simple CSV (no quotes)
@@ -426,11 +674,14 @@ public final class PaletteRunner {
 	// ---------- Helpers ----------
 	private static BufferedImage readPng(Path p) throws IOException {
 		if (!Files.isRegularFile(p)) throw new IllegalArgumentException("Missing base PNG: " + p);
-		return ImageIO.read(Files.newInputStream(p));
+		BufferedImage img = ImageIO.read(Files.newInputStream(p));
+		if (img == null) throw new IOException("Not a readable PNG: " + p);
+		return img;
 	}
 
 	private static void writePng(BufferedImage img, Path out) throws IOException {
-		Files.createDirectories(out.getParent());
+		Path parent = out.getParent();
+		if (parent != null) Files.createDirectories(parent);
 		ImageIO.write(img, "png", Files.newOutputStream(out));
 	}
 

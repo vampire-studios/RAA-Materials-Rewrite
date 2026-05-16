@@ -53,14 +53,14 @@ public final class MaterialAssetBuilders {
     public static final Identifier GEAR_SHARED_ID = RAAMaterials.id("material_gear");
     public static final Identifier GEM_SHARED_ID = RAAMaterials.id("material_gem");
     public static final Identifier CRYSTAL_SHARED_ID = RAAMaterials.id("material_crystal");
-    public static final Identifier BALL_SHARED_ID = RAAMaterials.id("material_ball");
-    public static final Identifier ROD_SHARED_ID = RAAMaterials.id("material_rod");
-    public static final Identifier WIRE_SHARED_ID = RAAMaterials.id("material_wire");
-    public static final Identifier COIL_SHARED_ID = RAAMaterials.id("material_coil");
-    public static final Identifier RIVET_SHARED_ID = RAAMaterials.id("material_rivet");
-    public static final Identifier BOLT_SHARED_ID = RAAMaterials.id("material_bolt");
-    public static final Identifier NAIL_SHARED_ID = RAAMaterials.id("material_nail");
-    public static final Identifier RING_SHARED_ID = RAAMaterials.id("material_ring");
+//    public static final Identifier BALL_SHARED_ID = RAAMaterials.id("material_ball");
+//    public static final Identifier ROD_SHARED_ID = RAAMaterials.id("material_rod");
+//    public static final Identifier WIRE_SHARED_ID = RAAMaterials.id("material_wire");
+//    public static final Identifier COIL_SHARED_ID = RAAMaterials.id("material_coil");
+//    public static final Identifier RIVET_SHARED_ID = RAAMaterials.id("material_rivet");
+//    public static final Identifier BOLT_SHARED_ID = RAAMaterials.id("material_bolt");
+//    public static final Identifier NAIL_SHARED_ID = RAAMaterials.id("material_nail");
+//    public static final Identifier RING_SHARED_ID = RAAMaterials.id("material_ring");
 
     public static final Identifier SHOVEL_SHARED_ID = RAAMaterials.id("material_shovel");
     public static final Identifier HOE_SHARED_ID = RAAMaterials.id("material_hoe");
@@ -169,14 +169,14 @@ public final class MaterialAssetBuilders {
             new TextureRequirement(Form.SHARD, "shard", assets -> assets.itemTextures().shard()),
             new TextureRequirement(Form.GEAR, "gear", assets -> assets.itemTextures().gear()),
             new TextureRequirement(Form.GEM, "gem", assets -> assets.itemTextures().gem()),
-            new TextureRequirement(Form.BALL, "ball", assets -> assets.itemTextures().ball()),
-            new TextureRequirement(Form.ROD, "rod", assets -> assets.itemTextures().rod()),
-            new TextureRequirement(Form.WIRE, "wire", assets -> assets.itemTextures().wire()),
-            new TextureRequirement(Form.COIL, "coil", assets -> assets.itemTextures().coil()),
-            new TextureRequirement(Form.RIVET, "rivet", assets -> assets.itemTextures().rivet()),
-            new TextureRequirement(Form.BOLT, "bolt", assets -> assets.itemTextures().bolt()),
-            new TextureRequirement(Form.NAIL, "nail", assets -> assets.itemTextures().nail()),
-            new TextureRequirement(Form.RING, "ring", assets -> assets.itemTextures().ring()),
+//            new TextureRequirement(Form.BALL, "ball", assets -> assets.itemTextures().ball()),
+//            new TextureRequirement(Form.ROD, "rod", assets -> assets.itemTextures().rod()),
+//            new TextureRequirement(Form.WIRE, "wire", assets -> assets.itemTextures().wire()),
+//            new TextureRequirement(Form.COIL, "coil", assets -> assets.itemTextures().coil()),
+//            new TextureRequirement(Form.RIVET, "rivet", assets -> assets.itemTextures().rivet()),
+//            new TextureRequirement(Form.BOLT, "bolt", assets -> assets.itemTextures().bolt()),
+//            new TextureRequirement(Form.NAIL, "nail", assets -> assets.itemTextures().nail()),
+//            new TextureRequirement(Form.RING, "ring", assets -> assets.itemTextures().ring()),
             new TextureRequirement(Form.BUDDING, "budding", assets -> assets.crystalTextures().budding()),
             new TextureRequirement(Form.BUD_SMALL, "budSmall", assets -> assets.crystalTextures().budSmall()),
             new TextureRequirement(Form.BUD_MEDIUM, "budMedium", assets -> assets.crystalTextures().budMedium()),
@@ -633,69 +633,69 @@ public final class MaterialAssetBuilders {
                         .orElseThrow(() -> new IllegalStateException("Missing crystalItem texture for material at index " + idx))
         ));
 
-        buildItemFamily(ctx, new ItemFamilySpec(
-                List.of(Form.BALL),
-                BALL_SHARED_ID,
-                "item/material_ball/",
-                idx -> textures(ctx.materials().get(idx)).itemTextures().ball()
-                        .orElseThrow(() -> new IllegalStateException("Missing ball texture for material at index " + idx))
-        ));
-
-        buildItemFamily(ctx, new ItemFamilySpec(
-                List.of(Form.ROD),
-                ROD_SHARED_ID,
-                "item/material_rod/",
-                idx -> textures(ctx.materials().get(idx)).itemTextures().rod()
-                        .orElseThrow(() -> new IllegalStateException("Missing rod texture for material at index " + idx))
-        ));
-
-        buildItemFamily(ctx, new ItemFamilySpec(
-                List.of(Form.WIRE),
-                WIRE_SHARED_ID,
-                "item/material_wire/",
-                idx -> textures(ctx.materials().get(idx)).itemTextures().wire()
-                        .orElseThrow(() -> new IllegalStateException("Missing wire texture for material at index " + idx))
-        ));
-
-        buildItemFamily(ctx, new ItemFamilySpec(
-                List.of(Form.COIL),
-                COIL_SHARED_ID,
-                "item/material_coil/",
-                idx -> textures(ctx.materials().get(idx)).itemTextures().coil()
-                        .orElseThrow(() -> new IllegalStateException("Missing coil texture for material at index " + idx))
-        ));
-
-        buildItemFamily(ctx, new ItemFamilySpec(
-                List.of(Form.RIVET),
-                RIVET_SHARED_ID,
-                "item/material_rivet/",
-                idx -> textures(ctx.materials().get(idx)).itemTextures().rivet()
-                        .orElseThrow(() -> new IllegalStateException("Missing rivet texture for material at index " + idx))
-        ));
-
-        buildItemFamily(ctx, new ItemFamilySpec(
-                List.of(Form.BOLT),
-                BOLT_SHARED_ID,
-                "item/material_bolt/",
-                idx -> textures(ctx.materials().get(idx)).itemTextures().bolt()
-                        .orElseThrow(() -> new IllegalStateException("Missing bolt texture for material at index " + idx))
-        ));
-
-        buildItemFamily(ctx, new ItemFamilySpec(
-                List.of(Form.NAIL),
-                NAIL_SHARED_ID,
-                "item/material_nail/",
-                idx -> textures(ctx.materials().get(idx)).itemTextures().nail()
-                        .orElseThrow(() -> new IllegalStateException("Missing nail texture for material at index " + idx))
-        ));
-
-        buildItemFamily(ctx, new ItemFamilySpec(
-                List.of(Form.RING),
-                RING_SHARED_ID,
-                "item/material_ring/",
-                idx -> textures(ctx.materials().get(idx)).itemTextures().ring()
-                        .orElseThrow(() -> new IllegalStateException("Missing ring texture for material at index " + idx))
-        ));
+//        buildItemFamily(ctx, new ItemFamilySpec(
+//                List.of(Form.BALL),
+//                BALL_SHARED_ID,
+//                "item/material_ball/",
+//                idx -> textures(ctx.materials().get(idx)).itemTextures().ball()
+//                        .orElseThrow(() -> new IllegalStateException("Missing ball texture for material at index " + idx))
+//        ));
+//
+//        buildItemFamily(ctx, new ItemFamilySpec(
+//                List.of(Form.ROD),
+//                ROD_SHARED_ID,
+//                "item/material_rod/",
+//                idx -> textures(ctx.materials().get(idx)).itemTextures().rod()
+//                        .orElseThrow(() -> new IllegalStateException("Missing rod texture for material at index " + idx))
+//        ));
+//
+//        buildItemFamily(ctx, new ItemFamilySpec(
+//                List.of(Form.WIRE),
+//                WIRE_SHARED_ID,
+//                "item/material_wire/",
+//                idx -> textures(ctx.materials().get(idx)).itemTextures().wire()
+//                        .orElseThrow(() -> new IllegalStateException("Missing wire texture for material at index " + idx))
+//        ));
+//
+//        buildItemFamily(ctx, new ItemFamilySpec(
+//                List.of(Form.COIL),
+//                COIL_SHARED_ID,
+//                "item/material_coil/",
+//                idx -> textures(ctx.materials().get(idx)).itemTextures().coil()
+//                        .orElseThrow(() -> new IllegalStateException("Missing coil texture for material at index " + idx))
+//        ));
+//
+//        buildItemFamily(ctx, new ItemFamilySpec(
+//                List.of(Form.RIVET),
+//                RIVET_SHARED_ID,
+//                "item/material_rivet/",
+//                idx -> textures(ctx.materials().get(idx)).itemTextures().rivet()
+//                        .orElseThrow(() -> new IllegalStateException("Missing rivet texture for material at index " + idx))
+//        ));
+//
+//        buildItemFamily(ctx, new ItemFamilySpec(
+//                List.of(Form.BOLT),
+//                BOLT_SHARED_ID,
+//                "item/material_bolt/",
+//                idx -> textures(ctx.materials().get(idx)).itemTextures().bolt()
+//                        .orElseThrow(() -> new IllegalStateException("Missing bolt texture for material at index " + idx))
+//        ));
+//
+//        buildItemFamily(ctx, new ItemFamilySpec(
+//                List.of(Form.NAIL),
+//                NAIL_SHARED_ID,
+//                "item/material_nail/",
+//                idx -> textures(ctx.materials().get(idx)).itemTextures().nail()
+//                        .orElseThrow(() -> new IllegalStateException("Missing nail texture for material at index " + idx))
+//        ));
+//
+//        buildItemFamily(ctx, new ItemFamilySpec(
+//                List.of(Form.RING),
+//                RING_SHARED_ID,
+//                "item/material_ring/",
+//                idx -> textures(ctx.materials().get(idx)).itemTextures().ring()
+//                        .orElseThrow(() -> new IllegalStateException("Missing ring texture for material at index " + idx))
+//        ));
 
         buildLayeredItemFamily(ctx, Form.SHOVEL, SHOVEL_SHARED_ID, "item/material_shovel/",
                 idx -> textures(ctx.materials().get(idx)).toolTextures().shovelHead()
@@ -2069,7 +2069,7 @@ public final class MaterialAssetBuilders {
     }
 
     private static void addWallParts(JState state, Map<String, ?> base, Identifier post, Identifier side, Identifier sideTall) {
-        state.add(JState.multipart(JState.model(post)).when(base));
+        state.add(JState.multipart(JState.model(post)).when(BlockstateTemplates.plus(base, "up", "true")));
         state.add(JState.multipart(JState.model(side).uvlock().y(0)).when(BlockstateTemplates.plus(base, "north", "low")));
         state.add(JState.multipart(JState.model(side).uvlock().y(90)).when(BlockstateTemplates.plus(base, "east", "low")));
         state.add(JState.multipart(JState.model(side).uvlock().y(180)).when(BlockstateTemplates.plus(base, "south", "low")));

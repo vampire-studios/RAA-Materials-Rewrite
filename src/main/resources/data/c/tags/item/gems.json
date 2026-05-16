@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "raa_materials:material_gem",
+    "raa_materials:material_crystal",
+    "raa_materials:material_shard"
+  ]
+}

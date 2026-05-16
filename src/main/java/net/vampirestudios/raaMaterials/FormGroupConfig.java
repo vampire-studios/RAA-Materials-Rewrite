@@ -39,7 +39,7 @@ public final class FormGroupConfig {
 		map.put(FormGroup.STONE_DECOR, List.of(BRICKS, PILLAR, TILES, MOSAIC, MOSSY, CRACKED, COBBLED, CHISELED, POLISHED, SLAB, STAIRS, WALL, CUT, SMOOTH));
 		map.put(FormGroup.SAND_SET, List.of(SANDSTONE, SLAB, STAIRS, WALL, CHISELED));
 		map.put(FormGroup.GRAVEL_SET, List.of(POLISHED, SLAB, STAIRS, WALL));
-		map.put(FormGroup.CLAY_SET, List.of(BLOCK, BALL, CERAMIC));
+		map.put(FormGroup.CLAY_SET, List.of(BLOCK, RAW, CERAMIC));
 		map.put(FormGroup.MUD_SET, List.of(DRIED, BRICKS, SLAB, STAIRS, WALL));
 		map.put(FormGroup.SOIL_SET, List.of(BLOCK, PACKED_SOIL));
 		map.put(FormGroup.SALT_SET, List.of(BLOCK, DUST));

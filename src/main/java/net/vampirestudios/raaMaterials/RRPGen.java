@@ -5,7 +5,6 @@ import net.vampirestudios.arrp.api.RRPCallback;
 import net.vampirestudios.arrp.api.RuntimeResourcePack;
 import net.vampirestudios.raaMaterials.material.MaterialDef;
 import net.vampirestudios.raaMaterials.recipe.ParametricCookingRecipe;
-import net.vampirestudios.raaMaterials.recipe.ParametricStonecuttingRecipe;
 import net.vampirestudios.raaMaterials.recipe.RRPRecipes;
 
 import java.nio.charset.StandardCharsets;
@@ -62,10 +61,6 @@ public final class RRPGen {
 	private static void generateStaticRecipeStubs() {
 		for (var kind : ParametricCookingRecipe.Kind.values()) {
 			addRecipeStub(kind.id(), "raa_materials:" + kind.id());
-		}
-		for (var kind : ParametricStonecuttingRecipe.Kind.values()) {
-			String id = "stonecutting_" + kind.id();
-			addRecipeStub(id, "raa_materials:" + id);
 		}
 	}
 

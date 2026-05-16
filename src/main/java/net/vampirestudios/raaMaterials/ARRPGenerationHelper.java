@@ -61,9 +61,15 @@ public class ARRPGenerationHelper {
             "material_chain",
             "material_lantern",
             "material_lamp",
-            "material_crystal_pane",
+            "material_pane",
             "material_rod_block",
-            "material_spike"
+            "material_spike",
+            "material_log",
+            "material_wood",
+            "material_stripped_log",
+            "material_stripped_wood",
+            "material_planks",
+            "material_beam"
     };
 
     private static final String[] PARAMETRIC_SLAB_DROPS = {

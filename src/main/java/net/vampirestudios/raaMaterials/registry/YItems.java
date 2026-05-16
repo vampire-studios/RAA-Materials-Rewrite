@@ -69,6 +69,10 @@ public final class YItems {
 
 	public static Item PARAM_PANE_ITEM, PARAM_ROD_BLOCK_ITEM; // pane + rod-like light
 
+	// Wood
+	public static Item PARAM_LOG_ITEM, PARAM_WOOD_ITEM, PARAM_STRIPPED_LOG_ITEM, PARAM_STRIPPED_WOOD_ITEM;
+	public static Item PARAM_PLANKS_ITEM, PARAM_BEAM_ITEM;
+
 	// Base shapes
 	public static Item PARAM_SLAB_ITEM, PARAM_STAIRS_ITEM, PARAM_WALL_ITEM;
 
@@ -191,13 +195,21 @@ public final class YItems {
 		PARAM_LAMP_ITEM = regBlockItem("material_lamp", YBlocks.PARAM_LAMP);
 
 		// ---- NEW crystal-ish block items ----
-		PARAM_PANE_ITEM = regBlockItem("material_crystal_pane", YBlocks.PARAM_CRYSTAL_PANE);
+		PARAM_PANE_ITEM = regBlockItem("material_pane", YBlocks.PARAM_CRYSTAL_PANE);
 		PARAM_ROD_BLOCK_ITEM = regBlockItem("material_rod_block", YBlocks.PARAM_ROD_BLOCK);
 
 		PARAM_GLASS_ITEM = regBlockItem("material_glass", YBlocks.PARAM_GLASS);
 		PARAM_TINTED_GLASS_ITEM = regBlockItem("material_tinted_glass", YBlocks.PARAM_TINTED_GLASS);
 
 		PARAM_SPIKE_ITEM = regBlockItem("material_spike", YBlocks.PARAM_SPIKE);
+
+		// Wood
+		PARAM_LOG_ITEM           = regBlockItem("material_log",           YBlocks.PARAM_LOG);
+		PARAM_WOOD_ITEM          = regBlockItem("material_wood",          YBlocks.PARAM_WOOD);
+		PARAM_STRIPPED_LOG_ITEM  = regBlockItem("material_stripped_log",  YBlocks.PARAM_STRIPPED_LOG);
+		PARAM_STRIPPED_WOOD_ITEM = regBlockItem("material_stripped_wood", YBlocks.PARAM_STRIPPED_WOOD);
+		PARAM_PLANKS_ITEM        = regBlockItem("material_planks",        YBlocks.PARAM_PLANKS);
+		PARAM_BEAM_ITEM          = regBlockItem("material_beam",          YBlocks.PARAM_BEAM);
 		PARAM_PACKED_SOIL_ITEM = regBlockItem("material_packed_soil", YBlocks.PARAM_PACKED_SOIL);
 		PARAM_HORSE_ARMOR_ITEM = regHorseArmorItem("material_horse_armor");
 		PARAM_WOLF_ARMOR_ITEM = regWolfArmorItem("material_wolf_armor");

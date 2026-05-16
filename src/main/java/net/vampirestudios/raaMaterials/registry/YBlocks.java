@@ -16,6 +16,7 @@ import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.vampirestudios.raaMaterials.RAAMaterials;
 import net.vampirestudios.raaMaterials.content.*;
+import net.vampirestudios.raaMaterials.content.ParametricLogBlock;
 
 import java.util.function.Function;
 
@@ -79,6 +80,10 @@ public final class YBlocks {
 
 	public static Block PARAM_SPIKE;
 
+	// -------- Wood --------
+	public static ParametricLogBlock PARAM_LOG, PARAM_WOOD, PARAM_STRIPPED_LOG, PARAM_STRIPPED_WOOD;
+	public static Block PARAM_PLANKS, PARAM_BEAM;
+
 	private static Block regBlock(String id, Block item) {
 		return Registry.register(BuiltInRegistries.BLOCK, RAAMaterials.id(id), item);
 	}
@@ -96,7 +101,7 @@ public final class YBlocks {
 
 		PARAM_BLOCK = regBlock("material_block", new ParametricBlock(Block.Properties.of()
 				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_block")))
-				.strength(5.0f)
+				.strength(1.5F, 6.0F)
 				.sound(SoundType.METAL)
 		));
 
@@ -230,13 +235,13 @@ public final class YBlocks {
 		// --- Crystal-only forms ---
 		PARAM_CRYSTAL_BLOCK = regBlock("material_crystal_block", new ParametricBlock(Block.Properties.of()
 				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_crystal_block")))
-				.strength(5.0f)
+				.strength(1.5F)
 				.sound(SoundType.AMETHYST)
 		));
 		// Crystal Bricks (opaque decor)
 		PARAM_CRYSTAL_BRICKS = regBlock("material_crystal_bricks", new ParametricBlock(Block.Properties.of()
 				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_crystal_bricks")))
-				.strength(5.0f)
+				.strength(1.5F)
 				.sound(SoundType.AMETHYST)
 		));
 
@@ -244,7 +249,7 @@ public final class YBlocks {
 		PARAM_CLUSTER = regBlock("material_crystal_cluster", new ParametricCrystalClusterBlock(Block.Properties.of()
 				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_crystal_cluster")))
 				.strength(1.5f)
-				.lightLevel(s -> 12)  // nice glow
+				.lightLevel(statex -> 5)
 				.noOcclusion()
 				.sound(SoundType.AMETHYST_CLUSTER)
 		));
@@ -382,8 +387,8 @@ public final class YBlocks {
 				.strength(3.0F).instrument(NoteBlockInstrument.BASS).ignitedByLava().sound(SoundType.WOOD).noOcclusion()));
 
 		// -------- Crystal-specific --------
-		PARAM_CRYSTAL_PANE = regBlock("material_crystal_pane", new ParametricPaneBlock(Block.Properties.of()
-				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_crystal_pane")))
+		PARAM_CRYSTAL_PANE = regBlock("material_pane", new ParametricPaneBlock(Block.Properties.of()
+				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_pane")))
 				.strength(0.3f).sound(SoundType.GLASS).noOcclusion()
 				.instrument(NoteBlockInstrument.HAT)
 		));
@@ -421,6 +426,30 @@ public final class YBlocks {
 				.randomTicks()
 		));
 
+		// -------- Wood --------
+		PARAM_LOG          = regLogBlock("material_log");
+		PARAM_STRIPPED_LOG = regLogBlock("material_stripped_log");
+		PARAM_WOOD         = regLogBlock("material_wood");
+		PARAM_STRIPPED_WOOD = regLogBlock("material_stripped_wood");
+
+		PARAM_PLANKS = regBlock("material_planks", new ParametricBlock(Block.Properties.of()
+				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_planks")))
+				.strength(2.0f, 3.0f).sound(SoundType.WOOD).ignitedByLava()
+		));
+		PARAM_BEAM = regBlock("material_beam", new ParametricPillarBlock(Block.Properties.of()
+				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id("material_beam")))
+				.strength(2.0f, 3.0f).sound(SoundType.WOOD).ignitedByLava()
+		));
+
+		PARAM_LOG.linkStripped(PARAM_STRIPPED_LOG);
+		PARAM_WOOD.linkStripped(PARAM_STRIPPED_WOOD);
+	}
+
+	private static ParametricLogBlock regLogBlock(String id) {
+		var props = Block.Properties.of()
+				.setId(ResourceKey.create(Registries.BLOCK, RAAMaterials.id(id)))
+				.strength(2.0f).sound(SoundType.WOOD).ignitedByLava();
+		return (ParametricLogBlock) Registry.register(BuiltInRegistries.BLOCK, RAAMaterials.id(id), new ParametricLogBlock(props));
 	}
 
 	public static BlockBehaviour.Properties buttonProperties(String name) {

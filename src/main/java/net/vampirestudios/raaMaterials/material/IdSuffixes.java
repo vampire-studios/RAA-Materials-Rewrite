@@ -55,7 +55,6 @@ public final class IdSuffixes {
             case CRYSTAL_BRICKS -> "crystal_bricks";
             case CERAMIC -> "ceramic";
             case DRIED -> "dried";
-            case BALL -> "ball";
             case PACKED_SOIL -> "packed_soil";
 
             default -> form.name().toLowerCase();

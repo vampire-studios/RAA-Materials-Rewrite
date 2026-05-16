@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "raa_materials:material_log",
+    "raa_materials:material_wood",
+    "raa_materials:material_stripped_log",
+    "raa_materials:material_stripped_wood",
+    "raa_materials:material_beam"
+  ]
+}

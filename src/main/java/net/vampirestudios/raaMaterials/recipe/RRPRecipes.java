@@ -455,37 +455,37 @@ public class RRPRecipes {
 				);
 			}
 
-			// 4 nuggets in a diamond ring pattern → 2 rings
-			if (isMetal(def) && has(def, Form.NUGGET, Form.RING)) {
-				addShapedComponentRecipe(pack, "ring_from_nuggets/" + id, "misc",
-						new String[]{" X ", "X X", " X "},
-						Map.of('X', componentIngredient(YItems.PARAM_NUGGET, mat)),
-						YItems.PARAM_RING, mat, 2
-				);
-			}
-
-			// Ball: 2×2 of the primary crafting unit → 1 ball
-			if (isMetal(def) && has(def, Form.INGOT, Form.BALL)) {
-				addShapedComponentRecipe(pack, "ball_from_ingots/" + id, "misc",
-						new String[]{"XX", "XX"},
-						Map.of('X', componentIngredient(YItems.PARAM_INGOT, mat)),
-						YItems.PARAM_BALL, mat, 1
-				);
-			}
-			if (isGem(def) && has(def, Form.GEM, Form.BALL)) {
-				addShapedComponentRecipe(pack, "ball_from_gems/" + id, "misc",
-						new String[]{"XX", "XX"},
-						Map.of('X', componentIngredient(YItems.PARAM_GEM, mat)),
-						YItems.PARAM_BALL, mat, 1
-				);
-			}
-			if (isCrystal(def) && has(def, Form.CRYSTAL, Form.BALL)) {
-				addShapedComponentRecipe(pack, "ball_from_crystals/" + id, "misc",
-						new String[]{"XX", "XX"},
-						Map.of('X', componentIngredient(YItems.PARAM_CRYSTAL, mat)),
-						YItems.PARAM_BALL, mat, 1
-				);
-			}
+//			// 4 nuggets in a diamond ring pattern → 2 rings
+//			if (isMetal(def) && has(def, Form.NUGGET, Form.RING)) {
+//				addShapedComponentRecipe(pack, "ring_from_nuggets/" + id, "misc",
+//						new String[]{" X ", "X X", " X "},
+//						Map.of('X', componentIngredient(YItems.PARAM_NUGGET, mat)),
+//						YItems.PARAM_RING, mat, 2
+//				);
+//			}
+//
+//			// Ball: 2×2 of the primary crafting unit → 1 ball
+//			if (isMetal(def) && has(def, Form.INGOT, Form.BALL)) {
+//				addShapedComponentRecipe(pack, "ball_from_ingots/" + id, "misc",
+//						new String[]{"XX", "XX"},
+//						Map.of('X', componentIngredient(YItems.PARAM_INGOT, mat)),
+//						YItems.PARAM_BALL, mat, 1
+//				);
+//			}
+//			if (isGem(def) && has(def, Form.GEM, Form.BALL)) {
+//				addShapedComponentRecipe(pack, "ball_from_gems/" + id, "misc",
+//						new String[]{"XX", "XX"},
+//						Map.of('X', componentIngredient(YItems.PARAM_GEM, mat)),
+//						YItems.PARAM_BALL, mat, 1
+//				);
+//			}
+//			if (isCrystal(def) && has(def, Form.CRYSTAL, Form.BALL)) {
+//				addShapedComponentRecipe(pack, "ball_from_crystals/" + id, "misc",
+//						new String[]{"XX", "XX"},
+//						Map.of('X', componentIngredient(YItems.PARAM_CRYSTAL, mat)),
+//						YItems.PARAM_BALL, mat, 1
+//				);
+//			}
 
 			// ── Building blocks ───────────────────────────────────────────────────────
 
@@ -575,11 +575,6 @@ public class RRPRecipes {
 						YItems.PARAM_WOLF_ARMOR_ITEM, mat, 1
 				);
 			}
-
-			// ── Stonecutting ─────────────────────────────────────────────────────
-
-			// Parametric system covers BLOCK→SLAB/STAIRS/WALL/POLISHED/BRICKS/CUT/CHISELED/PILLAR.
-			// These add secondary cuts from variant blocks.
 
 			if (has(def, Form.POLISHED, Form.SLAB)) {
 				addStonecuttingComponentRecipe(pack, "stonecutting/polished_slab/" + id,

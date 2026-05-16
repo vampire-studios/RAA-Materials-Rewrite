@@ -16,7 +16,7 @@ public final class FormGroups {
     public static final List<Form> STONE_DECOR = List.of(Form.BLOCK, Form.BRICKS, Form.STAIRS, Form.SLAB, Form.WALL, Form.CHISELED, Form.POLISHED);
     public static final List<Form> SAND_SET    = List.of(Form.BLOCK, Form.SANDSTONE, Form.CUT, Form.CHISELED, Form.SMOOTH, Form.SLAB, Form.STAIRS, Form.WALL);
     public static final List<Form> GRAVEL_SET  = List.of(Form.BLOCK, Form.POLISHED, Form.SLAB, Form.STAIRS, Form.WALL);
-    public static final List<Form> CLAY_SET    = List.of(Form.BLOCK, Form.BALL, Form.CERAMIC);
+    public static final List<Form> CLAY_SET    = List.of(Form.BLOCK, Form.RAW, Form.CERAMIC);
     public static final List<Form> MUD_SET     = List.of(Form.BLOCK, Form.DRIED, Form.BRICKS, Form.SLAB, Form.STAIRS, Form.WALL);
     public static final List<Form> SOIL_SET    = List.of(Form.BLOCK, Form.PACKED_SOIL);
     public static final List<Form> SALT_SET    = List.of(Form.BLOCK, Form.DUST);

@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "raa_materials:material_sword",
+    "raa_materials:material_dagger"
+  ]
+}

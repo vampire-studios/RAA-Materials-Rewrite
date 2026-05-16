@@ -153,14 +153,14 @@ public final class YTabs {
 								addIf(output, def, Form.SHARD, YItems.PARAM_SHARD);
 								addIf(output, def, Form.SHEET, YItems.PARAM_SHEET);
 								addIf(output, def, Form.GEAR, YItems.PARAM_GEAR);
-								addIf(output, def, Form.BALL, YItems.PARAM_BALL);
-								addIfHas(output, def, YItems.PARAM_ROD, Form.ROD);
-								addIfHas(output, def, YItems.PARAM_WIRE, Form.WIRE);
-								addIfHas(output, def, YItems.PARAM_COIL, Form.COIL);
-								addIfHas(output, def, YItems.PARAM_RIVET, Form.RIVET);
-								addIfHas(output, def, YItems.PARAM_BOLT, Form.BOLT);
-								addIfHas(output, def, YItems.PARAM_NAIL, Form.NAIL);
-								addIfHas(output, def, YItems.PARAM_RING, Form.RING);
+//								addIf(output, def, Form.BALL, YItems.PARAM_BALL);
+//								addIfHas(output, def, YItems.PARAM_ROD, Form.ROD);
+//								addIfHas(output, def, YItems.PARAM_WIRE, Form.WIRE);
+//								addIfHas(output, def, YItems.PARAM_COIL, Form.COIL);
+//								addIfHas(output, def, YItems.PARAM_RIVET, Form.RIVET);
+//								addIfHas(output, def, YItems.PARAM_BOLT, Form.BOLT);
+//								addIfHas(output, def, YItems.PARAM_NAIL, Form.NAIL);
+//								addIfHas(output, def, YItems.PARAM_RING, Form.RING);
 							}
 						})
 						.build()

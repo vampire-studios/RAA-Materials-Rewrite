@@ -41,7 +41,7 @@ public final class Forms {
 		put("material_dust", Form.DUST);
 		put("material_sheet", Form.SHEET);
 		put("material_gear", Form.GEAR);
-		put("material_ball", Form.BALL);
+//		put("material_ball", Form.BALL);
 
 		// ---- Crystalline
 		put("material_crystal", Form.CRYSTAL);
@@ -124,13 +124,13 @@ public final class Forms {
 		put("material_bucket", Form.BUCKET);
 
 		// ---- Components / fasteners / wiring
-		put("material_rod", Form.ROD);
-		put("material_wire", Form.WIRE);
-		put("material_coil", Form.COIL);
-		put("material_rivet", Form.RIVET);
-		put("material_bolt", Form.BOLT);
-		put("material_nail", Form.NAIL);
-		put("material_ring", Form.RING);
+//		put("material_rod", Form.ROD);
+//		put("material_wire", Form.WIRE);
+//		put("material_coil", Form.COIL);
+//		put("material_rivet", Form.RIVET);
+//		put("material_bolt", Form.BOLT);
+//		put("material_nail", Form.NAIL);
+//		put("material_ring", Form.RING);
 
 		// ---- Signs
 		put("material_sign", Form.SIGN);
@@ -151,12 +151,21 @@ public final class Forms {
 		put("material_war_hammer", Form.WAR_HAMMER);
 		put("material_spear", Form.SPEAR);
 		put("material_sickle", Form.SICKLE);
-		put("material_crown", Form.CROWN);
-		put("material_cloak", Form.CLOAK);
-		put("material_amulet", Form.AMULET);
-		put("material_orb", Form.ORB);
-		put("material_music_disc", Form.MUSIC_DISC);
+//		put("material_crown", Form.CROWN);
+//		put("material_cloak", Form.CLOAK);
+//		put("material_amulet", Form.AMULET);
+//		put("material_orb", Form.ORB);
+//		put("material_music_disc", Form.MUSIC_DISC);
 		put("material_food", Form.FOOD);
+
+		// ---- Wood
+		put("material_log", Form.LOG);
+		put("material_wood", Form.WOOD);
+		put("material_stripped_log", Form.STRIPPED_LOG);
+		put("material_stripped_wood", Form.STRIPPED_WOOD);
+		put("material_beam", Form.BEAM);
+		put("material_leaves", Form.LEAVES);
+		put("material_sapling", Form.SAPLING);
 	}
 
 	private Forms() {
@@ -257,14 +266,14 @@ public final class Forms {
 		if (t.endsWith("_gear")) return Form.GEAR;
 		if (t.endsWith("_gem")) return Form.GEM;
 		if (t.endsWith("_raw")) return Form.RAW;
-		if (t.endsWith("_ball")) return Form.BALL;
-		if (t.endsWith("_wire")) return Form.WIRE;
-		if (t.endsWith("_coil")) return Form.COIL;
-		if (t.endsWith("_rivet")) return Form.RIVET;
-		if (t.endsWith("_bolt")) return Form.BOLT;
-		if (t.endsWith("_nail")) return Form.NAIL;
-		if (t.endsWith("_ring")) return Form.RING;
-		if (t.endsWith("_rod_item") || t.endsWith("_rod")) return Form.ROD;
+//		if (t.endsWith("_ball")) return Form.BALL;
+//		if (t.endsWith("_wire")) return Form.WIRE;
+//		if (t.endsWith("_coil")) return Form.COIL;
+//		if (t.endsWith("_rivet")) return Form.RIVET;
+//		if (t.endsWith("_bolt")) return Form.BOLT;
+//		if (t.endsWith("_nail")) return Form.NAIL;
+//		if (t.endsWith("_ring")) return Form.RING;
+//		if (t.endsWith("_rod_item") || t.endsWith("_rod")) return Form.ROD;
 
 		// Tools
 		if (t.endsWith("_pickaxe")) return Form.PICKAXE;
@@ -294,13 +303,21 @@ public final class Forms {
 		if (t.endsWith("_war_hammer")) return Form.WAR_HAMMER;
 		if (t.endsWith("_spear")) return Form.SPEAR;
 		if (t.endsWith("_sickle")) return Form.SICKLE;
-		if (t.endsWith("_crown")) return Form.CROWN;
-		if (t.endsWith("_cloak")) return Form.CLOAK;
-		if (t.endsWith("_amulet")) return Form.AMULET;
-		if (t.endsWith("_orb")) return Form.ORB;
-		if (t.endsWith("_music_disc")) return Form.MUSIC_DISC;
+//		if (t.endsWith("_crown")) return Form.CROWN;
+//		if (t.endsWith("_cloak")) return Form.CLOAK;
+//		if (t.endsWith("_amulet")) return Form.AMULET;
+//		if (t.endsWith("_orb")) return Form.ORB;
+//		if (t.endsWith("_music_disc")) return Form.MUSIC_DISC;
 		if (t.endsWith("_food")) return Form.FOOD;
 		if (t.endsWith("_spike")) return Form.SPIKE;
+
+		// Wood
+		if (t.endsWith("_stripped_log")) return Form.STRIPPED_LOG;
+		if (t.endsWith("_stripped_wood")) return Form.STRIPPED_WOOD;
+		if (t.endsWith("_log")) return Form.LOG;
+		if (t.endsWith("_beam")) return Form.BEAM;
+		if (t.endsWith("_leaves")) return Form.LEAVES;
+		if (t.endsWith("_sapling")) return Form.SAPLING;
 
 		// Default safest guess
 		return Form.BLOCK;

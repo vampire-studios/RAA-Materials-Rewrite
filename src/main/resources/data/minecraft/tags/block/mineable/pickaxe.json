@@ -41,7 +41,20 @@
     "raa_materials:material_grate",
     "raa_materials:material_pressure_plate_stone",
     "raa_materials:material_pressure_plate_metal",
-    "raa_materials:material_crystal_pane",
+    "raa_materials:material_button_stone",
+    "raa_materials:material_button_metal",
+    "raa_materials:material_pane",
+    "raa_materials:material_glass",
+    "raa_materials:material_tinted_glass",
+    "raa_materials:material_lamp",
+    "raa_materials:material_basalt_lamp",
+    "raa_materials:material_calcite_lamp",
+    "raa_materials:material_crystal_bud_small",
+    "raa_materials:material_crystal_bud_medium",
+    "raa_materials:material_crystal_bud_large",
+    "raa_materials:material_chain",
+    "raa_materials:material_lantern",
+    "raa_materials:material_spike",
     "raa_materials:material_rod_block"
   ]
 }

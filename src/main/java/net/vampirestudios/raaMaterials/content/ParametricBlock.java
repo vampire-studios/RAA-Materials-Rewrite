@@ -8,15 +8,20 @@ import net.minecraft.world.item.component.BlockItemStateProperties;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.vampirestudios.raaMaterials.RAAConfig;
 import net.vampirestudios.raaMaterials.YComponents;
+import net.vampirestudios.raaMaterials.material.ClientMaterialCache;
+import net.vampirestudios.raaMaterials.material.MaterialDef;
+import net.vampirestudios.raaMaterials.material.MaterialKind;
 import net.vampirestudios.raaMaterials.material.MaterialRegistry;
 
 import java.util.List;
+import java.util.Optional;
 
 public class ParametricBlock extends Block {
 	public static final int MAX_MATERIAL_STATE = RAAConfig.active().materialsMax();
@@ -57,6 +62,25 @@ public class ParametricBlock extends Block {
 				net.minecraft.world.item.component.BlockItemStateProperties.EMPTY.with(MAT, idx));
 
 		return stack;
+	}
+
+	@Override
+	protected SoundType getSoundType(BlockState state) {
+		Optional<MaterialDef> material = ClientMaterialCache.byIndex(state.getValue(ParametricBlock.MAT));
+		if (material.isEmpty()) return super.getSoundType(state);
+
+		MaterialDef def = material.get();
+		if (def.kind() == MaterialKind.METAL || def.kind() == MaterialKind.ALLOY || def.kind() == MaterialKind.GEM) {
+			return SoundType.METAL;
+		} else if (def.kind() == MaterialKind.SAND) {
+			return SoundType.SAND;
+		} else if (def.kind() == MaterialKind.CRYSTAL) {
+			return SoundType.AMETHYST;
+		} else if (def.kind() == MaterialKind.CLAY || def.kind() == MaterialKind.GRAVEL) {
+			return SoundType.GRAVEL;
+		}
+
+		return super.getSoundType(state);
 	}
 
 	@Override

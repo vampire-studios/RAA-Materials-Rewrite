@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "raa_materials:material_pressure_plate_stone",
+    "raa_materials:material_pressure_plate_metal",
+    "raa_materials:material_pressure_plate_wood"
+  ]
+}

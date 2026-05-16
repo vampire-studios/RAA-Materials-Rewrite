@@ -60,8 +60,8 @@ public class OKLCh {
         // Compress chroma near shadows (L<0.2) and highlights (L>0.8)
         float C = (float) Math.sqrt(A*A + B*B);
         float h = (float) Math.atan2(B, A);
-        float fade = L < 0.2f ? L / 0.2f : L > 0.8f ? (1f - L) / 0.2f : 1f;
-        C *= Math.max(0f, Math.min(1f, fade));
+        float fade = L < 0.2f ? L / 0.2f : (L > 0.8f ? (1f - L) / 0.2f : 1f);
+        C *= Math.clamp(fade, 0f, 1f);
         A = (float) (Math.cos(h) * C);
         B = (float) (Math.sin(h) * C);
 

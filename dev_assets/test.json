@@ -1,0 +1,106 @@
+[
+	{
+		"bundle": "GEM_TEXTURE_SET",
+		"name": "stormglass",
+		"keyBase": "yourmod:stormglass",
+		"outDir": "dev_out",
+		"palette": {
+			"scheme": "GEM",
+			"seed": 42,
+			"hueBase": 180,
+			"hueJitterDeg": 15,
+			"satBase": 0.95,
+			"satVar": 0.10,
+			"valBase": 0.80,
+			"valVar": 0.15,
+			"brightness": 0.08,
+			"roughness": 0.12,
+			"speckle": 0.20,
+			"enforceContrast": true
+		},
+		"parts": {
+			"block": { "in": "dev_assets/blocks/_templates/gem_block_base.png" },
+			"ore": { "in": "dev_assets/blocks/_templates/gem_ore_base.png" },
+			"cluster": { "in": "dev_assets/blocks/_templates/crystal_cluster_base.png" },
+			"budding": { "in": "dev_assets/blocks/_templates/budding_crystal_base.png" },
+			"bud_small": { "in": "dev_assets/blocks/_templates/small_crystal_bud_base.png" },
+			"bud_medium": { "in": "dev_assets/blocks/_templates/medium_crystal_bud_base.png" },
+			"bud_large": { "in": "dev_assets/blocks/_templates/large_crystal_bud_base.png" },
+			"glass": { "in": "dev_assets/blocks/_templates/crystal_glass_base.png" },
+			"tinted_glass": { "in": "dev_assets/blocks/_templates/tinted_crystal_glass_base.png" },
+			"lamp": { "in": "dev_assets/blocks/_templates/crystal_lamp_base.png" }
+		}
+	},
+	{
+		"bundle": "METAL_TEXTURE_SET",
+		"name": "nightsteel",
+		"keyBase": "yourmod:nightsteel",
+		"outDir": "dev_out",
+		"palette": {
+			"scheme": "METAL",
+			"seed": 7766554433,
+			"hueBase": 220,
+			"hueJitterDeg": 8,
+			"satBase": 0.45,
+			"satVar": 0.10,
+			"valBase": 0.76,
+			"valVar": 0.08,
+			"temperature": -0.10,
+			"roughness": 0.35,
+			"anisotropy": 0.25,
+			"enforceContrast": true
+		},
+		"parts": {
+			"block": { "in": "dev_assets/blocks/_templates/metal_block_base.png" },
+			"ore": { "in": "dev_assets/blocks/_templates/metal_ore_base.png" },
+			"raw_block": { "in": "dev_assets/blocks/_templates/raw_metal_block_base.png" },
+			"bricks": { "in": "dev_assets/blocks/_templates/metal_bricks_base.png" },
+			"tiles": { "in": "dev_assets/blocks/_templates/metal_tiles_base.png" },
+			"plate_block": { "in": "dev_assets/blocks/_templates/metal_plate_block_base.png" },
+			"shingles": { "in": "dev_assets/blocks/_templates/metal_shingles_base.png" },
+			"pillar": { "in": "dev_assets/blocks/_templates/metal_pillar_base.png" },
+			"chiseled": { "in": "dev_assets/blocks/_templates/metal_chiseled_base.png" },
+			"bars": { "in": "dev_assets/blocks/_templates/metal_bars_base.png" },
+			"grate": { "in": "dev_assets/blocks/_templates/metal_grate_base.png" },
+			"door_top": { "in": "dev_assets/blocks/_templates/door_top.png" },
+			"door_bottom": { "in": "dev_assets/blocks/_templates/door_bottom.png" },
+			"trapdoor": { "in": "dev_assets/blocks/_templates/trapdoor_base.png" },
+			"chain": { "in": "dev_assets/blocks/_templates/chain_base.png" },
+			"lantern": { "in": "dev_assets/blocks/_templates/lantern_base.png" },
+			"lamp": { "in": "dev_assets/blocks/_templates/lamp_base.png" }
+		}
+	},
+	{
+		"bundle": "STONE_TEXTURE_SET",
+		"name": "bloodshale",
+		"keyBase": "yourmod:bloodshale",
+		"outDir": "dev_out",
+		"palette": {
+			"scheme": "STONE",
+			"seed": 987654321,
+			"hueBase": 12,
+			"hueJitterDeg": 6,
+			"satBase": 0.22,
+			"satVar": 0.07,
+			"valBase": 0.55,
+			"valVar": 0.15,
+			"grain": 0.75,
+			"speckle": 0.35,
+			"roughness": 0.85,
+			"enforceContrast": false
+		},
+		"parts": {
+			"block": { "in": "dev_assets/blocks/_templates/stone_base.png" },
+			"ore": { "in": "dev_assets/blocks/_templates/stone_ore_base.png" },
+			"cobbled": { "in": "dev_assets/blocks/_templates/cobbled_stone_base.png" },
+			"bricks": { "in": "dev_assets/blocks/_templates/stone_bricks_base.png" },
+			"tiles": { "in": "dev_assets/blocks/_templates/stone_tiles_base.png" },
+			"polished": { "in": "dev_assets/blocks/_templates/polished_stone_base.png" },
+			"chiseled": { "in": "dev_assets/blocks/_templates/chiseled_stone_base.png" },
+			"pillar": { "in": "dev_assets/blocks/_templates/stone_pillar_base.png" },
+			"smooth": { "in": "dev_assets/blocks/_templates/smooth_stone_base.png" },
+			"cut": { "in": "dev_assets/blocks/_templates/cut_stone_base.png" },
+			"sandstone": { "in": "dev_assets/blocks/_templates/sandstone_base.png" }
+		}
+	}
+]

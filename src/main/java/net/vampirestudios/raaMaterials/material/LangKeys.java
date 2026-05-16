@@ -29,6 +29,9 @@ public final class LangKeys {
 		if (form == CHISELED) {
 			return (kind == MaterialKind.SAND) ? "block.raa_materials.form.chiseled_sandstone" : "block.raa_materials.form.chiseled";
 		}
+		if (form == RAW) {
+			return (kind == MaterialKind.CLAY) ? "item.raa_materials.form.ball" : "item.raa_materials.form.raw";
+		}
 		if (form == BLOCK) {
 			var organic = kind == MaterialKind.METAL || kind == MaterialKind.GEM || kind == MaterialKind.CRYSTAL;
 			return !organic ? "block.raa_materials.form.block" : "block.raa_materials.form.storage_block";
@@ -36,11 +39,10 @@ public final class LangKeys {
 
 		return switch (form) {
 			case AXE -> "item.raa_materials.form.axe";
-			case BALL -> "item.raa_materials.form.ball";
 			case BARS -> "block.raa_materials.form.bars";
 			case BASALT_LAMP -> "block.raa_materials.form.basalt_lamp";
-			case BOLT -> "item.raa_materials.form.bolt";
 			case BRICKS -> "block.raa_materials.form.bricks";
+			case SPIKE -> "block.raa_materials.form.spike";
 			case BUDDING -> "block.raa_materials.form.budding";
 			case BUD_LARGE -> "block.raa_materials.form.bud_large";
 			case BUD_MEDIUM -> "block.raa_materials.form.bud_medium";
@@ -51,7 +53,6 @@ public final class LangKeys {
 			case CHIME -> "block.raa_materials.form.chime";
 			case CLUSTER -> "block.raa_materials.form.cluster";
 			case COBBLED -> "block.raa_materials.form.cobbled";
-			case COIL -> "item.raa_materials.form.coil";
 			case CRACKED -> "block.raa_materials.form.cracked";
 			case CRYSTAL -> "item.raa_materials.form.crystal";
 			case CRYSTAL_BRICKS -> "block.raa_materials.form.crystal_bricks";
@@ -70,7 +71,6 @@ public final class LangKeys {
 			case LAMP -> "block.raa_materials.form.lamp";
 			case MOSAIC -> "block.raa_materials.form.mosaic";
 			case MOSSY -> "block.raa_materials.form.mossy";
-			case NAIL -> "item.raa_materials.form.nail";
 			case NUGGET -> "item.raa_materials.form.nugget";
 			case ORE -> "block.raa_materials.form.ore";
 			case PACKED_SOIL -> "block.raa_materials.form.packed_soil";
@@ -83,12 +83,7 @@ public final class LangKeys {
 			case PLATE_BLOCK -> "block.raa_materials.form.plate";
 			case POLISHED -> "block.raa_materials.form.polished";
 			case PRESSURE_PLATE -> "block.raa_materials.form.pressure_plate";
-			case RAW -> "item.raa_materials.form.raw";
 			case RAW_BLOCK -> "block.raa_materials.form.raw_block";
-			case RING -> "item.raa_materials.form.ring";
-			case WIRE -> "item.raa_materials.form.wire";
-			case RIVET -> "item.raa_materials.form.rivet";
-			case ROD -> "item.raa_materials.form.rod_item";
 			case ROD_BLOCK -> "block.raa_materials.form.rod";
 			case SANDSTONE -> "block.raa_materials.form.sandstone";
 			case SHEET -> "item.raa_materials.form.sheet";
@@ -100,12 +95,21 @@ public final class LangKeys {
 			case TILES -> "block.raa_materials.form.tiles";
 			case TINTED_GLASS -> "block.raa_materials.form.tinted_glass";
 			case TRAPDOOR -> "block.raa_materials.form.trapdoor";
+			case SHIELD -> "item.raa_materials.form.shield";
+			case BOW -> "item.raa_materials.form.bow";
+			case CROSSBOW -> "item.raa_materials.form.crossbow";
+			case DAGGER -> "item.raa_materials.form.dagger";
+			case HAMMER -> "item.raa_materials.form.hammer";
+			case SCYTHE -> "item.raa_materials.form.scythe";
+			case STAFF -> "item.raa_materials.form.staff";
+			case WAND -> "item.raa_materials.form.wand";
 			case HELMET -> "item.raa_materials.form.helmet";
 			case CHESTPLATE -> "item.raa_materials.form.chestplate";
 			case LEGGINGS -> "item.raa_materials.form.leggings";
 			case BOOTS -> "item.raa_materials.form.boots";
 			case HORSE_ARMOR -> "item.raa_materials.form.horse_armor";
 			case WOLF_ARMOR -> "item.raa_materials.form.wolf_armor";
+			case NAUTILUS_ARMOR -> "item.raa_materials.form.nautilus_armor";
 			case SHEARS -> "item.raa_materials.form.shears";
 			case BUCKET -> "item.raa_materials.form.bucket";
 			case LADDER -> "block.raa_materials.form.ladder";
@@ -113,12 +117,17 @@ public final class LangKeys {
 			case WAR_HAMMER    -> "item.raa_materials.form.war_hammer";
 			case SPEAR         -> "item.raa_materials.form.spear";
 			case SICKLE        -> "item.raa_materials.form.sickle";
-			case CROWN         -> "item.raa_materials.form.crown";
-			case CLOAK         -> "item.raa_materials.form.cloak";
-			case AMULET        -> "item.raa_materials.form.amulet";
-			case ORB           -> "item.raa_materials.form.orb";
-			case MUSIC_DISC    -> "item.raa_materials.form.music_disc";
 			case FOOD          -> "item.raa_materials.form.food";
+			case SLAB -> "block.raa_materials.form.slab";
+			case STAIRS -> "block.raa_materials.form.stairs";
+			case WALL -> "block.raa_materials.form.wall";
+			case BEAM -> "block.raa_materials.form.beam";
+			case LOG -> "block.raa_materials.form.log";
+			case WOOD -> "block.raa_materials.form.wood";
+			case STRIPPED_LOG -> "block.raa_materials.form.stripped_log";
+			case STRIPPED_WOOD -> "block.raa_materials.form.stripped_wood";
+			case LEAVES -> "block.raa_materials.form.leaves";
+			case SAPLING -> "block.raa_materials.form.sapling";
 			default -> "block.raa_materials.form.generic";
 		};
 	}

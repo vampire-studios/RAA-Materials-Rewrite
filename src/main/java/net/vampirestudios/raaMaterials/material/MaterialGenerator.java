@@ -223,7 +223,7 @@ public final class MaterialGenerator {
 	);
 
 	private static final List<Form> METAL_PARTS = List.of(
-			INGOT, SHEET, GEAR, RING
+			INGOT, SHEET, GEAR
 	);
 
 	private static final List<Form> METAL_DECOR_BLOCKS = List.of(
@@ -250,7 +250,7 @@ public final class MaterialGenerator {
 	);
 
 	private static final List<Form> WOOD_PROCESSED = List.of(
-			STRIPPED_LOG, STRIPPED_WOOD, PLANKS, BEAM, BOARDS
+			STRIPPED_LOG, STRIPPED_WOOD, BLOCK, BEAM
 	);
 
 	private static final List<Form> WOOD_BUILDING = List.of(
@@ -313,7 +313,7 @@ public final class MaterialGenerator {
 			);
 
 			case CLAY -> List.of(
-					BLOCK, BALL, CERAMIC
+					BLOCK, RAW, CERAMIC
 			);
 
 			case MUD -> join(

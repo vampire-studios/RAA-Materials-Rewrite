@@ -1,0 +1,17 @@
+{
+  "replace": false,
+  "values": [
+    "raa_materials:material_log",
+    "raa_materials:material_wood",
+    "raa_materials:material_stripped_log",
+    "raa_materials:material_stripped_wood",
+    "raa_materials:material_planks",
+    "raa_materials:material_beam",
+    "raa_materials:material_fence",
+    "raa_materials:material_fence_gate",
+    "raa_materials:material_button_wood",
+    "raa_materials:material_pressure_plate_wood",
+    "raa_materials:material_door_wood",
+    "raa_materials:material_trapdoor_wood"
+  ]
+}

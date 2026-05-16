@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "raa_materials:material_wall",
+    "raa_materials:material_sandstone_wall",
+    "raa_materials:material_brick_wall",
+    "raa_materials:material_polished_wall"
+  ]
+}
